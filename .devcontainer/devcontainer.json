@@ -1,8 +1,6 @@
 {
     "name": "Typst Dev",
     "image": "ghcr.io/morepet/containers/dev/typst:latest",
-    "dockerComposeFile": "../docker-compose.yaml",
-    "service": "dev",
     "workspaceFolder": "/workspace",
     "customizations": {
         "vscode": {
@@ -41,12 +39,8 @@
         }
     },
     "mounts": [
-        "source=${localWorkspaceFolder},target=/workspace,type=bind,consistency=cached",
-        "source=${localEnv:HOME}${localEnv:USERPROFILE}/.gnupg/S.gpg-agent,target=/root/.gnupg/S.gpg-agent.host,type=bind"
+        "source=${localWorkspaceFolder},target=/workspace,type=bind,consistency=cached"
     ],
-    "remoteEnv": {
-        "GPG_TTY": "/dev/pts/0"
-    },
     "initializeCommand": "${localWorkspaceFolder}/.devcontainer/initialize.sh",
     "postCreateCommand": "${containerWorkspaceFolder}/.devcontainer/post-create.sh",
     "postAttachCommand": "${containerWorkspaceFolder}/.devcontainer/post-attach.sh"
