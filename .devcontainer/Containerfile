@@ -1,0 +1,67 @@
+# Use Python 3.12 as base image
+FROM python:3.12-slim
+
+# Prevent interactive prompts during package installation
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Install minimal system dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    curl \
+    ca-certificates \
+    git \
+    openssh-client \
+    gnupg2 \
+    shellcheck \
+    build-essential \
+    nano \
+    locales \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
+
+# Generate en_US.UTF-8 locale
+RUN echo "en_US.UTF-8 UTF-8" > /etc/locale.gen && locale-gen
+
+# Set locale environment variables
+ENV LANG=en_US.UTF-8
+ENV LANGUAGE=en_US:en
+ENV LC_ALL=en_US.UTF-8
+
+# Install Python development tools for pre-commit
+RUN pip install --no-cache-dir --upgrade pip setuptools wheel && \
+    pip install --no-cache-dir \
+    pre-commit==3.6.0 \
+    ruff==0.3.5 \
+    mypy==1.10.0 \
+    yamllint==1.35.1
+
+# Install hadolint
+RUN curl -fsSL https://github.com/hadolint/hadolint/releases/download/v2.12.0/hadolint-Linux-x86_64 -o /usr/local/bin/hadolint && \
+    chmod +x /usr/local/bin/hadolint
+
+# Install shfmt
+RUN curl -sSLo /usr/local/bin/shfmt https://github.com/mvdan/sh/releases/download/v3.12.0/shfmt_v3.12.0_linux_amd64 && \
+    chmod +x /usr/local/bin/shfmt
+
+# Install Typst (latest version: v0.13.1)
+RUN curl -fsSL https://github.com/typst/typst/releases/download/v0.13.1/typst-x86_64-unknown-linux-musl.tar.xz | \
+    tar -xJf - -C /tmp && \
+    mv /tmp/typst-x86_64-unknown-linux-musl/typst /usr/local/bin/typst && \
+    rm -rf /tmp/typst-x86_64-unknown-linux-musl
+
+# Create workspace directory
+RUN mkdir -p /workspace
+WORKDIR /workspace
+
+# Set environment variables
+ENV PYTHONUNBUFFERED="1"
+ENV IN_CONTAINER="true"
+ENV PRE_COMMIT_HOME="/workspace/.pre-commit-cache"
+ENV RUFF_CACHE_DIR="/workspace/.ruff_cache"
+ENV MYPY_CACHE_DIR="/workspace/.mypy_cache"
+
+# Create aliases for Typst and development
+RUN echo 'alias typst-compile="typst compile"' >> /root/.bashrc && \
+    echo 'alias typst-watch="typst watch"' >> /root/.bashrc && \
+    echo 'alias precommit="pre-commit run"' >> /root/.bashrc
+
+# Default command - interactive shell
+CMD ["/bin/bash"]
