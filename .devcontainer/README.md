@@ -1,120 +1,144 @@
-# Typst Container Setup
+# Dev Container Configuration
 
-This directory contains configuration for writing Typst documents in a reproducible, containerized environment using VS Code Dev Containers and Podman.
+This dev container is configured to work with GPG signing across **macOS**, **Linux**, and **Windows** using SSH agent forwarding.
 
-## Features
-- **Workspace Mounting:** Your project directory is mounted into the container at `/workspace`.
-- **GPG Agent Forwarding:** Your host GPG agent socket is forwarded into the container for signing and encryption operations.
-- **User Configuration:** Git and GPG configuration are automatically imported for a seamless development experience.
-- **Typst Development Environment:** Complete setup for creating and compiling Typst documents with live preview and LSP support.
+## How It Works
 
----
+### Cross-Platform SSH Agent Forwarding
 
-## Requirements
+VS Code Dev Containers automatically forwards your SSH agent into the container when available. This works seamlessly across all platforms:
 
-### System Dependencies
-- **Podman** (v4.0+) - Container runtime for building and running the development container
-- **Podman Compose** - For orchestrating the container services defined in `docker-compose.yml`
-- **GPG** - For GPG agent socket forwarding and key management
+- **macOS**: Works with native `ssh-agent` or external agents like GPG Suite
+- **Linux**: Works with `ssh-agent`, `gpg-agent`, or GNOME Keyring
+- **Windows**: Works with Windows OpenSSH agent or Pageant via WSL2
 
-### VS Code
-You will need **VS Code** with the **Dev Containers** extension for containerized development experience. To configure VS Code for Podman (system-wide):
+### Setup Process
 
-#### **Option A: VS Code Settings UI**
-  - Open VS Code Settings (`Ctrl+,`)
-  - Search for "dev containers"
-  - Set "Dev Containers: Docker Path" to `podman`
-  - Set "Dev Containers: Docker Compose Path" to `podman-compose`
+The container uses three lifecycle scripts:
 
-#### **Option B: Edit settings.json**
-  - Press `Ctrl+Shift+P` → "Preferences: Open Settings (JSON)"
-  - Add these lines:
-   ```json
-   {
-       "dev.containers.dockerPath": "podman",
-       "dev.containers.dockerComposePath": "podman-compose"
-   }
-   ```
+1. **`initialize.sh`** (runs on host before container starts)
+   - Exports your git configuration
+   - Exports GPG public keys and ownertrust
+   - Captures SSH agent information
 
-### Container Features
-The development container includes:
-- **Python 3.12** - Latest stable Python version for development tools
-- **Typst v0.13.1** - Modern typesetting system for creating professional documents
-- **Typst LSP v0.13.0** - Language Server Protocol for VS Code integration
-- **Development tools**: build-essential, git, curl, wget, nano, shellcheck
-- **Code quality tools**: ruff, mypy, yamllint, hadolint, shfmt, pre-commit hooks
-- **VS Code Extensions**: Python, YAML support, Typst LSP, TinyMist, Typst Preview, GitHub PR integration, Ruff, MyPy
+2. **`post-create.sh`** (runs once when container is created)
+   - Imports git configuration
+   - Imports GPG keys
+   - Configures GPG agent
+   - Sets up git signing configuration
 
----
+3. **`post-attach.sh`** (runs every time you attach)
+   - Verifies SSH agent forwarding
+   - Tests GPG availability
+   - Displays diagnostic information
 
-## Getting Started
+## Prerequisites
 
-### 1. **Set Up GPG Agent Socket Environment Variable**
-Verify your GPG socket path with `gpgconf --list-dirs agent-socket`. Then add the following to your `~/.bashrc` (or equivalent shell profile) and restart VS Code:
+### 1. SSH Agent with Keys
 
-```sh
-# Set GPG agent socket for dev containers
-export GPG_SOCKET_PATH="$(gpgconf --list-dirs agent-socket)"
-```
+Ensure you have an SSH agent running on your host with your keys loaded:
 
-### 2. **Run User Configuration Script**
-Before starting the dev container, run the setup script to export your Git and GPG configuration:
-
-```sh
-.devcontainer/setup-user-conf.sh
-```
-
-This will:
-- Generate a valid `.gitconfig` for use inside the container.
-- Export your public GPG keys and ownertrust for import into the container.
-- Validate that your `GPG_SOCKET_PATH` is set and matches your actual GPG agent socket.
-
-If necessary, you can edit the generated `.devcontainer/.conf/.gitconfig` to match your needs.
-
-### 3. **Build the Dev Container**
-Run:
-
-```sh
-podman-compose build dev
-```
-
-### 4. **Start the Dev Container**
-- Open the project root in VS Code.
-- Use the **Dev Containers** extension to "Reopen in Container".
-- The container will mount your workspace and forward your GPG agent socket automatically.
-
----
-
-## Working with Typst Documents
-
-### Available Commands
-The container includes convenient aliases for Typst development:
-- `typst-compile` - Compile a Typst document to PDF
-- `typst-watch` - Watch for changes and automatically recompile
-- `precommit` - Run pre-commit hooks for code quality
-
-### VS Code Integration
-The container is configured with:
-- **Typst LSP** for syntax highlighting, autocompletion, and error checking
-- **TinyMist** for enhanced Typst support
-- **Typst Preview** for live document preview
-- **Auto-formatting** on save with Ruff for Python files
-
-### Example Usage
 ```bash
-# Compile a Typst document
-typst compile main.typ output.pdf
+# Check if ssh-agent is running and has keys
+ssh-add -l
 
-# Watch for changes
-typst watch main.typ output.pdf
-
-# Run code quality checks
-precommit
+# If no agent, start one (varies by OS/shell)
+eval "$(ssh-agent -s)"
+ssh-add ~/.ssh/id_ed25519  # or your key path
 ```
 
----
+### 2. GPG Keys
 
-## Project Structure
-- `.devcontainer/` - Container configuration and setup scripts
-- `.githooks/` - Git hooks for automated quality checks
-- Configuration files for various development tools (`.hadolint.yaml`, `.yamllint`, etc.)
+If you want to use GPG signing in the container, make sure GPG is installed on your host and you have keys:
+
+```bash
+# Check for GPG keys
+gpg --list-secret-keys --keyid-format LONG
+
+# If you need to generate a key
+gpg --full-generate-key
+```
+
+### 3. Git Configuration
+
+Make sure your git user is configured:
+
+```bash
+git config --global user.name "Your Name"
+git config --global user.email "your.email@example.com"
+```
+
+## Platform-Specific Notes
+
+### macOS
+
+- Works out of the box with macOS Keychain
+- Docker Desktop automatically handles SSH socket forwarding
+- GPG Suite integrates well if installed
+
+### Linux
+
+- Most distributions include `ssh-agent` by default
+- If using GNOME, ssh-agent integration works automatically
+- For other desktops, ensure `ssh-agent` is started in your shell profile
+
+### Windows (WSL2)
+
+- Use Windows OpenSSH agent (recommended)
+- Start the service: `Get-Service ssh-agent | Set-Service -StartupType Automatic`
+- Add keys using PowerShell: `ssh-add`
+- WSL2 automatically forwards the Windows agent
+
+## Troubleshooting
+
+### SSH Agent Not Working
+
+If `ssh-add -l` shows an error in the container:
+
+1. Check that ssh-agent is running on your host
+2. Ensure keys are added: `ssh-add ~/.ssh/id_ed25519`
+3. On Windows, ensure Windows SSH agent service is running
+4. Restart the dev container
+
+### GPG Keys Not Available
+
+If GPG keys aren't imported:
+
+1. Check that GPG is installed on your host: `gpg --version`
+2. Verify keys exist: `gpg --list-keys`
+3. Rebuild the container to re-import keys
+4. Check `.devcontainer/.conf/` for exported keys
+
+### Git Signing Not Working
+
+If commits aren't being signed:
+
+1. Check GPG key is configured: `git config --global user.signingkey`
+2. Verify GPG can access keys: `gpg --list-secret-keys`
+3. Test signing: `echo "test" | gpg --clearsign`
+4. Check GPG agent is running: `gpgconf --list-components`
+
+## Files Generated
+
+The initialization process creates these files in `.devcontainer/.conf/` (gitignored):
+
+- `.gitconfig` - Your processed git configuration
+- `gpg-public-keys.asc` - Exported public GPG keys
+- `gpg-ownertrust.txt` - GPG key trust database
+- `gpg-signing-key.txt` - Your GPG signing key ID
+- `ssh-auth-sock.txt` - SSH agent socket path (for reference)
+
+## Removed Files
+
+The following files are no longer needed with this approach:
+
+- `setup-user-conf.sh` - Replaced by `initialize.sh`
+- Environment variable `GPG_SOCKET_PATH` - No longer required
+
+## Benefits of This Approach
+
+1. **Cross-platform**: Works on macOS, Linux, and Windows without changes
+2. **Secure**: Keys never leave your host system
+3. **Automatic**: SSH agent forwarding handled by VS Code
+4. **Simple**: No manual socket path configuration needed
+5. **Maintained**: Uses VS Code's built-in forwarding mechanism

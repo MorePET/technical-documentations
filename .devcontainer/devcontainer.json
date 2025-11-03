@@ -42,7 +42,12 @@
     },
     "mounts": [
         "source=${localWorkspaceFolder},target=/workspace,type=bind,consistency=cached",
-        "source=${env:GPG_SOCKET_PATH},target=/root/.gnupg/S.gpg-agent,type=bind"
+        "source=${localEnv:HOME}${localEnv:USERPROFILE}/.gnupg/S.gpg-agent,target=/root/.gnupg/S.gpg-agent.host,type=bind"
     ],
-    "postAttachCommand": "/workspace/.devcontainer/post-attach.sh"
+    "remoteEnv": {
+        "GPG_TTY": "/dev/pts/0"
+    },
+    "initializeCommand": "${localWorkspaceFolder}/.devcontainer/initialize.sh",
+    "postCreateCommand": "${containerWorkspaceFolder}/.devcontainer/post-create.sh",
+    "postAttachCommand": "${containerWorkspaceFolder}/.devcontainer/post-attach.sh"
 }
