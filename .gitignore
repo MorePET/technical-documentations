@@ -188,9 +188,14 @@ __marimo__/
 # Cache and build artifacts (but NOT final outputs - we commit those)
 .typst/
 typst-cache/
+typst-fletcher/
 
 # Temporary build files
 *_temp.html
+*-temp.html
+diagram-test*
+test-*
+*-styled.html
 
 # OS-specific files
 .DS_Store
