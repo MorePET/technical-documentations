@@ -1,0 +1,70 @@
+stakeholders:
+  - stakeholder: Physician (plus nurse)
+    pain:
+      - Time-consuming documentation
+      - Alert fatigue
+      - Workflow disruption
+      - Limited clinical decision support
+      - Integration challenges
+    promise: Reduce documentation time by 50% while improving care quality
+    proof:
+      - Pilot study with 10 physicians
+      - Time-motion analysis
+      - Satisfaction surveys
+      - Clinical outcome tracking
+
+  - stakeholder: Patient
+    pain:
+      - Lack of transparency
+      - Limited access to care
+      - Complex navigation
+      - Poor communication
+      - High out-of-pocket costs
+    promise: Improve patient engagement and reduce barriers to care access
+    proof:
+      - Patient satisfaction scores
+      - Access metrics
+      - Engagement analytics
+      - Cost analysis
+
+  - stakeholder: Provider (Hospital)
+    pain:
+      - Rising operational costs
+      - Staff burnout
+      - Quality metrics pressure
+      - Regulatory compliance burden
+      - Technology integration issues
+    promise: Reduce costs by 20% while maintaining or improving quality metrics
+    proof:
+      - Financial modeling
+      - ROI analysis
+      - Pilot program results
+      - Benchmark comparisons
+
+  - stakeholder: Payer
+    pain:
+      - Unsustainable cost growth
+      - Fraud and abuse
+      - Quality measurement challenges
+      - Administrative burden
+      - Member satisfaction issues
+    promise: Demonstrate cost savings and improved outcomes through value-based care
+    proof:
+      - Claims data analysis
+      - Cost-effectiveness studies
+      - Quality metrics
+      - Member retention data
+
+  - stakeholder: Policy maker (Guidelines)
+    pain:
+      - Limited evidence base
+      - Implementation gaps
+      - Health inequities
+      - Resource allocation challenges
+      - Regulatory complexity
+    promise: Provide evidence-based solutions that scale and reduce health disparities
+    proof:
+      - Population health data
+      - Implementation studies
+      - Health equity metrics
+      - Cost-effectiveness analysis
