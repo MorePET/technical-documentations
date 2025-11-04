@@ -81,28 +81,44 @@ if command -v git >/dev/null 2>&1; then
     echo "Exported git configuration to $GITCONFIG_OUT"
 fi
 
-# Export GPG public keys
-echo "Exporting GPG keys..."
-if command -v gpg >/dev/null 2>&1 && gpg --list-keys >/dev/null 2>&1; then
-    gpg --export --armor >"$CONF_DIR/gpg-public-keys.asc" 2>/dev/null || true
-    gpg --export-ownertrust >"$CONF_DIR/gpg-ownertrust.txt" 2>/dev/null || true
-    
-    # Export GPG key IDs for signing (exclude expired keys)
-    # Use machine-readable format to reliably filter out expired keys
-    gpg --list-secret-keys --keyid-format LONG --with-colons 2>/dev/null | \
-        awk -F: '/^sec:/ && $2 != "e" && $2 != "r" {print $5}' >"$CONF_DIR/gpg-signing-key.txt" 2>/dev/null || true
-    
-    echo "Exported GPG keys to $CONF_DIR/"
-else
-    echo "No GPG keys found or GPG not available. Skipping GPG export."
+# Export SSH public keys for git signing
+echo "Exporting SSH keys..."
+SSH_KEY_FOUND=false
+
+# Check common SSH key locations
+for KEY_TYPE in id_ed25519 id_rsa id_ecdsa; do
+    if [ -f "$HOME/.ssh/${KEY_TYPE}.pub" ]; then
+        cp "$HOME/.ssh/${KEY_TYPE}.pub" "$CONF_DIR/ssh-signing-key.pub" 2>/dev/null || true
+        echo "$HOME/.ssh/${KEY_TYPE}.pub" > "$CONF_DIR/ssh-key-path.txt"
+        echo "Found SSH key: $HOME/.ssh/${KEY_TYPE}.pub"
+        SSH_KEY_FOUND=true
+        break
+    fi
+done
+
+if [ "$SSH_KEY_FOUND" = false ]; then
+    echo "⚠ No SSH keys found in ~/.ssh/"
+    echo "  Common key names: id_ed25519, id_rsa, id_ecdsa"
+    echo "  Generate one with: ssh-keygen -t ed25519 -C 'your.email@example.com'"
 fi
 
-# Detect OS and export SSH_AUTH_SOCK path for documentation
+# Check SSH agent
 if [[ -n "${SSH_AUTH_SOCK:-}" ]]; then
-    echo "SSH_AUTH_SOCK is set to: $SSH_AUTH_SOCK"
+    echo "✓ SSH_AUTH_SOCK is set to: $SSH_AUTH_SOCK"
     echo "$SSH_AUTH_SOCK" >"$CONF_DIR/ssh-auth-sock.txt"
+    
+    # Test if ssh-add works
+    if command -v ssh-add >/dev/null 2>&1; then
+        if ssh-add -l >/dev/null 2>&1; then
+            KEY_COUNT=$(ssh-add -l | wc -l)
+            echo "✓ SSH agent has $KEY_COUNT key(s) loaded"
+        else
+            echo "⚠ SSH agent found but no keys loaded. Run 'ssh-add' to add keys."
+        fi
+    fi
 else
-    echo "Warning: SSH_AUTH_SOCK not set. SSH agent forwarding may not work."
+    echo "⚠ SSH_AUTH_SOCK not set. SSH agent forwarding may not work."
+    echo "  Make sure ssh-agent is running on your host system."
 fi
 
 echo "Initialization complete"

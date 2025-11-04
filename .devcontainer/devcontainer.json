@@ -1,6 +1,9 @@
 {
     "name": "Typst Dev",
-    "image": "ghcr.io/morepet/containers/dev/typst:latest",
+    "build": {
+        "dockerfile": "Containerfile",
+        "context": "."
+    },
     "workspaceFolder": "/workspace",
     "customizations": {
         "vscode": {

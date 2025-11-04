@@ -1,13 +1,16 @@
 ---
 # docker-compose.yaml for Typst projects
+# For standalone use (without VS Code devcontainer)
 
 version: '3.8'
 name: typst
 
 services:
-  # Service to be used with e.g. VS Code Dev Containers
   dev:
-    image: ghcr.io/morepet/containers/dev/typst:latest
+    build:
+      context: .devcontainer
+      dockerfile: Containerfile
+    image: typst-dev:latest
     volumes:
       - ./:/workspace
     working_dir: /workspace
