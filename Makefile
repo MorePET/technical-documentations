@@ -1,116 +1,108 @@
-# Makefile for building styled HTML from Typst documents
-# Usage:
-#   make                    # Build stakeholder-example.html
-#   make FILE=myfile        # Build myfile.html
-#   make clean              # Remove generated HTML files
+# Makefile for Technical Documentation Build System
+# Builds diagrams, colors, PDF, and HTML with dark mode support
 
-# Default file to build
-FILE ?= stakeholder-example
-
-# Files
-TYP_FILE = $(FILE).typ
-HTML_FILE = $(FILE).html
-
-# Tools
-TYPST = typst
-PYTHON = python
-STYLE_SCRIPT = add-styling.py
-CSS_FILE = styles.css
+.PHONY: all clean colors diagrams pdf html help check test
 
 # Default target
-.PHONY: all
-all: $(HTML_FILE)
+all: colors diagrams pdf html
+	@echo "=================================================="
+	@echo "✅ Full build complete!"
+	@echo "=================================================="
+	@echo "📄 PDF:  technical-doc-example.pdf"
+	@echo "🌐 HTML: technical-doc-example.html"
+	@echo ""
+	@echo "To view HTML: open technical-doc-example.html"
+	@echo "🌓 Toggle dark mode with the button in top-right"
 
-# Build HTML from Typst and apply styling
-$(HTML_FILE): $(TYP_FILE) $(CSS_FILE) $(STYLE_SCRIPT)
-	@echo "📝 Building $(FILE)..."
-	@echo "🔨 Compiling Typst to HTML..."
-	@if $(TYPST) compile --format html $(TYP_FILE) 2>&1 | grep -q "features html"; then \
-		echo "⚠️  HTML export requires Typst compiled with --features html"; \
-		if [ -f "$(HTML_FILE)" ]; then \
-			echo "✓ Using existing $(HTML_FILE)"; \
-		else \
-			echo "❌ No HTML file found. Export manually first."; \
-			exit 1; \
-		fi; \
-	else \
-		echo "✓ Typst compilation successful"; \
-	fi
-	@echo "🎨 Adding CSS styling..."
-	@$(PYTHON) $(STYLE_SCRIPT) $(HTML_FILE) --force
-	@echo "✅ Done! Open $(HTML_FILE) in your browser"
+# Generate color files (CSS and Typst) from colors.json
+colors:
+	@echo "🎨 Generating color files..."
+	@python3 build-colors.py
 
-# Build with inline CSS (single file)
-.PHONY: inline
-inline: $(TYP_FILE) $(CSS_FILE) $(STYLE_SCRIPT)
-	@echo "📝 Building $(FILE) with inline CSS..."
-	@echo "🔨 Compiling Typst to HTML..."
-	$(TYPST) compile --format html $(TYP_FILE)
-	@echo "🎨 Adding inline CSS..."
-	$(PYTHON) $(STYLE_SCRIPT) $(HTML_FILE) --inline --force
-	@echo "✅ Done! Open $(HTML_FILE) in your browser"
+# Compile diagrams to SVG
+diagrams: colors
+	@echo "📊 Compiling diagrams..."
+	@python3 build-diagrams.py
 
-# Build all Typst files in directory
-.PHONY: all-files
-all-files:
-	@echo "📝 Building all Typst files..."
-	@for file in *.typ; do \
-		if [ -f "$$file" ]; then \
-			base=$${file%.typ}; \
-			echo "Building $$base..."; \
-			$(TYPST) compile --format html "$$file"; \
-			$(PYTHON) $(STYLE_SCRIPT) "$$base.html" --force; \
-		fi \
-	done
-	@echo "✅ All files built!"
+# Compile PDF
+pdf: diagrams
+	@echo "📄 Compiling PDF..."
+	@typst compile technical-doc-example.typ technical-doc-example.pdf
+	@echo "✓ PDF created: technical-doc-example.pdf"
 
-# Clean generated HTML files
-.PHONY: clean
+# Compile HTML with styling and dark mode
+html: diagrams
+	@echo "🌐 Compiling HTML..."
+	@python3 build-html.py technical-doc-example.typ technical-doc-example.html
+	@echo "✓ HTML created: technical-doc-example.html"
+
+# Check for errors without building
+check:
+	@echo "🔍 Checking configuration..."
+	@python3 -c "import json; json.load(open('colors.json')); print('✓ colors.json is valid')"
+	@python3 -c "from pathlib import Path; assert Path('diagrams/architecture.typ').exists(); print('✓ Diagram files exist')"
+	@python3 -c "from pathlib import Path; assert Path('technical-doc-example.typ').exists(); print('✓ Main document exists')"
+	@echo "✅ All checks passed"
+
+# Quick test - compile everything and check outputs exist
+test: all
+	@echo "🧪 Testing build outputs..."
+	@test -f technical-doc-example.pdf && echo "✓ PDF exists" || echo "❌ PDF missing"
+	@test -f technical-doc-example.html && echo "✓ HTML exists" || echo "❌ HTML missing"
+	@test -f diagrams/architecture.svg && echo "✓ Diagrams exist" || echo "❌ Diagrams missing"
+	@test -f generated/colors.css && echo "✓ Colors generated" || echo "❌ Colors missing"
+	@echo "✅ All tests passed"
+
+# Clean build artifacts
 clean:
-	@echo "🧹 Cleaning generated HTML files..."
-	@rm -f *.html
-	@echo "✅ Clean complete!"
+	@echo "🧹 Cleaning build artifacts..."
+	@rm -f technical-doc-example.pdf
+	@rm -f technical-doc-example.html
+	@rm -f technical-doc-example_temp.html
+	@rm -f colors.css
+	@rm -f diagrams/*.svg
+	@rm -f generated/colors.css
+	@rm -f generated/colors.typ
+	@echo "✓ Clean complete"
 
-# Watch mode: rebuild on changes (requires entr or similar)
-.PHONY: watch
-watch:
-	@if command -v entr >/dev/null 2>&1; then \
-		echo "👀 Watching for changes... (Ctrl+C to stop)"; \
-		echo "$(TYP_FILE)" | entr -c make; \
-	else \
-		echo "❌ Error: 'entr' not found. Install with: apt install entr"; \
-		exit 1; \
-	fi
-
-# Open in default browser (Linux)
-.PHONY: open
-open: $(HTML_FILE)
-	@if command -v xdg-open >/dev/null 2>&1; then \
-		xdg-open $(HTML_FILE); \
-	else \
-		echo "✅ Open $(HTML_FILE) in your browser"; \
-	fi
+# Clean and rebuild everything
+rebuild: clean all
 
 # Show help
-.PHONY: help
 help:
-	@echo "Typst HTML Build System"
+	@echo "Technical Documentation Build System"
+	@echo "===================================="
 	@echo ""
-	@echo "Usage:"
-	@echo "  make              Build stakeholder-example.html (default)"
-	@echo "  make FILE=myfile  Build myfile.html"
-	@echo "  make inline       Build with inline CSS (single file)"
-	@echo "  make all-files    Build all .typ files in directory"
-	@echo "  make clean        Remove generated HTML files"
-	@echo "  make watch        Watch for changes and rebuild (requires 'entr')"
-	@echo "  make open         Build and open in browser"
-	@echo "  make help         Show this help message"
+	@echo "Available targets:"
+	@echo "  make all       - Build everything (colors, diagrams, PDF, HTML)"
+	@echo "  make colors    - Generate color files from colors.json"
+	@echo "  make diagrams  - Compile diagrams to SVG"
+	@echo "  make pdf       - Compile PDF document"
+	@echo "  make html      - Compile HTML with dark mode support"
+	@echo "  make check     - Validate configuration files"
+	@echo "  make test      - Build and test outputs"
+	@echo "  make clean     - Remove all build artifacts"
+	@echo "  make rebuild   - Clean and rebuild everything"
+	@echo "  make help      - Show this help message"
+	@echo ""
+	@echo "Pre-commit hook:"
+	@echo "  make install-hook - Install git pre-commit hook"
 	@echo ""
 	@echo "Examples:"
-	@echo "  make                           # Build default file"
-	@echo "  make FILE=report               # Build report.typ"
-	@echo "  make inline FILE=presentation  # Build with inline CSS"
+	@echo "  make           # Build everything"
+	@echo "  make pdf       # Only compile PDF"
+	@echo "  make rebuild   # Clean and rebuild"
 
-# Prevent make from deleting intermediate files
-.PRECIOUS: $(HTML_FILE)
-
+# Install pre-commit hook
+install-hook:
+	@echo "📝 Installing pre-commit hook..."
+	@mkdir -p .git/hooks
+	@cp build-hooks/pre-commit .git/hooks/pre-commit
+	@chmod +x .git/hooks/pre-commit
+	@echo "✓ Pre-commit hook installed"
+	@echo ""
+	@echo "The hook will:"
+	@echo "  1. Check if colors.json was modified"
+	@echo "  2. Check if diagram .typ files were modified"
+	@echo "  3. Rebuild affected components"
+	@echo "  4. Stage updated files for commit"

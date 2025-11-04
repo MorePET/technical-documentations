@@ -185,14 +185,12 @@ __marimo__/
 .streamlit/secrets.toml
 
 # Typst
-# Generated output files
-*.pdf
-*.png
-*.svg
-
-# Typst cache and build artifacts
+# Cache and build artifacts (but NOT final outputs - we commit those)
 .typst/
 typst-cache/
+
+# Temporary build files
+*_temp.html
 
 # OS-specific files
 .DS_Store

@@ -41,9 +41,31 @@ def add_css_to_html(input_file, output_file=None, css_file="styles.css", inline=
             except EOFError:
                 # Non-interactive mode, skip
                 pass
-        # Remove existing style/link tags
-        html_content = re.sub(r'<link[^>]*rel="stylesheet"[^>]*>', '', html_content)
-        html_content = re.sub(r'<style>.*?</style>', '', html_content, flags=re.DOTALL)
+        # Remove existing style/link tags from the head section only (not from SVGs!)
+        # But preserve diagram colors CSS which is needed for theme switching
+        # Split at </head> to only process the head section
+        head_end = html_content.find('</head>')
+        if head_end != -1:
+            head_section = html_content[:head_end]
+            body_section = html_content[head_end:]
+            
+            # Preserve diagram colors CSS if present
+            diagram_colors_match = re.search(r'(<style>\s*/\* Diagram colors.*?</style>)', head_section, flags=re.DOTALL)
+            diagram_colors_css = diagram_colors_match.group(1) if diagram_colors_match else ''
+            
+            # Remove style/link tags only from head
+            head_section = re.sub(r'<link[^>]*rel="stylesheet"[^>]*>', '', head_section)
+            head_section = re.sub(r'<style>.*?</style>', '', head_section, flags=re.DOTALL)
+            
+            # Restore diagram colors CSS
+            if diagram_colors_css:
+                head_section += f'\n    {diagram_colors_css}\n'
+            
+            html_content = head_section + body_section
+        else:
+            # Fallback: remove all (shouldn't happen with valid HTML)
+            html_content = re.sub(r'<link[^>]*rel="stylesheet"[^>]*>', '', html_content)
+            html_content = re.sub(r'<style>.*?</style>', '', html_content, flags=re.DOTALL)
     
     if inline:
         # Inline CSS

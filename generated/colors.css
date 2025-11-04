@@ -1,0 +1,101 @@
+/* Auto-generated from colors.json - DO NOT EDIT MANUALLY */
+/* Run: python3 build-colors.py to regenerate */
+
+:root {
+  /* Page background (transparent for embedding) */
+  --color-background: transparent;
+  /* Primary text color */
+  --color-text: #000000;
+  /* Node and edge strokes (arrows, outlines) */
+  --color-stroke: #000000;
+  /* Blue node background (blue.lighten(80%)) */
+  --color-node-bg-blue: #cce3f7;
+  /* Lighter blue node background (blue.lighten(90%)) */
+  --color-node-bg-blue-light: #e6f1fb;
+  /* Green node background (green.lighten(80%)) */
+  --color-node-bg-green: #d5f5d9;
+  /* Orange node background (orange.lighten(80%)) */
+  --color-node-bg-orange: #ffe7d1;
+  /* Purple node background (purple.lighten(80%)) */
+  --color-node-bg-purple: #efcff4;
+  /* Red node background (red.lighten(80%)) */
+  --color-node-bg-red: #ffd9d7;
+  /* Neutral/gray node background */
+  --color-node-bg-neutral: #f0f0f0;
+  /* Gradient start (light center) */
+  --color-gradient-start: #ffffff;
+  /* Blue gradient end */
+  --color-gradient-end-blue: #99ccff;
+  /* Link and arrow colors */
+  --color-link-color: #000000;
+  /* Edge label text color */
+  --color-label-color: #000000;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-background: transparent;
+    --color-text: #ffffff;
+    --color-stroke: #ffffff;
+    --color-node-bg-blue: #1e3a5f;
+    --color-node-bg-blue-light: #1a2f4a;
+    --color-node-bg-green: #1e3d1e;
+    --color-node-bg-orange: #4a3420;
+    --color-node-bg-purple: #3a2651;
+    --color-node-bg-red: #4a2020;
+    --color-node-bg-neutral: #2d3748;
+    --color-gradient-start: #1a202c;
+    --color-gradient-end-blue: #1e3a5f;
+    --color-link-color: #ffffff;
+    --color-label-color: #ffffff;
+  }
+}
+
+/* Dark theme via manual toggle */
+[data-theme='dark'] {
+  --color-background: transparent;
+  --color-text: #ffffff;
+  --color-stroke: #ffffff;
+  --color-node-bg-blue: #1e3a5f;
+  --color-node-bg-blue-light: #1a2f4a;
+  --color-node-bg-green: #1e3d1e;
+  --color-node-bg-orange: #4a3420;
+  --color-node-bg-purple: #3a2651;
+  --color-node-bg-red: #4a2020;
+  --color-node-bg-neutral: #2d3748;
+  --color-gradient-start: #1a202c;
+  --color-gradient-end-blue: #1e3a5f;
+  --color-link-color: #ffffff;
+  --color-label-color: #ffffff;
+}
+
+/* Light theme via manual toggle (overrides system dark mode) */
+[data-theme='light'] {
+  --color-background: transparent;
+  --color-text: #000000;
+  --color-stroke: #000000;
+  --color-node-bg-blue: #cce3f7;
+  --color-node-bg-blue-light: #e6f1fb;
+  --color-node-bg-green: #d5f5d9;
+  --color-node-bg-orange: #ffe7d1;
+  --color-node-bg-purple: #efcff4;
+  --color-node-bg-red: #ffd9d7;
+  --color-node-bg-neutral: #f0f0f0;
+  --color-gradient-start: #ffffff;
+  --color-gradient-end-blue: #99ccff;
+  --color-link-color: #000000;
+  --color-label-color: #000000;
+}
+
+/* Utility classes for diagrams */
+.diagram {
+  max-width: 100%;
+  height: auto;
+  margin: 1em auto;
+  display: block;
+}
+
+.diagram-container {
+  text-align: center;
+  padding: 1em 0;
+}
