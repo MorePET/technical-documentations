@@ -8,9 +8,13 @@ This script:
 3. Removes white backgrounds and injects CSS imports
 
 Usage:
-    python build-diagrams.py
+    python build-diagrams.py [project]
+    
+    project: Project folder name (default: technical-documentation)
+             The script will look for diagrams in {project}/diagrams/
 """
 
+import argparse
 import json
 import re
 import subprocess
@@ -115,13 +119,27 @@ def compile_diagram(typ_file: Path, color_mappings: dict) -> bool:
 
 def main():
     """Compile all diagram files to SVG and post-process them."""
-    project_root = Path(__file__).parent
-    diagrams_dir = project_root / 'diagrams'
-    colors_file = project_root / 'colors.json'
+    # Parse command-line arguments
+    parser = argparse.ArgumentParser(description='Compile diagrams to SVG')
+    parser.add_argument('project', nargs='?', default='technical-documentation',
+                       help='Project folder name (default: technical-documentation)')
+    args = parser.parse_args()
+    
+    project_root = Path(__file__).parent.parent  # Go up from scripts/ to project root
+    project_dir = project_root / args.project
+    diagrams_dir = project_dir / 'diagrams'
+    colors_file = project_root / 'lib' / 'colors.json'
+    
+    print(f"Building diagrams for project: {args.project}")
+    
+    if not project_dir.exists():
+        print(f"Error: project directory not found at {project_dir}")
+        sys.exit(1)
     
     if not diagrams_dir.exists():
-        print(f"Error: diagrams directory not found at {diagrams_dir}")
-        sys.exit(1)
+        print(f"Warning: diagrams directory not found at {diagrams_dir}")
+        print(f"Creating empty diagrams directory...")
+        diagrams_dir.mkdir(parents=True, exist_ok=True)
     
     # Load color mappings
     print("Loading color mappings...")
@@ -133,7 +151,8 @@ def main():
     
     if not typ_files:
         print(f"No .typ files found in {diagrams_dir}")
-        sys.exit(1)
+        print("Nothing to compile.")
+        return 0
     
     print(f"Found {len(typ_files)} diagram(s) to compile\n")
     

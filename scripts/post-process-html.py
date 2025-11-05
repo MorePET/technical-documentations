@@ -88,8 +88,8 @@ def add_css_link(html_content: str, css_path: str = "generated/colors.css") -> s
         return html_content  # Already has the CSS inlined
     
     # Read the colors.css file and inline it
-    project_root = Path(__file__).parent
-    colors_css_file = project_root / css_path
+    project_root = Path(__file__).parent.parent  # Go up from scripts/ to project root
+    colors_css_file = project_root / 'lib' / css_path
     
     if not colors_css_file.exists():
         colors_css_file = project_root / 'colors.css'
@@ -122,7 +122,9 @@ def main():
         print(f"Error: Input file not found: {input_file}")
         sys.exit(1)
     
-    diagrams_dir = input_file.parent / 'diagrams'
+    # Diagrams are in example/diagrams/
+    project_root = Path(__file__).parent.parent
+    diagrams_dir = project_root / 'example' / 'diagrams'
     
     print(f"Processing {input_file}...")
     

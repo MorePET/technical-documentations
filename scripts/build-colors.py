@@ -152,9 +152,9 @@ def generate_typst(colors: dict, output_file: Path):
 
 def main():
     """Main entry point."""
-    project_root = Path(__file__).parent
-    colors_file = project_root / 'colors.json'
-    generated_dir = project_root / 'generated'
+    project_root = Path(__file__).parent.parent  # Go up from scripts/ to project root
+    colors_file = project_root / 'lib' / 'colors.json'
+    generated_dir = project_root / 'lib' / 'generated'
     
     # Check if colors.json exists
     if not colors_file.exists():

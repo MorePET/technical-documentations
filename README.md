@@ -1,310 +1,192 @@
-# Stakeholder Analysis - Typst with HTML Styling
+# Technical Documentation System
 
-Beautiful, modern HTML exports from Typst documents with professional CSS styling - **now with native Typst integration!**
-
-> **⚠️ Note:** HTML export requires Typst compiled with `--features html` (experimental). PDF export works perfectly. See `HTML-EXPORT-SETUP.md` for details.
-
-## 📋 Overview
-
-This project demonstrates how to create stunning HTML exports from Typst documents with **automatic CSS styling built right into your Typst template**. No post-processing needed!
-
-### What's Included
-
-- **📄 Typst Source**: `stakeholder-example.typ` - Source document
-- **🎨 CSS Stylesheet**: `styles.css` - Modern, responsive styling
-- **🤖 Automation Script**: `add-styling.py` - Auto-apply CSS to HTML exports
-- **🔧 Build Tools**: `build.sh` and `Makefile` - Streamlined workflow
-- **📖 Documentation**: `STYLING-GUIDE.md` - Complete styling guide
-
-### Examples
-
-- `stakeholder-example.html` - Plain Typst HTML export
-- `stakeholder-example-styled.html` - Styled version with CSS
+Create professional technical documentation with diagrams in both PDF and HTML with automatic dark mode.
 
 ## 🚀 Quick Start
 
-### Method 1: Native Typst Integration (Recommended ⭐)
+### 1. Setup
 
-The CSS styling is now **built into the template**! Just export:
+**Option A: Native Installation (Recommended for beginners)**
+```bash
+# Install Typst, Python 3, and Make on your system (see Requirements below)
+# Clone this repo and you're ready!
+```
+
+**Option B: Dev Container**
+```bash
+# Open in VS Code with Dev Containers extension
+# Or use GitHub Codespaces
+# Everything pre-installed!
+```
+
+### 2. See the Example
+
+```bash
+make example                        # Build the example project
+open technical-doc-example.html     # View HTML (has diagrams & dark mode)
+open technical-doc-example.pdf      # View PDF
+```
+
+The example shows:
+- System Architecture diagram
+- Data Flow diagram  
+- State Machine diagram
+- Stakeholder tables (CSV/JSON/YAML)
+- Dark mode toggle
+
+### 3. Start Your Own Documentation
+
+```bash
+# Your workspace is ready in technical-documentation/
+cd technical-documentation
+vim technical-documentation.typ     # Edit your content
+
+# Add diagrams (see example/diagrams/ for reference)
+cd diagrams
+# Create .typ files here
+
+# Build your documentation
+cd /workspace
+make                                # Builds technical-documentation (default)
+```
+
+## 📋 Make Commands
+
+| Command | What it does |
+|---------|--------------|
+| `make` | Build your documentation (technical-documentation/) |
+| `make example` | Build the example/demo |
+| `make all-projects` | Build everything |
+| `make pdf` | Just PDF for default project |
+| `make html` | Just HTML for default project |
+| `make clean` | Remove build artifacts |
+| `make help` | Show all commands |
+
+### ⚙️ Configuration
+
+| Variable | Options | Description |
+|----------|---------|-------------|
+| `THEME_TOGGLE` | `yes` (default) / `no` | Include theme toggle button or use auto mode only |
+
+**Examples:**
+```bash
+make THEME_TOGGLE=no          # Build without theme toggle (auto mode only)
+make THEME_TOGGLE=no example  # Build example without toggle
+```
+
+## 📁 Project Structure
+
+```
+workspace/
+├── technical-documentation/    ← YOUR WORK (default)
+│   ├── technical-documentation.typ
+│   └── diagrams/
+│
+├── example/                   ← REFERENCE/DEMO
+│   ├── technical-doc-example.typ
+│   └── diagrams/              (3 diagram examples)
+│
+├── lib/                       ← SHARED (colors, styles, package)
+│   ├── technical-documentation-package.typ
+│   ├── colors.json
+│   └── styles.css
+│
+├── scripts/                   ← BUILD TOOLS
+└── Makefile                   ← BUILD COMMANDS
+```
+
+## ✏️ Editing Your Documentation
+
+**Main document:** `technical-documentation/technical-documentation.typ`
 
 ```typst
-// In your .typ file:
-#import "technical-documentation-package.typ": *
-#show: tech-doc  // Automatically includes CSS!
+#import "../lib/technical-documentation-package.typ": tech-doc
 
-= Your Document
+#show: tech-doc
+
+= My Section
+Content here...
+
+// Add diagrams (see example/ for templates)
 ```
 
-Then export:
+**Change colors:** Edit `lib/colors.json` and rebuild
+
+**Add diagrams:** Create `.typ` files in `technical-documentation/diagrams/` (copy from `example/diagrams/` as template)
+
+## 🎨 HTML Features
+
+- 🌓 **Dark mode toggle** (top-right) - 3 states: 🌙 Dark / ☀️ Light / 🌓 Auto (system)
+  - Optional: Can be disabled for auto-only mode (`THEME_TOGGLE=no`)
+- 📚 **TOC sidebar** (left) - Collapsible sections with smooth navigation
+- 📊 **Diagrams** - SVG diagrams that switch colors with theme
+- 📱 **Responsive** - Works on mobile, tablet, and desktop
+
+## 🔧 Requirements
+
+### Minimal (No Containers Needed!)
+
+This project uses **only Python standard library** - no pip packages required!
+
+- **Typst** (>= 0.14.0) - [Download here](https://github.com/typst/typst/releases)
+  - Version 0.14.0+ required for HTML export
+- **Python 3** (any recent version)
+- **Make** (or run scripts manually with `python3 scripts/...`)
+
+### Platform-Specific Setup
+
+#### Linux
 ```bash
-typst compile --format html stakeholder-example.typ
+# Install via package manager
+sudo apt install make python3  # Debian/Ubuntu
+# Install Typst >= 0.14.0 from https://github.com/typst/typst/releases
 ```
 
-**That's it!** The HTML will automatically include the CSS link.
-
-**Dark Mode?** Already included! The CSS automatically switches between light and dark modes based on the viewer's browser/system preference using `prefers-color-scheme`. No special configuration needed!
-
-**Want an Interactive Toggle?** Add one line for presentations/demos:
-```typst
-#show: tech-doc.with(html-theme-toggle: true)
-```
-This adds a floating button to switch themes instantly! See `THEME-TOGGLE-GUIDE.md` for details.
-
-**Use Inline CSS (single file):**
-```typst
-#show: tech-doc.with(html-inline-css: read("styles.css"))
-```
-
-See `AUTO-DARK-MODE.md` to learn about the automatic theme switching, `THEME-TOGGLE-GUIDE.md` for the interactive toggle, or `TYPST-HTML-STYLING.md` for complete documentation.
-
-### Method 2: Using Build Scripts (Alternative)
-
-If you prefer post-processing:
-
-**Option A: Build Script**
+#### macOS
 ```bash
-./build.sh stakeholder-example
+brew install typst make python3
 ```
 
-**Option B: Make**
+#### Windows
+**Recommended: WSL2** (Ubuntu inside Windows)
 ```bash
-make
-# or
-make FILE=stakeholder-example
+# Inside WSL2:
+sudo apt install make python3
+# Install Typst >= 0.14.0 from https://github.com/typst/typst/releases
 ```
 
-**Option C: Manual**
+**Alternative: Native Windows**
+- Install Python from python.org
+- Install Typst >= 0.14.0 from typst.app
+- Use PowerShell (may need to adapt Make commands)
+
+### Dev Container Option
+
+If you prefer containers (optional):
+- **Docker** or **Podman** (container runtime)
+- **VS Code** with "Dev Containers" extension (recommended)
+  - Or use any editor + run containers manually
+
+**Container setup by platform:**
+- **Linux**: `docker` or `podman` native
+- **macOS**: Docker Desktop or Podman Machine
+- **Windows**: Docker Desktop (auto-installs WSL2)
+
+**Without VS Code:**
 ```bash
-# 1. Export from Typst
-typst compile --format html stakeholder-example.typ
-
-# 2. Apply styling
-python add-styling.py stakeholder-example.html --force
-
-# 3. Open in browser
-xdg-open stakeholder-example.html  # Linux
-# or just open the file manually
+# Build and run container manually:
+docker build -f .devcontainer/Containerfile -t typst-dev .
+docker run -it -v $(pwd):/workspace typst-dev
+# Then: make example
 ```
 
-## 🎨 Styling Features
+## 📚 More Info
 
-The CSS provides:
-
-- ✨ **Modern Design**: Clean, professional look with subtle gradients and shadows
-- 🌓 **Automatic Dark Mode**: Switches based on browser/system preference using `prefers-color-scheme`
-- 📊 **Enhanced Tables**: 
-  - Color-coded header row (blue gradient)
-  - Hover effects on rows
-  - Smooth transitions
-  - Proper spacing and borders
-- 📱 **Responsive Layout**: Automatically adapts to mobile, tablet, and desktop
-- 🖨️ **Print-Optimized**: Looks great when printing to PDF
-- ♿ **Accessible**: High contrast ratios and readable fonts
-- 🎯 **Professional Typography**: Modern font stack with proper hierarchy
-- 🔧 **DRY & SOLID**: Single CSS file with variables, no duplicate code
-
-### Before and After
-
-| Plain HTML Export | With CSS Styling |
-|-------------------|------------------|
-| No colors | Blue gradient headers |
-| Basic borders | Subtle shadows and spacing |
-| Cramped layout | Breathing room with proper padding |
-| Plain bullets | Styled with brand colors |
-| Not mobile-friendly | Fully responsive |
-
-## 🔧 Customization
-
-### Quick Color Change
-
-Edit `styles.css`:
-
-```css
-:root {
-  --primary-color: #2563eb;  /* Change to your brand color */
-  --text-color: #1f2937;
-  /* ... more variables ... */
-}
-```
-
-### Column Width Adjustment
-
-```css
-table td:first-child { width: 15%; }  /* Stakeholder column */
-table td:nth-child(2) { width: 28%; } /* Pain column */
-table td:nth-child(3) { width: 28%; } /* Promise column */
-table td:nth-child(4) { width: 29%; } /* Proof column */
-```
-
-See `STYLING-GUIDE.md` for detailed customization options.
-
-## 📦 Build Options
-
-### Build Script (`build.sh`)
-
-Simple bash script for quick builds:
-
-```bash
-./build.sh                    # Build default file
-./build.sh my-document       # Build specific file
-```
-
-### Makefile
-
-More powerful build system:
-
-```bash
-make                         # Build default file
-make FILE=my-document        # Build specific file
-make inline                  # Build with inline CSS
-make all-files              # Build all .typ files
-make clean                  # Remove generated HTML
-make watch                  # Watch and rebuild on changes
-make open                   # Build and open in browser
-make help                   # Show all commands
-```
-
-## 🔄 Workflow Recommendations
-
-### For Development
-
-Use watch mode to see changes in real-time:
-
-```bash
-make watch
-```
-
-Then edit your `.typ` file and save. The HTML will auto-rebuild.
-
-### For Distribution
-
-**Single File (Inline CSS):**
-```bash
-make inline
-```
-This creates one self-contained HTML file.
-
-**Two Files (External CSS):**
-```bash
-make
-```
-Distribute both `.html` and `styles.css` together.
-
-### For Version Control
-
-Add to `.gitignore`:
-```
-*.html
-```
-
-Keep in git:
-```
-*.typ
-styles.css
-add-styling.py
-build.sh
-Makefile
-```
-
-## 📱 Responsive Design
-
-The CSS automatically adapts:
-
-- **Desktop (>1024px)**: Full 4-column table layout
-- **Tablet (768-1024px)**: Smaller fonts, adjusted spacing
-- **Mobile (<768px)**: Stacked layout, hidden table headers
-
-Test responsive design:
-1. Open HTML in browser
-2. Press `F12` (Developer Tools)
-3. Click device toolbar icon
-4. Select different device sizes
-
-## 🎯 Use Cases
-
-This setup is perfect for:
-
-- 📊 **Stakeholder Analysis** (like this example)
-- 📈 **Business Reports** with tables and data
-- 📝 **Technical Documentation** 
-- 🎓 **Academic Papers** with structured content
-- 📋 **Requirements Documents**
-- 💼 **Project Proposals**
-
-## 🛠️ Requirements
-
-- **Typst**: For compiling `.typ` to HTML ([install](https://github.com/typst/typst))
-- **Python 3**: For the styling script (usually pre-installed on Linux)
-- **Make** (optional): For using the Makefile (usually pre-installed on Linux)
-
-Check installation:
-```bash
-typst --version
-python --version
-make --version
-```
-
-## 💡 Tips & Tricks
-
-### Sharing with Others
-
-**Option A:** Email/Upload
-- Use inline CSS: `make inline`
-- Share the single HTML file
-
-**Option B:** Web Hosting
-- Upload both HTML and CSS to a web server
-- Share the URL
-
-**Option C:** Convert to PDF
-- Open HTML in browser
-- Print to PDF (maintains styling)
-
-### Multiple Documents
-
-Build all documents at once:
-```bash
-make all-files
-```
-
-### Custom Build Commands
-
-Add your own targets to the Makefile:
-```makefile
-.PHONY: deploy
-deploy: all
-	rsync -av *.html *.css user@server:/path/
-```
-
-## 📚 Documentation
-
-- **`STYLING-GUIDE.md`**: Complete guide to styling options
-- **`styles.css`**: Commented CSS with customization notes
-- **`Makefile`**: All available build commands
-
-## 🤝 Contributing
-
-Feel free to customize the CSS, scripts, and build tools for your needs!
-
-### Ideas for Enhancement
-
-- 🌙 Add dark mode toggle
-- 📊 Add Chart.js for data visualization
-- 🔍 Add table filtering/sorting with JavaScript
-- 📱 Add mobile-specific interactions
-- 🎨 Create multiple theme variants
-- 🔗 Add table of contents generation
-
-## 📄 License
-
-Use freely for your projects!
-
-## 🙏 Acknowledgments
-
-- Built with [Typst](https://github.com/typst/typst) - Modern markup-based typesetting
-- Styled with modern CSS best practices
-- Inspired by clean, professional web design
+- `technical-documentation/README.md` - Detailed usage
+- `docs/BUILD_SYSTEM.md` - Build system docs
+- `example/` - Working examples with diagrams
+- `make help` - All available commands
 
 ---
 
-**Questions?** Check `STYLING-GUIDE.md` or customize the files to suit your needs!
+**Tip:** Run `make example` first to see what's possible, then edit `technical-documentation/` for your own docs!

@@ -24,29 +24,27 @@ REBUILD_DOCS=false
 # Check what files were modified
 while IFS= read -r file; do
     case "$file" in
-        colors.json)
-            echo -e "${YELLOW}  • colors.json modified${NC}"
+        lib/colors.json)
+            echo -e "${YELLOW}  • lib/colors.json modified${NC}"
             REBUILD_COLORS=true
             REBUILD_DIAGRAMS=true  # Diagrams depend on colors
             REBUILD_DOCS=true
             ;;
-        diagrams/*.typ)
+        example/diagrams/*.typ)
             echo -e "${YELLOW}  • Diagram source modified: $file${NC}"
             REBUILD_DIAGRAMS=true
             REBUILD_DOCS=true
             ;;
-        technical-doc-example.typ|technical-documentation-package.typ)
+        example/technical-doc-example.typ|lib/technical-documentation-package.typ)
             echo -e "${YELLOW}  • Document source modified: $file${NC}"
             REBUILD_DOCS=true
             ;;
-        *.py)
+        scripts/*.py)
             # Build scripts changed - rebuild everything to be safe
-            if [[ "$file" == build-*.py ]] || [[ "$file" == add-styling.py ]] || [[ "$file" == post-process-html.py ]]; then
-                echo -e "${YELLOW}  • Build script modified: $file${NC}"
-                REBUILD_COLORS=true
-                REBUILD_DIAGRAMS=true
-                REBUILD_DOCS=true
-            fi
+            echo -e "${YELLOW}  • Build script modified: $file${NC}"
+            REBUILD_COLORS=true
+            REBUILD_DIAGRAMS=true
+            REBUILD_DOCS=true
             ;;
     esac
 done <<< "$STAGED_FILES"
@@ -63,29 +61,29 @@ echo -e "${BLUE}🔨 Rebuilding affected components...${NC}"
 # Rebuild colors if needed
 if [ "$REBUILD_COLORS" = true ]; then
     echo -e "${YELLOW}  → Regenerating color files...${NC}"
-    python3 build-colors.py > /dev/null 2>&1
-    git add generated/colors.css generated/colors.typ
+    python3 scripts/build-colors.py > /dev/null 2>&1
+    git add lib/generated/colors.css lib/generated/colors.typ
     echo -e "${GREEN}  ✓ Colors updated${NC}"
 fi
 
 # Rebuild diagrams if needed
 if [ "$REBUILD_DIAGRAMS" = true ]; then
     echo -e "${YELLOW}  → Recompiling diagrams...${NC}"
-    python3 build-diagrams.py > /dev/null 2>&1
-    git add diagrams/*.svg
+    python3 scripts/build-diagrams.py > /dev/null 2>&1
+    git add example/diagrams/*.svg
     echo -e "${GREEN}  ✓ Diagrams updated${NC}"
 fi
 
 # Rebuild documentation if needed
 if [ "$REBUILD_DOCS" = true ]; then
     echo -e "${YELLOW}  → Recompiling PDF...${NC}"
-    typst compile technical-doc-example.typ technical-doc-example.pdf > /dev/null 2>&1
+    typst compile --root . example/technical-doc-example.typ technical-doc-example.pdf > /dev/null 2>&1
     git add technical-doc-example.pdf
     echo -e "${GREEN}  ✓ PDF updated${NC}"
     
     echo -e "${YELLOW}  → Recompiling HTML...${NC}"
-    python3 build-html.py technical-doc-example.typ technical-doc-example.html > /dev/null 2>&1
-    git add technical-doc-example.html colors.css
+    python3 scripts/build-html.py example/technical-doc-example.typ technical-doc-example.html > /dev/null 2>&1
+    git add technical-doc-example.html colors.css styles.css
     echo -e "${GREEN}  ✓ HTML updated${NC}"
 fi
 

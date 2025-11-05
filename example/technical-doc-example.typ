@@ -1,5 +1,5 @@
 // Import the technical documentation package
-#import "technical-documentation-package.typ": *
+#import "../lib/technical-documentation-package.typ": *
 // apply styles to the document
 #show: tech-doc
 
@@ -254,19 +254,19 @@ There are various ways to use tables and typst programming to implement a stakeh
 == From a CSV file
 <from-csv-file>
 #stakeholder-table-from-csv(
-  file: "stakeholders.csv",
+  file: "/example/stakeholders.csv",
 )
 
 == From a JSON file
 <from-json-file>
 #stakeholder-table-from-json(
-  file: "stakeholders.json",
+  file: "/example/stakeholders.json",
 )
 
 == From a YAML file
 <from-yaml-file>
 #stakeholder-table-from-yaml(
-  file: "stakeholders.yaml",
+  file: "/example/stakeholders.yaml",
 )
 
 #pagebreak()

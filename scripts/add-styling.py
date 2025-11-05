@@ -132,23 +132,22 @@ def add_css_to_html(input_file, output_file=None, css_file="styles.css", inline=
       function toggleTheme() {
         const current = body.getAttribute('data-theme');
         
-        if (current === 'dark') {
+        // Simple cycle: Auto → Dark → Light → Auto
+        if (!current) {
+          // Auto → Dark
+          body.setAttribute('data-theme', 'dark');
+          localStorage.setItem('theme', 'dark');
+          updateIcon('dark');
+        } else if (current === 'dark') {
           // Dark → Light
           body.setAttribute('data-theme', 'light');
           localStorage.setItem('theme', 'light');
           updateIcon('light');
-        } else if (current === 'light') {
+        } else {
           // Light → Auto
           body.removeAttribute('data-theme');
           localStorage.removeItem('theme');
           updateIcon('auto');
-        } else {
-          // Auto → Opposite of system
-          const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-          const newTheme = isDark ? 'light' : 'dark';
-          body.setAttribute('data-theme', newTheme);
-          localStorage.setItem('theme', newTheme);
-          updateIcon(newTheme);
         }
       }
       
@@ -201,6 +200,20 @@ def add_css_to_html(input_file, output_file=None, css_file="styles.css", inline=
       #theme-icon {
         font-size: 1.1rem;
         line-height: 1;
+      }
+      
+      /* Auto dark mode (system preference) */
+      @media (prefers-color-scheme: dark) {
+        body:not([data-theme]) {
+          background: #0f172a;
+          color: #e2e8f0;
+          color-scheme: dark;
+        }
+        
+        body:not([data-theme]) main {
+          background: #1e293b;
+          color: #e2e8f0;
+        }
       }
       
       /* Dark mode forced styles */
@@ -263,7 +276,7 @@ def add_css_to_html(input_file, output_file=None, css_file="styles.css", inline=
     <!-- TOC Sidebar -->
     <div id="toc-sidebar" class="toc-sidebar">
       <div class="toc-header">
-        <h3>📚 Contents</h3>
+        <h3>Contents</h3>
         <button id="toc-toggle" class="toc-collapse-btn" aria-label="Collapse sidebar">←</button>
       </div>
       <nav id="toc-nav" class="toc-nav">
@@ -271,7 +284,7 @@ def add_css_to_html(input_file, output_file=None, css_file="styles.css", inline=
       </nav>
     </div>
     <button id="toc-mobile-toggle" class="toc-mobile-toggle" aria-label="Toggle table of contents">
-      📚
+      
     </button>'''
         body_injections.append(toc_html)
         
@@ -312,26 +325,31 @@ def add_css_to_html(input_file, output_file=None, css_file="styles.css", inline=
             // Smooth scroll on click
             link.addEventListener('click', (e) => {
               e.preventDefault();
-              heading.scrollIntoView({ behavior: 'smooth', block: 'start' });
-              history.pushState(null, null, '#' + heading.id);
+              
+              const wasActive = link.classList.contains('active');
+              
+              // If losing focus (clicking a different link), collapse ALL subsections
+              // EXCEPT if clicking an H3 (subsection) - keep its parent's subsections open
+              if (!wasActive && heading.tagName !== 'H3') {
+                document.querySelectorAll('.toc-sublist').forEach(sl => {
+                  sl.classList.add('collapsed');
+                });
+              }
               
               // Highlight active link
               document.querySelectorAll('.toc-link').forEach(l => l.classList.remove('active'));
               link.classList.add('active');
+              
+              // Scroll to heading (unless toggling subsections)
+              if (!wasActive || heading.tagName !== 'H2') {
+                heading.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                history.pushState(null, null, '#' + heading.id);
+              }
             });
             
             if (heading.tagName === 'H2') {
               // Main section
               li.appendChild(link);
-              
-              // Add collapse button for sections with subsections
-              const collapseBtn = document.createElement('button');
-              collapseBtn.className = 'toc-item-collapse';
-              collapseBtn.innerHTML = '▼';
-              collapseBtn.setAttribute('aria-label', 'Toggle subsections');
-              collapseBtn.style.display = 'none'; // Hidden by default, shown if subsections exist
-              
-              li.insertBefore(collapseBtn, link);
               tocList.appendChild(li);
               
               currentH2Item = li;
@@ -340,19 +358,29 @@ def add_css_to_html(input_file, output_file=None, css_file="styles.css", inline=
               // Subsection
               if (!currentSublist) {
                 currentSublist = document.createElement('ul');
-                currentSublist.className = 'toc-sublist';
+                currentSublist.className = 'toc-sublist collapsed'; // Start collapsed
                 currentH2Item.appendChild(currentSublist);
                 
-                // Show collapse button for parent
-                const collapseBtn = currentH2Item.querySelector('.toc-item-collapse');
-                if (collapseBtn) {
-                  collapseBtn.style.display = 'inline-block';
+                // Make the parent H2 link toggleable
+                const parentLink = currentH2Item.querySelector('.toc-link');
+                if (parentLink) {
+                  parentLink.classList.add('has-subsections');
                   
-                  // Add collapse functionality
-                  collapseBtn.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    currentSublist.classList.toggle('collapsed');
-                    collapseBtn.innerHTML = currentSublist.classList.contains('collapsed') ? '▶' : '▼';
+                  // Capture the sublist in closure properly
+                  const thisSublist = currentSublist;
+                  
+                  // Add click handler for subsection behavior
+                  parentLink.addEventListener('click', (e) => {
+                    const wasActive = parentLink.classList.contains('active');
+                    
+                    if (wasActive) {
+                      // Already active: toggle subsections (show/hide)
+                      e.preventDefault();
+                      thisSublist.classList.toggle('collapsed');
+                    } else {
+                      // Not active: expand this one (others already collapsed by general handler)
+                      thisSublist.classList.remove('collapsed');
+                    }
                   });
                 }
               }
@@ -496,21 +524,6 @@ def add_css_to_html(input_file, output_file=None, css_file="styles.css", inline=
         position: relative;
       }
       
-      .toc-item-collapse {
-        background: none;
-        border: none;
-        color: var(--primary-color, #2563eb);
-        cursor: pointer;
-        padding: 0.25rem;
-        font-size: 0.7rem;
-        margin-right: 0.25rem;
-        transition: transform 0.2s ease;
-      }
-      
-      .toc-item-collapse:hover {
-        transform: scale(1.2);
-      }
-      
       .toc-link {
         display: block;
         padding: 0.5rem 0.75rem;
@@ -533,6 +546,10 @@ def add_css_to_html(input_file, output_file=None, css_file="styles.css", inline=
         color: white;
         font-weight: 600;
         border-left: 3px solid var(--primary-hover, #1d4ed8);
+      }
+      
+      .toc-link.has-subsections {
+        font-weight: 600;
       }
       
       .toc-sublist {
@@ -682,7 +699,7 @@ def add_css_to_html(input_file, output_file=None, css_file="styles.css", inline=
         else:
             html_content = html_content.replace('</html>', f'{toc_js}\n</html>')
         
-        print(f"✅ Added collapsible TOC sidebar")
+        print(f"✅ Added collapsible TOC sidebar (click active section to toggle subsections)")
     
     # Inject all body elements at once (after <body> tag)
     if body_injections:
@@ -701,7 +718,7 @@ def add_css_to_html(input_file, output_file=None, css_file="styles.css", inline=
     if theme_toggle:
         print(f"🌓 Click the theme button in the top-right corner to switch between light/dark/auto modes!")
     if toc_sidebar:
-        print(f"📚 TOC sidebar on the left shows all headings - click arrows to collapse sections!")
+        print(f"TOC sidebar on the left shows all headings - click active section to toggle subsections!")
 
 
 if __name__ == "__main__":
