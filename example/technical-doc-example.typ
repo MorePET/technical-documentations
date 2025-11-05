@@ -276,7 +276,7 @@ There are various ways to use tables and typst programming to implement a stakeh
 The technical documentation package includes powerful diagram capabilities using Fletcher, a Typst library for creating flowcharts, architecture diagrams, and state machines. All diagrams support both PDF and HTML output with automatic dark mode adaptation.
 
 #note([
-  *Dark Mode Support*: When viewing in HTML, these diagrams automatically adapt to your system's color scheme. Try toggling dark mode to see the colors change seamlessly!
+  *Dark Mode Support*: When viewing in HTML, these diagrams automatically adapt to your system's color scheme using a centralized color palette defined in `lib/colors.json`. Try toggling dark mode to see the colors change seamlessly!
 ])
 
 == System Architecture Diagram
@@ -355,7 +355,16 @@ Using diagrams in technical documentation provides several advantages:
 
 *Collaboration*: Text-based diagram definitions can be reviewed in pull requests just like code, enabling better team collaboration.
 
+== Customizing Diagrams
+
+These diagrams are defined in simple Typst code and can be customized with different layouts, labels, and spacing to match your specific use case.
+
 #note([
-  *Pro Tip*: These diagrams are defined in simple Typst code and can be customized with different colors, layouts, and labels to match your specific use case. Check the source code to see how easy they are to modify!
+  *Color System*: All diagram colors come from `lib/colors.json`, which defines light/dark mode pairs. Using arbitrary colors will break dark mode! To customize colors:
+  - Edit `lib/colors.json` to add/modify color pairs
+  - Run `make colors` to regenerate CSS and Typst files
+  - Use the predefined colors: `node-bg-blue`, `node-bg-green`, `node-bg-orange`, `node-bg-purple`, `node-bg-red`, `node-bg-neutral`
+  
+  See `docs/DARK_MODE_COLOR_STANDARDS.md` for details on the color system and `technical-documentation/README.md` for diagram examples.
 ])
 

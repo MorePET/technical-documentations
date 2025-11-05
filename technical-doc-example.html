@@ -1009,7 +1009,7 @@
       <h2>2 Technical Diagrams with Fletcher</h2>
     </div>
     <p>The technical documentation package includes powerful diagram capabilities using Fletcher, a Typst library for creating flowcharts, architecture diagrams, and state machines. All diagrams support both PDF and HTML output with automatic dark mode adaptation.</p>
-    <div><strong>Dark Mode Support</strong>: When viewing in HTML, these diagrams automatically adapt to your system’s color scheme. Try toggling dark mode to see the colors change seamlessly!</div>
+    <div><strong>Dark Mode Support</strong>: When viewing in HTML, these diagrams automatically adapt to your system’s color scheme using a centralized color palette defined in <code>lib/colors.json</code>. Try toggling dark mode to see the colors change seamlessly!</div>
     <div>
       <h3>2.1 System Architecture Diagram</h3>
     </div>
@@ -2024,7 +2024,19 @@
     <p><strong>Accessibility</strong>: Modern diagram tools produce semantic markup that works with screen readers and other assistive technologies.</p>
     <p><strong>Consistency</strong>: Using a standardized diagramming library ensures visual consistency across all documentation, making it easier for readers to understand different sections.</p>
     <p><strong>Collaboration</strong>: Text-based diagram definitions can be reviewed in pull requests just like code, enabling better team collaboration.</p>
-    <div><strong>Pro Tip</strong>: These diagrams are defined in simple Typst code and can be customized with different colors, layouts, and labels to match your specific use case. Check the source code to see how easy they are to modify!</div>
+    <div>
+      <h3>2.5 Customizing Diagrams</h3>
+    </div>
+    <p>These diagrams are defined in simple Typst code and can be customized with different layouts, labels, and spacing to match your specific use case.</p>
+    <div>
+      <p><strong>Color System</strong>: All diagram colors come from <code>lib/colors.json</code>, which defines light/dark mode pairs. Using arbitrary colors will break dark mode! To customize colors:</p>
+      <ul>
+        <li>Edit <code>lib/colors.json</code> to add/modify color pairs</li>
+        <li>Run <code>make colors</code> to regenerate CSS and Typst files</li>
+        <li>Use the predefined colors: <code>node-bg-blue</code>, <code>node-bg-green</code>, <code>node-bg-orange</code>, <code>node-bg-purple</code>, <code>node-bg-red</code>, <code>node-bg-neutral</code></li>
+      </ul>
+      <p>See <code>docs/DARK_MODE_COLOR_STANDARDS.md</code> for details on the color system and <code>technical-documentation/README.md</code> for diagram examples.</p>
+    </div>
   
     <script>
       // Theme toggle functionality
