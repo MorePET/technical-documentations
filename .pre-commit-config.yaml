@@ -20,19 +20,21 @@ repos:
       - id: mixed-line-ending
       - id: trailing-whitespace
 
-  # Python Linting and Formatting (Ruff)
-  # Note: Ruff disabled in pre-commit due to architecture issues (rosetta error on ARM)
-  # Run manually with: uv run ruff check --fix src/ scripts/ tests/
-  # - repo: https://github.com/astral-sh/ruff-pre-commit
-  #   rev: v0.14.3
-  #   hooks:
-  #     - id: ruff
-  #       name: ruff (commit)
-  #       args: [--fix, --ignore=D]
-  #       stages: [pre-commit]
-  #     - id: ruff-format
-  #       name: ruff-format (commit)
-  #       stages: [pre-commit]
+  # Python Linting and Formatting (Ruff via uv)
+  - repo: local
+    hooks:
+      - id: ruff-check
+        name: ruff check
+        entry: uv run ruff check --fix --ignore=D
+        language: system
+        types: [python]
+        stages: [pre-commit]
+      - id: ruff-format
+        name: ruff format
+        entry: uv run ruff format
+        language: system
+        types: [python]
+        stages: [pre-commit]
 
   # YAML Linting
   - repo: https://github.com/adrienverge/yamllint
