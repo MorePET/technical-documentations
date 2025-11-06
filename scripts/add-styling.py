@@ -175,9 +175,9 @@ def add_css_to_html(
 
       function updateIcon(theme) {
         if (theme === 'light') {
-          icon.textContent = '☀️';
+          icon.textContent = '🌕';
         } else if (theme === 'dark') {
-          icon.textContent = '🌙';
+          icon.textContent = '🌑';
         } else {
           icon.textContent = '🌓';
         }
@@ -790,7 +790,7 @@ def add_css_to_html(
     print(f"\n💡 Open {output_path} in your browser to see the result!")
     if theme_toggle:
         print(
-            "🌓 Click the theme button in the top-right corner to switch between light/dark/auto modes!"
+            "🌓 Click the theme button in the top-right corner to switch between light (🌕) / dark (🌑) / auto (🌓) modes!"
         )
     if toc_sidebar:
         print(

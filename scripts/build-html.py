@@ -191,7 +191,9 @@ def main():
     print("\nTo view:")
     print(f"  Open {html_file} in a browser")
     if theme_toggle:
-        print("  🌓 Click the theme button to switch between light/dark/auto modes!")
+        print(
+            "  🌓 Click the theme button to switch between light (🌕) / dark (🌑) / auto (🌓) modes!"
+        )
     else:
         print("  🌓 Dark mode follows your system settings (auto mode)")
     print("  Use the TOC sidebar on the left to navigate sections!")

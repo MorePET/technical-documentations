@@ -83,8 +83,7 @@ fi
 
 # Step 1: Generate colors
 print_step "Step 1/4: Generating color files from lib/colors.json..."
-python3 scripts/build-colors.py
-if [ $? -eq 0 ]; then
+if python3 scripts/build-colors.py; then
     print_status "Color files generated (CSS and Typst)"
 else
     print_error "Color generation failed"
@@ -94,8 +93,7 @@ echo ""
 
 # Step 2: Compile diagrams
 print_step "Step 2/4: Compiling diagrams to SVG for project '$PROJECT'..."
-python3 scripts/build-diagrams.py "$PROJECT"
-if [ $? -eq 0 ]; then
+if python3 scripts/build-diagrams.py "$PROJECT"; then
     print_status "Diagrams compiled successfully"
 else
     print_error "Diagram compilation failed"
@@ -105,8 +103,7 @@ echo ""
 
 # Step 3: Compile PDF
 print_step "Step 3/4: Compiling PDF..."
-typst compile --root . "$SRC_FILE" "${OUT_NAME}.pdf"
-if [ $? -eq 0 ]; then
+if typst compile --root . "$SRC_FILE" "${OUT_NAME}.pdf"; then
     print_status "PDF created: ${OUT_NAME}.pdf"
 else
     print_error "PDF compilation failed"
@@ -116,8 +113,7 @@ echo ""
 
 # Step 4: Compile HTML
 print_step "Step 4/4: Compiling HTML with dark mode support..."
-python3 scripts/build-html.py "$SRC_FILE" "${OUT_NAME}.html"
-if [ $? -eq 0 ]; then
+if python3 scripts/build-html.py "$SRC_FILE" "${OUT_NAME}.html"; then
     print_status "HTML created: ${OUT_NAME}.html"
 else
     print_error "HTML compilation failed"
@@ -142,7 +138,7 @@ echo ""
 echo "To view:"
 echo "  PDF:  open ${OUT_NAME}.pdf"
 echo "  HTML: open ${OUT_NAME}.html"
-echo "        🌓 Click theme button (top-right) to switch light/dark/auto modes"
+echo "        🌓 Click theme button (top-right) to switch light (🌕) / dark (🌑) / auto (🌓) modes"
 echo "        Use TOC sidebar (left) to navigate sections"
 echo ""
 

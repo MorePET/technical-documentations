@@ -74,7 +74,7 @@ make                                # Builds technical-documentation (default)
 **Examples:**
 
 ```bash
-make THEME_TOGGLE=no          # Build without theme toggle (auto mode only)
+make THEME_TOGGLE=no          # Build without darkmode toggle (auto mode only)
 make THEME_TOGGLE=no example  # Build example without toggle
 ```
 
@@ -120,7 +120,7 @@ Content here...
 
 ## 🎨 HTML Features
 
-- 🌓 **Dark mode toggle** (top-right) - 3 states: 🌙 Dark / ☀️ Light / 🌓 Auto (system)
+- 🌓 **Dark mode toggle** (top-right) - 3 states: 🌑 Dark / 🌕 Light / 🌓 Auto (system)
   - Optional: Can be disabled for auto-only mode (`THEME_TOGGLE=no`)
 - 📚 **TOC sidebar** (left) - Collapsible sections with smooth navigation
 - 📊 **Diagrams** - SVG diagrams that switch colors with theme
