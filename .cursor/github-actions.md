@@ -1,8 +1,10 @@
 # GitHub Actions Workflows
 
-## Standard Workflows
+## Centralized Workflows
 
-These workflows should be copied to all MorePET repositories for consistency.
+MorePET uses centralized reusable workflows from [MorePET/github-actions](https://github.com/MorePET/github-actions).
+
+All MorePET repositories should call these workflows instead of maintaining local copies.
 
 ## Renovate (Dependency Updates)
 
@@ -10,7 +12,7 @@ These workflows should be copied to all MorePET repositories for consistency.
 
 **Purpose:** Automated dependency updates with 3-day soak time for patches.
 
-**Template:**
+**Template (calls central workflow):**
 
 ```yaml
 ---
@@ -23,21 +25,14 @@ on:
 
 jobs:
   renovate:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: renovatebot/github-action@v40.3.12
-        with:
-          token: ${{ secrets.RENOVATE_TOKEN }}
-        env:
-          LOG_LEVEL: info
-          RENOVATE_CONFIG_FILE: .github/renovate.json
+    uses: MorePET/github-actions/.github/workflows/renovate-reusable.yml@main
+    secrets:
+      token: ${{ secrets.RENOVATE_TOKEN }}
 ```
 
-**Required:**
+**Required:** 
 - Repository secret: `RENOVATE_TOKEN` (fine-grained PAT)
-- Config file: `.github/renovate.json`
+- Config file: `.github/renovate.json` (in your repo)
 
 ## CI/CD (Testing)
 
@@ -45,7 +40,7 @@ jobs:
 
 **Purpose:** Run tests and linting on all PRs and pushes.
 
-**Template:**
+**Template (calls central workflow):**
 
 ```yaml
 ---
@@ -59,38 +54,18 @@ on:
 
 jobs:
   test:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
+    uses: MorePET/github-actions/.github/workflows/ci-python-reusable.yml@main
+```
 
-      - name: Install uv
-        uses: astral-sh/setup-uv@v4
-        with:
-          enable-cache: true
+**With custom Python version:**
 
-      - name: Set up Python
-        run: uv python install 3.12
-
-      - name: Install dependencies
-        run: uv sync --frozen
-
-      - name: Run pre-commit
-        run: uv run pre-commit run --all-files
-
-      - name: Run tests
-        run: |
-          if [ -d "tests" ]; then
-            uv run pytest --cov --cov-report=term-missing
-          else
-            echo "No tests directory, skipping"
-          fi
-
-      - name: Upload coverage
-        if: github.event_name == 'pull_request'
-        uses: codecov/codecov-action@v4
-        with:
-          files: ./coverage.xml
-          fail_ci_if_error: false
+```yaml
+jobs:
+  test:
+    uses: MorePET/github-actions/.github/workflows/ci-python-reusable.yml@main
+    with:
+      python_version: '3.11'
+      run_tests: true
 ```
 
 ## Renovate Configuration

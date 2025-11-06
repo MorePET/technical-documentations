@@ -1,6 +1,6 @@
 # Renovate Setup Instructions
 
-This repository uses self-hosted Renovate running in GitHub Actions to automatically manage dependency updates.
+This repository uses centralized reusable workflows from [MorePET/github-actions](https://github.com/MorePET/github-actions) to automatically manage dependency updates.
 
 ## Prerequisites
 

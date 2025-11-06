@@ -9,15 +9,7 @@ on:
 
 jobs:
   renovate:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+    uses: MorePET/github-actions/.github/workflows/renovate-reusable.yml@main
+    secrets:
+      token: ${{ secrets.RENOVATE_TOKEN }}
 
-      - name: Self-hosted Renovate
-        uses: renovatebot/github-action@v40.3.12
-        with:
-          token: ${{ secrets.RENOVATE_TOKEN }}
-        env:
-          LOG_LEVEL: info
-          RENOVATE_CONFIG_FILE: .github/renovate.json
