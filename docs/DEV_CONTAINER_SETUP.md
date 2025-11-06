@@ -18,11 +18,70 @@ Choose **one** of these options:
 
 #### Option B: Podman (Docker-free alternative)
 
-**Installation:**
+**Why Podman?**
 
-- **macOS**: [Podman Desktop](https://podman-desktop.io/downloads) or `brew install podman`
-- **Windows**: [Podman Desktop](https://podman-desktop.io/downloads)
-- **Linux**: `sudo apt install podman` (Debian/Ubuntu) or see [Podman installation](https://podman.io/getting-started/installation)
+Podman is often preferred over Docker for several reasons:
+
+- **Rootless by default**: Runs containers without requiring root privileges, improving security
+- **Daemonless architecture**: No background daemon process required, reducing resource usage
+- **Docker-compatible**: Drop-in replacement for Docker CLI commands
+- **Better security model**: Each container runs in its own user namespace
+- **Open source**: Fully open source without commercial licensing concerns
+- **Systemd integration**: Native support for systemd in containers (Linux)
+
+Both Docker and Podman work equally well with this dev container. Choose based on your preference and system requirements.
+
+**Installation Options:**
+
+There are two ways to use Podman:
+
+1. **Podman Desktop** (Recommended for macOS/Windows) - GUI app that includes:
+   - Graphical interface for managing containers
+   - **Podman CLI** included
+   - **Automatic podman machine management** (handles VM setup)
+   - Easy status monitoring and troubleshooting
+
+2. **Podman CLI only** - Command-line tool:
+   - Lightweight, no GUI
+   - Requires manual podman machine setup on macOS/Windows
+   - Native on Linux (no VM needed)
+
+**Platform-specific installation:**
+
+- **macOS**:
+  - Option 1: [Podman Desktop](https://podman-desktop.io/downloads) (recommended - includes CLI + GUI)
+  - Option 2: `brew install podman` (CLI only - requires manual machine setup)
+
+- **Windows**:
+  - Option 1: [Podman Desktop](https://podman-desktop.io/downloads) (recommended - includes CLI + GUI)
+  - Option 2: [Podman CLI installer](https://github.com/containers/podman/releases) (requires manual machine setup)
+
+- **Linux**:
+  - `sudo apt install podman` (Debian/Ubuntu)
+  - See [Podman installation](https://podman.io/getting-started/installation) for other distros
+  - **No podman machine needed** - runs natively!
+
+**About Podman Machine (macOS/Windows only):**
+
+Since containers are Linux-based, macOS and Windows need a lightweight Linux VM to run them.
+This VM is called a "podman machine".
+
+- **Podman Desktop**: Automatically creates and manages the VM for you
+- **CLI only**: You must manually create and start the machine:
+
+  ```bash
+  # Create the machine (first time only)
+  podman machine init
+
+  # Start the machine
+  podman machine start
+
+  # Check status
+  podman machine list
+
+  # Stop when done (optional)
+  podman machine stop
+  ```
 
 **Configure VS Code for Podman:**
 
@@ -30,8 +89,9 @@ If using Podman instead of Docker, configure VS Code Dev Containers extension:
 
 1. Open VS Code Settings (Cmd/Ctrl + ,)
 2. Search for "dev containers docker path"
-3. Set **Dev > Containers: Docker Path** to:
-   - macOS/Linux: `/usr/local/bin/podman` (or run `which podman` to find path)
+3. Set **Dev > Containers: Docker Path** to the path or just `podman` if it is executable everywhere
+   - macOS: `/usr/local/bin/podman` (Homebrew) or `/opt/podman/bin/podman` (Podman Desktop)
+   - Linux: `/usr/bin/podman` (or run `which podman` to find exact path)
    - Windows: `C:\Program Files\RedHat\Podman\podman.exe`
 
 Or edit `.vscode/settings.json`:
@@ -40,6 +100,22 @@ Or edit `.vscode/settings.json`:
 {
   "dev.containers.dockerPath": "/usr/local/bin/podman"
 }
+```
+
+**Verify Podman is working:**
+
+```bash
+# Check version
+podman --version
+
+# On macOS/Windows: verify machine is running
+podman machine list
+# Should show:
+# NAME    VM TYPE   CREATED      LAST UP               CPUS  MEMORY  DISK SIZE
+# podman  qemu      X mins ago   Currently running     2     2GiB    100GiB
+
+# Test with a simple container
+podman run --rm hello-world
 ```
 
 ### 2. VS Code + Dev Containers Extension
@@ -51,9 +127,13 @@ Or edit `.vscode/settings.json`:
 
 **Install extension:**
 
+- via cli
+
 ```bash
 code --install-extension ms-vscode-remote.remote-containers
 ```
+
+- or from the VS code package browser
 
 ### 3. GitHub Container Registry (GHCR) Authentication
 
@@ -375,10 +455,45 @@ error: gpg failed to sign the data
    podman info
    ```
 
-2. **Check Podman machine** (macOS/Windows):
+   If this fails, Podman isn't properly running.
+
+2. **Check Podman machine** (macOS/Windows only):
 
    ```bash
+   # Check machine status
    podman machine list
+   ```
+
+   Common machine issues:
+
+   **Machine not running:**
+
+   ```bash
+   # Start the machine
+   podman machine start
+
+   # If it fails to start, try reinitializing
+   podman machine stop
+   podman machine rm
+   podman machine init
+   podman machine start
+   ```
+
+   **Machine doesn't exist:**
+
+   ```bash
+   # Create a new machine
+   podman machine init
+   podman machine start
+   ```
+
+   **Machine stuck or corrupted:**
+
+   ```bash
+   # Remove and recreate
+   podman machine stop
+   podman machine rm
+   podman machine init --cpus 2 --memory 4096 --disk-size 100
    podman machine start
    ```
 
@@ -400,6 +515,13 @@ error: gpg failed to sign the data
 
    # Update VS Code setting with full path
    ```
+
+5. **Podman Desktop users:**
+
+   - Open Podman Desktop
+   - Check if the machine is running in the GUI
+   - Try stopping and starting from the GUI
+   - Check logs in Podman Desktop for specific errors
 
 ### Issue: Pre-commit hooks fail to install
 
