@@ -141,6 +141,17 @@ def add_styling(output_html: Path, theme_toggle: bool = True) -> bool:
         return False
 
 
+def fix_trailing_whitespace(html_file: Path) -> None:
+    """Remove trailing whitespace from HTML file to pass linter checks."""
+    content = html_file.read_text(encoding="utf-8")
+    # Strip trailing whitespace from each line
+    fixed_content = "\n".join(line.rstrip() for line in content.splitlines())
+    # Ensure file ends with newline
+    if fixed_content and not fixed_content.endswith("\n"):
+        fixed_content += "\n"
+    html_file.write_text(fixed_content, encoding="utf-8")
+
+
 def main():
     """Main entry point."""
     if len(sys.argv) < 3:
@@ -179,6 +190,9 @@ def main():
     # Step 4: Add styling enhancements (theme toggle, TOC sidebar)
     if not add_styling(html_file, theme_toggle=theme_toggle):
         sys.exit(1)
+
+    # Step 5: Fix trailing whitespace in generated HTML
+    fix_trailing_whitespace(html_file)
 
     # Clean up temp file
     if temp_html.exists():
