@@ -170,23 +170,26 @@ make example
 ### Dev Container Option
 
 If you prefer containers (optional):
+
 - **Docker** or **Podman** (container runtime)
-- **VS Code** with "Dev Containers" extension (recommended)
-  - Or use any editor + run containers manually
+- **VS Code** with "Dev Containers" extension
+- **GitHub Container Registry (GHCR) token** for pulling pre-built images
 
-**Container setup by platform:**
-- **Linux**: `docker` or `podman` native
-- **macOS**: Docker Desktop or Podman Machine
-- **Windows**: Docker Desktop (auto-installs WSL2)
+**Quick start:**
 
-**Without VS Code:**
+1. Install [Docker Desktop](https://docs.docker.com/desktop/) or [Podman](https://podman.io/)
+2. Install [VS Code Dev Containers extension](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers)
+3. Configure Podman path (if using Podman) - see [Dev Container Setup Guide](docs/DEV_CONTAINER_SETUP.md#option-b-podman-docker-free-alternative)
+4. [Authenticate with GHCR](docs/DEV_CONTAINER_SETUP.md#3-github-container-registry-ghcr-authentication)
+5. Open project in VS Code and select "Reopen in Container"
 
-```bash
-# Build and run container manually:
-docker build -f .devcontainer/Containerfile -t typst-dev .
-docker run -it -v $(pwd):/workspace typst-dev
-# Then: make example
-```
+**Important setup requirements:**
+
+- GHCR authentication (GitHub Personal Access Token with `read:packages` scope)
+- SSH key named `~/.ssh/id_ed25519_github.pub` for git signing (optional)
+- Podman users: configure VS Code to use Podman instead of Docker
+
+See **[Dev Container Setup Guide](docs/DEV_CONTAINER_SETUP.md)** for complete instructions.
 
 ## 🔍 Code Quality & Linting
 
@@ -214,6 +217,7 @@ See [Linter & Pre-commit Guide](docs/LINTER_AND_PRECOMMIT.md) for details.
 
 - [Detailed Usage Guide](technical-documentation/README.md) - How to write documentation
 - [Build System Documentation](docs/BUILD_SYSTEM.md) - Build pipeline and make targets
+- [Dev Container Setup Guide](docs/DEV_CONTAINER_SETUP.md) - Container development environment
 - [Linter & Pre-commit Guide](docs/LINTER_AND_PRECOMMIT.md) - Code quality and hooks
 - [Dark Mode Color Standards](docs/DARK_MODE_COLOR_STANDARDS.md) - Color palette design
 - [Example Project](example/) - Working examples with diagrams
