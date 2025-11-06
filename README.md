@@ -188,11 +188,35 @@ docker run -it -v $(pwd):/workspace typst-dev
 # Then: make example
 ```
 
+## 🔍 Code Quality & Linting
+
+This project uses **pre-commit hooks** to automatically check and fix code quality issues:
+
+```bash
+# Install hooks (one-time setup)
+make install-hook
+
+# Hooks run automatically on git commit
+# Or run manually:
+pre-commit run --all-files
+```
+
+**What's checked:**
+- ✅ Trailing whitespace (auto-fixed)
+- ✅ Python code style (Ruff)
+- ✅ Shell scripts (ShellCheck)
+- ✅ YAML/JSON syntax
+- ✅ Markdown formatting
+
+See [Linter & Pre-commit Guide](docs/LINTER_AND_PRECOMMIT.md) for details.
+
 ## 📚 More Info
 
-- `technical-documentation/README.md` - Detailed usage
-- `docs/BUILD_SYSTEM.md` - Build system docs
-- `example/` - Working examples with diagrams
+- [Detailed Usage Guide](technical-documentation/README.md) - How to write documentation
+- [Build System Documentation](docs/BUILD_SYSTEM.md) - Build pipeline and make targets
+- [Linter & Pre-commit Guide](docs/LINTER_AND_PRECOMMIT.md) - Code quality and hooks
+- [Dark Mode Color Standards](docs/DARK_MODE_COLOR_STANDARDS.md) - Color palette design
+- [Example Project](example/) - Working examples with diagrams
 - `make help` - All available commands
 
 ---
