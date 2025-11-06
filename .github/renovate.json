@@ -3,7 +3,8 @@
   "extends": ["config:recommended"],
   "packageRules": [
     {
-      "description": "Security updates - immediate auto-merge after CI passes",
+      "description": "Security patches - immediate auto-merge after CI passes",
+      "matchUpdateTypes": ["patch"],
       "matchManagers": ["pep621"],
       "vulnerabilityAlerts": {
         "enabled": true
@@ -12,7 +13,18 @@
       "automergeType": "pr",
       "minimumReleaseAge": null,
       "schedule": ["at any time"],
-      "labels": ["dependencies", "security", "automerge"]
+      "labels": ["dependencies", "security", "patch", "automerge"]
+    },
+    {
+      "description": "Security in minor/major - urgent manual review",
+      "matchUpdateTypes": ["minor", "major"],
+      "matchManagers": ["pep621"],
+      "vulnerabilityAlerts": {
+        "enabled": true
+      },
+      "automerge": false,
+      "schedule": ["at any time"],
+      "labels": ["dependencies", "security", "urgent"]
     },
     {
       "description": "Patch updates - 3 day soak time before auto-merge",

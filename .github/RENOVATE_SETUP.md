@@ -6,7 +6,19 @@ This repository uses centralized reusable workflows from [MorePET/github-actions
 
 You need to create a **Fine-Grained Personal Access Token (PAT)** to allow Renovate to access this repository.
 
-## Step 1: Create Fine-Grained PAT
+## Step 1: Enable Auto-merge in Repository Settings
+
+**This is required for Renovate to auto-merge PRs after CI passes.**
+
+1. **Go to:** This repository's **Settings** → **General**
+
+2. **Scroll to** "Pull Requests" section
+
+3. **Check** ✅ **"Allow auto-merge"**
+
+4. **Click** "Save" if prompted
+
+## Step 2: Create Fine-Grained PAT
 
 1. **Go to:** [github.com/settings/tokens?type=beta](https://github.com/settings/tokens?type=beta)
 
@@ -17,7 +29,7 @@ You need to create a **Fine-Grained Personal Access Token (PAT)** to allow Renov
    - **Expiration:** 90 days (recommended for security)
    - **Repository access:** "Only select repositories"
      - Select this repository only
-
+   
 4. **Permissions → Repository permissions:**
    - **Contents:** Read and write ✅
    - **Pull requests:** Read and write ✅
@@ -28,7 +40,7 @@ You need to create a **Fine-Grained Personal Access Token (PAT)** to allow Renov
 
 6. **Copy the token** (you won't see it again!)
 
-## Step 2: Add Token to Repository Secrets
+## Step 3: Add Token to Repository Secrets
 
 1. **Go to:** This repository's **Settings** → **Secrets and variables** → **Actions**
 
@@ -40,7 +52,7 @@ You need to create a **Fine-Grained Personal Access Token (PAT)** to allow Renov
 
 4. **Click** "Add secret"
 
-## Step 3: Test the Workflow
+## Step 4: Test the Workflow
 
 1. **Go to:** Actions tab in this repository
 
@@ -61,7 +73,9 @@ You need to create a **Fine-Grained Personal Access Token (PAT)** to allow Renov
 
 ### Auto-merge Strategy
 
-Renovate will automatically merge certain updates after CI passes:
+**Renovate automatically enables auto-merge** on PRs it creates. When CI passes, GitHub will merge the PR automatically.
+
+Renovate will auto-merge certain updates after CI passes:
 
 | Update Type | Soak Time | Auto-merge? | Labels |
 |-------------|-----------|-------------|--------|
