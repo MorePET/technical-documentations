@@ -11,7 +11,8 @@
                 "charliermarsh.ruff",
                 "ms-vscode.vscode-json",
                 "redhat.vscode-yaml",
-                "GitHub.vscode-pull-request-github"
+                "GitHub.vscode-pull-request-github",
+                "ritwickdey.LiveServer"
             ],
             "settings": {
                 "python.defaultInterpreterPath": "/usr/local/bin/python",
