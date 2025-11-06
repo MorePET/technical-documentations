@@ -1,0 +1,60 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["config:recommended"],
+  "packageRules": [
+    {
+      "description": "Security updates - immediate auto-merge after CI passes",
+      "matchManagers": ["pep621"],
+      "vulnerabilityAlerts": {
+        "enabled": true
+      },
+      "automerge": true,
+      "automergeType": "pr",
+      "minimumReleaseAge": null,
+      "schedule": ["at any time"],
+      "labels": ["dependencies", "security", "automerge"]
+    },
+    {
+      "description": "Patch updates - 3 day soak time before auto-merge",
+      "matchUpdateTypes": ["patch"],
+      "matchManagers": ["pep621"],
+      "groupName": "Python patch updates",
+      "automerge": true,
+      "automergeType": "pr",
+      "minimumReleaseAge": "3 days",
+      "schedule": ["at any time"],
+      "labels": ["dependencies", "patch", "automerge"]
+    },
+    {
+      "description": "Minor updates - manual review required",
+      "matchUpdateTypes": ["minor"],
+      "matchManagers": ["pep621"],
+      "groupName": "Python minor updates",
+      "automerge": false,
+      "schedule": ["every weekend"],
+      "labels": ["dependencies", "minor"]
+    },
+    {
+      "description": "Major updates - manual review required",
+      "matchUpdateTypes": ["major"],
+      "matchManagers": ["pep621"],
+      "groupName": "Python major updates",
+      "automerge": false,
+      "schedule": ["every 2 weeks on Monday"],
+      "labels": ["dependencies", "major"]
+    },
+    {
+      "description": "Pre-commit hooks - group and manual review",
+      "matchManagers": ["pre-commit"],
+      "groupName": "Pre-commit hooks",
+      "automerge": false,
+      "schedule": ["every 2 weeks on Monday"],
+      "labels": ["dependencies", "pre-commit"]
+    }
+  ],
+  "prConcurrentLimit": 5,
+  "prHourlyLimit": 2,
+  "labels": ["dependencies"],
+  "assignees": [],
+  "reviewers": []
+}

@@ -83,6 +83,29 @@ repos:
         files: ^Makefile$
         args: ["--config=.checkmake.ini"]
 
+  # Typst Syntax Check
+  - repo: local
+    hooks:
+      - id: typst-check
+        name: Typst Syntax Check
+        entry: bash -c 'for file in "$@"; do typst compile "$file" /dev/null || exit 1; done' --
+        language: system
+        files: '\.typ$'
+        pass_filenames: true
+      - id: sembr-check
+        name: Check semantic line breaks (warning only)
+        entry: bash -c 'uv run sembr check "$@" 2>&1 || exit 0' --
+        language: system
+        files: '\.typ$'
+        pass_filenames: true
+      - id: sembr-fix
+        name: Format with semantic line breaks (manual)
+        entry: bash -c 'uv run sembr format --in-place "$@"' --
+        language: system
+        files: '\.typ$'
+        pass_filenames: true
+        stages: [manual]
+
   # GitHub Data Sync
   - repo: local
     hooks:
