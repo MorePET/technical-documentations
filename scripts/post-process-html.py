@@ -19,93 +19,104 @@ from pathlib import Path
 
 def inject_svgs_into_html(html_content: str, diagrams_dir: Path) -> str:
     """Inject SVG content into HTML where diagrams should appear."""
-    
+
     # Find all img tags with diagram SVG sources
     img_pattern = r'<img[^>]*src="([^"]*diagrams/[^"]*\.svg)"[^>]*>'
-    
+
     def replace_img_with_svg(match):
         svg_path_str = match.group(1)
         svg_file = diagrams_dir.parent / svg_path_str
-        
+
         if not svg_file.exists():
             print(f"Warning: SVG file not found: {svg_file}")
             return match.group(0)  # Return original if SVG not found
-        
+
         try:
             svg_content = svg_file.read_text()
             # Extract just the SVG element (remove XML declaration if present)
-            svg_start = svg_content.find('<svg')
+            svg_start = svg_content.find("<svg")
             if svg_start != -1:
                 svg_content = svg_content[svg_start:]
-            
+
             print(f"  ✓ Injected {svg_file.name}")
             return f'<div class="diagram-container">{svg_content}</div>'
         except Exception as e:
             print(f"  ✗ Error reading {svg_file.name}: {e}")
             return match.group(0)
-    
+
     html_content = re.sub(img_pattern, replace_img_with_svg, html_content)
-    
+
     # Fallback: inject SVGs based on known section headers
     # This handles the case where Typst HTML export doesn't create img tags
     diagram_mappings = {
-        'System Architecture Diagram': 'architecture.svg',
-        'Data Flow Diagram': 'data-flow.svg',
-        'State Machine Diagram': 'state-machine.svg',
+        "System Architecture Diagram": "architecture.svg",
+        "Data Flow Diagram": "data-flow.svg",
+        "State Machine Diagram": "state-machine.svg",
     }
-    
+
     for header_text, svg_filename in diagram_mappings.items():
         svg_file = diagrams_dir / svg_filename
-        
+
         if not svg_file.exists():
             continue
-        
+
         # Find the paragraph after the header containing this text
-        pattern = rf'(<h3>[^<]*{re.escape(header_text)}[^<]*</h3>\s*</div>\s*<p>[^<]*</p>)'
-        
-        def inject_after_paragraph(match):
+        pattern = (
+            rf"(<h3>[^<]*{re.escape(header_text)}[^<]*</h3>\s*</div>\s*<p>[^<]*</p>)"
+        )
+
+        def inject_after_paragraph(
+            match, svg_file=svg_file, svg_filename=svg_filename, header_text=header_text
+        ):
             try:
                 svg_content = svg_file.read_text()
-                svg_start = svg_content.find('<svg')
+                svg_start = svg_content.find("<svg")
                 if svg_start != -1:
                     svg_content = svg_content[svg_start:]
-                
+
                 print(f"  ✓ Injected {svg_filename} after '{header_text}' section")
-                return match.group(1) + f'\n    <div class="diagram-container">{svg_content}</div>'
+                return (
+                    match.group(1)
+                    + f'\n    <div class="diagram-container">{svg_content}</div>'
+                )
             except Exception as e:
                 print(f"  ✗ Error reading {svg_filename}: {e}")
                 return match.group(1)
-        
+
         html_content = re.sub(pattern, inject_after_paragraph, html_content)
-    
+
     return html_content
 
 
 def add_css_link(html_content: str, css_path: str = "generated/colors.css") -> str:
     """Inline colors.css into HTML head (needed for data-theme to work with SVGs)."""
-    
-    if '--color-background' in html_content:
+
+    if "--color-background" in html_content:
         return html_content  # Already has the CSS inlined
-    
+
     # Read the colors.css file and inline it
     project_root = Path(__file__).parent.parent  # Go up from scripts/ to project root
-    colors_css_file = project_root / 'lib' / css_path
-    
+    colors_css_file = project_root / "lib" / css_path
+
     if not colors_css_file.exists():
-        colors_css_file = project_root / 'colors.css'
-    
+        colors_css_file = project_root / "colors.css"
+
     if colors_css_file.exists():
         colors_css_content = colors_css_file.read_text()
-        css_inline = f'    <style>\n/* Diagram colors - inlined for data-theme support */\n{colors_css_content}\n    </style>\n'
-        
+        css_inline = f"    <style>\n/* Diagram colors - inlined for data-theme support */\n{colors_css_content}\n    </style>\n"
+
         # Find </head> tag and insert before it
-        head_end = html_content.find('</head>')
+        head_end = html_content.find("</head>")
         if head_end != -1:
-            html_content = html_content[:head_end] + css_inline + html_content[head_end:]
+            html_content = (
+                html_content[:head_end] + css_inline + html_content[head_end:]
+            )
             print("  ✓ Inlined colors.css into HTML head for theme support")
     else:
-        print(f"  ⚠ Warning: {css_path} not found, colors may not switch with theme toggle")
-    
+        print(
+            f"  ⚠ Warning: {css_path} not found, colors may not switch with theme toggle"
+        )
+
     return html_content
 
 
@@ -114,42 +125,41 @@ def main():
     if len(sys.argv) < 3:
         print("Usage: python3 post-process-html.py input.html output.html")
         sys.exit(1)
-    
+
     input_file = Path(sys.argv[1])
     output_file = Path(sys.argv[2])
-    
+
     if not input_file.exists():
         print(f"Error: Input file not found: {input_file}")
         sys.exit(1)
-    
+
     # Diagrams are in example/diagrams/
     project_root = Path(__file__).parent.parent
-    diagrams_dir = project_root / 'example' / 'diagrams'
-    
+    diagrams_dir = project_root / "example" / "diagrams"
+
     print(f"Processing {input_file}...")
-    
+
     # Read HTML content
     html_content = input_file.read_text()
-    
+
     # Inject SVGs
     print("\nInjecting SVG diagrams...")
     html_content = inject_svgs_into_html(html_content, diagrams_dir)
-    
+
     # Add CSS link
     print("\nAdding CSS stylesheet...")
     html_content = add_css_link(html_content)
-    
+
     # Write output
     output_file.write_text(html_content)
-    
+
     print(f"\n✓ Successfully processed HTML → {output_file}")
     print("\nNext steps:")
     print("1. Copy generated/colors.css to the same directory as your HTML")
     print("2. Open the HTML in a browser to test dark mode")
-    
+
     return 0
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     sys.exit(main())
-

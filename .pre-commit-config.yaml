@@ -28,14 +28,12 @@ repos:
         entry: uv run ruff check --fix --ignore=D
         language: system
         types: [python]
-        files: ^(src/|scripts/|tests/).*\.py$
         stages: [pre-commit]
       - id: ruff-format
         name: ruff format
         entry: uv run ruff format
         language: system
         types: [python]
-        files: ^(src/|scripts/|tests/).*\.py$
         stages: [pre-commit]
 
   # YAML Linting

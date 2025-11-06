@@ -4,12 +4,20 @@ Script to add CSS styling to Typst HTML exports with optional dark mode toggle a
 Usage: python add-styling.py input.html [output.html] [--inline] [--theme-toggle] [--toc-sidebar]
 """
 
-import sys
 import re
+import sys
 from pathlib import Path
 
 
-def add_css_to_html(input_file, output_file=None, css_file="styles.css", inline=False, force=False, theme_toggle=False, toc_sidebar=False):
+def add_css_to_html(
+    input_file,
+    output_file=None,
+    css_file="styles.css",
+    inline=False,
+    force=False,
+    theme_toggle=False,
+    toc_sidebar=False,
+):
     """
     Add CSS link or inline styles to an HTML file with optional theme toggle and TOC sidebar.
 
@@ -27,15 +35,15 @@ def add_css_to_html(input_file, output_file=None, css_file="styles.css", inline=
     css_path = Path(css_file)
 
     # Read the HTML
-    html_content = input_path.read_text(encoding='utf-8')
+    html_content = input_path.read_text(encoding="utf-8")
 
     # Check if styling already exists
-    if '<link rel="stylesheet"' in html_content or '<style>' in html_content:
+    if '<link rel="stylesheet"' in html_content or "<style>" in html_content:
         if not force:
             print("⚠️  Styling already exists in the HTML file.")
             try:
                 response = input("Do you want to replace it? (y/n): ")
-                if response.lower() != 'y':
+                if response.lower() != "y":
                     print("Aborted.")
                     return
             except EOFError:
@@ -44,28 +52,38 @@ def add_css_to_html(input_file, output_file=None, css_file="styles.css", inline=
         # Remove existing style/link tags from the head section only (not from SVGs!)
         # But preserve diagram colors CSS which is needed for theme switching
         # Split at </head> to only process the head section
-        head_end = html_content.find('</head>')
+        head_end = html_content.find("</head>")
         if head_end != -1:
             head_section = html_content[:head_end]
             body_section = html_content[head_end:]
 
             # Preserve diagram colors CSS if present
-            diagram_colors_match = re.search(r'(<style>\s*/\* Diagram colors.*?</style>)', head_section, flags=re.DOTALL)
-            diagram_colors_css = diagram_colors_match.group(1) if diagram_colors_match else ''
+            diagram_colors_match = re.search(
+                r"(<style>\s*/\* Diagram colors.*?</style>)",
+                head_section,
+                flags=re.DOTALL,
+            )
+            diagram_colors_css = (
+                diagram_colors_match.group(1) if diagram_colors_match else ""
+            )
 
             # Remove style/link tags only from head
-            head_section = re.sub(r'<link[^>]*rel="stylesheet"[^>]*>', '', head_section)
-            head_section = re.sub(r'<style>.*?</style>', '', head_section, flags=re.DOTALL)
+            head_section = re.sub(r'<link[^>]*rel="stylesheet"[^>]*>', "", head_section)
+            head_section = re.sub(
+                r"<style>.*?</style>", "", head_section, flags=re.DOTALL
+            )
 
             # Restore diagram colors CSS
             if diagram_colors_css:
-                head_section += f'\n    {diagram_colors_css}\n'
+                head_section += f"\n    {diagram_colors_css}\n"
 
             html_content = head_section + body_section
         else:
             # Fallback: remove all (shouldn't happen with valid HTML)
-            html_content = re.sub(r'<link[^>]*rel="stylesheet"[^>]*>', '', html_content)
-            html_content = re.sub(r'<style>.*?</style>', '', html_content, flags=re.DOTALL)
+            html_content = re.sub(r'<link[^>]*rel="stylesheet"[^>]*>', "", html_content)
+            html_content = re.sub(
+                r"<style>.*?</style>", "", html_content, flags=re.DOTALL
+            )
 
     if inline:
         # Inline CSS
@@ -73,19 +91,21 @@ def add_css_to_html(input_file, output_file=None, css_file="styles.css", inline=
             print(f"❌ CSS file not found: {css_path}")
             sys.exit(1)
 
-        css_content = css_path.read_text(encoding='utf-8')
+        css_content = css_path.read_text(encoding="utf-8")
         style_tag = f"\n    <style>\n{css_content}\n    </style>"
 
         # Insert before </head> or after <head>
-        if '</head>' in html_content:
-            html_content = html_content.replace('</head>', f'{style_tag}\n  </head>')
-        elif '<head>' in html_content:
-            html_content = html_content.replace('<head>', f'<head>{style_tag}')
+        if "</head>" in html_content:
+            html_content = html_content.replace("</head>", f"{style_tag}\n  </head>")
+        elif "<head>" in html_content:
+            html_content = html_content.replace("<head>", f"<head>{style_tag}")
         else:
             # Add head section if it doesn't exist
-            html_content = html_content.replace('<html>', f'<html>\n  <head>{style_tag}\n  </head>')
+            html_content = html_content.replace(
+                "<html>", f"<html>\n  <head>{style_tag}\n  </head>"
+            )
 
-        print(f"✅ Embedded CSS inline")
+        print("✅ Embedded CSS inline")
     else:
         # External link
         # Use relative path
@@ -93,13 +113,15 @@ def add_css_to_html(input_file, output_file=None, css_file="styles.css", inline=
         link_tag = f'\n    <link rel="stylesheet" href="{css_relative}">'
 
         # Insert before </head> or after <head>
-        if '</head>' in html_content:
-            html_content = html_content.replace('</head>', f'{link_tag}\n  </head>')
-        elif '<head>' in html_content:
-            html_content = html_content.replace('<head>', f'<head>{link_tag}')
+        if "</head>" in html_content:
+            html_content = html_content.replace("</head>", f"{link_tag}\n  </head>")
+        elif "<head>" in html_content:
+            html_content = html_content.replace("<head>", f"<head>{link_tag}")
         else:
             # Add head section if it doesn't exist
-            html_content = html_content.replace('<html>', f'<html>\n  <head>{link_tag}\n  </head>')
+            html_content = html_content.replace(
+                "<html>", f"<html>\n  <head>{link_tag}\n  </head>"
+            )
 
         print(f"✅ Added link to {css_relative}")
 
@@ -109,14 +131,14 @@ def add_css_to_html(input_file, output_file=None, css_file="styles.css", inline=
     # Add theme toggle if requested
     if theme_toggle:
         # Theme toggle button HTML
-        toggle_html = '''
+        toggle_html = """
     <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme">
       <span id="theme-icon">🌓</span> Theme
-    </button>'''
+    </button>"""
         body_injections.append(toggle_html)
 
         # Theme toggle JavaScript
-        toggle_js = '''
+        toggle_js = """
     <script>
       // Theme toggle functionality
       const body = document.body;
@@ -160,10 +182,10 @@ def add_css_to_html(input_file, output_file=None, css_file="styles.css", inline=
           icon.textContent = '🌓';
         }
       }
-    </script>'''
+    </script>"""
 
         # Theme toggle CSS
-        toggle_css = '''
+        toggle_css = """
     <style>
       /* Theme Toggle Button */
       .theme-toggle {
@@ -249,30 +271,32 @@ def add_css_to_html(input_file, output_file=None, css_file="styles.css", inline=
           font-size: 0.9rem;
         }
       }
-    </style>'''
+    </style>"""
 
         # Insert CSS before </head> or at the beginning
-        if '</head>' in html_content:
-            html_content = html_content.replace('</head>', f'{toggle_css}\n  </head>')
-        elif '<head>' in html_content:
-            html_content = html_content.replace('<head>', f'<head>{toggle_css}')
+        if "</head>" in html_content:
+            html_content = html_content.replace("</head>", f"{toggle_css}\n  </head>")
+        elif "<head>" in html_content:
+            html_content = html_content.replace("<head>", f"<head>{toggle_css}")
         else:
             # Add head if it doesn't exist
-            html_content = html_content.replace('<html>', f'<html>\n  <head>{toggle_css}\n  </head>')
+            html_content = html_content.replace(
+                "<html>", f"<html>\n  <head>{toggle_css}\n  </head>"
+            )
 
         # Insert JavaScript before </body> or at the end
-        if '</body>' in html_content:
-            html_content = html_content.replace('</body>', f'{toggle_js}\n  </body>')
+        if "</body>" in html_content:
+            html_content = html_content.replace("</body>", f"{toggle_js}\n  </body>")
         else:
             # Fallback: add before </html>
-            html_content = html_content.replace('</html>', f'{toggle_js}\n</html>')
+            html_content = html_content.replace("</html>", f"{toggle_js}\n</html>")
 
-        print(f"✅ Added dark mode toggle button")
+        print("✅ Added dark mode toggle button")
 
     # Add TOC sidebar if requested
     if toc_sidebar:
         # TOC sidebar HTML
-        toc_html = '''
+        toc_html = """
     <!-- TOC Sidebar -->
     <div id="toc-sidebar" class="toc-sidebar">
       <div class="toc-header">
@@ -286,11 +310,11 @@ def add_css_to_html(input_file, output_file=None, css_file="styles.css", inline=
     <button id="toc-expand-btn" class="toc-expand-btn" aria-label="Expand sidebar">→</button>
     <button id="toc-mobile-toggle" class="toc-mobile-toggle" aria-label="Toggle table of contents">
 
-    </button>'''
+    </button>"""
         body_injections.append(toc_html)
 
         # TOC JavaScript
-        toc_js = '''
+        toc_js = """
     <script>
       // TOC Sidebar functionality
       (function() {
@@ -453,10 +477,10 @@ def add_css_to_html(input_file, output_file=None, css_file="styles.css", inline=
         // Initial highlight
         highlightActiveSection();
       })();
-    </script>'''
+    </script>"""
 
         # TOC CSS
-        toc_css = '''
+        toc_css = """
     <style>
       /* TOC Sidebar */
       .toc-sidebar {
@@ -724,65 +748,90 @@ def add_css_to_html(input_file, output_file=None, css_file="styles.css", inline=
           margin-left: 0 !important;
         }
       }
-    </style>'''
+    </style>"""
 
         # Insert CSS before </head>
-        if '</head>' in html_content:
-            html_content = html_content.replace('</head>', f'{toc_css}\n  </head>')
-        elif '<head>' in html_content:
-            html_content = html_content.replace('<head>', f'<head>{toc_css}')
+        if "</head>" in html_content:
+            html_content = html_content.replace("</head>", f"{toc_css}\n  </head>")
+        elif "<head>" in html_content:
+            html_content = html_content.replace("<head>", f"<head>{toc_css}")
         else:
-            html_content = html_content.replace('<html>', f'<html>\n  <head>{toc_css}\n  </head>')
+            html_content = html_content.replace(
+                "<html>", f"<html>\n  <head>{toc_css}\n  </head>"
+            )
 
         # Insert JavaScript before </body>
-        if '</body>' in html_content:
-            html_content = html_content.replace('</body>', f'{toc_js}\n  </body>')
+        if "</body>" in html_content:
+            html_content = html_content.replace("</body>", f"{toc_js}\n  </body>")
         else:
-            html_content = html_content.replace('</html>', f'{toc_js}\n</html>')
+            html_content = html_content.replace("</html>", f"{toc_js}\n</html>")
 
-        print(f"✅ Added collapsible TOC sidebar (click active section to toggle subsections)")
+        print(
+            "✅ Added collapsible TOC sidebar (click active section to toggle subsections)"
+        )
 
     # Inject all body elements at once (after <body> tag)
     if body_injections:
-        combined_injection = ''.join(body_injections)
-        if '<body>' in html_content:
-            html_content = html_content.replace('<body>', f'<body>{combined_injection}', 1)
+        combined_injection = "".join(body_injections)
+        if "<body>" in html_content:
+            html_content = html_content.replace(
+                "<body>", f"<body>{combined_injection}", 1
+            )
         else:
             # Fallback: add after html tag
-            html_content = html_content.replace('<html>', f'<html><body>{combined_injection}', 1)
+            html_content = html_content.replace(
+                "<html>", f"<html><body>{combined_injection}", 1
+            )
 
     # Write the modified HTML
-    output_path.write_text(html_content, encoding='utf-8')
+    output_path.write_text(html_content, encoding="utf-8")
 
     print(f"✅ Styled HTML saved to: {output_path}")
     print(f"\n💡 Open {output_path} in your browser to see the result!")
     if theme_toggle:
-        print(f"🌓 Click the theme button in the top-right corner to switch between light/dark/auto modes!")
+        print(
+            "🌓 Click the theme button in the top-right corner to switch between light/dark/auto modes!"
+        )
     if toc_sidebar:
-        print(f"TOC sidebar on the left shows all headings - click active section to toggle subsections!")
+        print(
+            "TOC sidebar on the left shows all headings - click active section to toggle subsections!"
+        )
 
 
 if __name__ == "__main__":
     if len(sys.argv) < 2:
-        print("Usage: python add-styling.py input.html [output.html] [--inline] [--force] [--theme-toggle] [--toc-sidebar]")
-        print("Example: python add-styling.py stakeholder-example.html --theme-toggle --toc-sidebar")
+        print(
+            "Usage: python add-styling.py input.html [output.html] [--inline] [--force] [--theme-toggle] [--toc-sidebar]"
+        )
+        print(
+            "Example: python add-styling.py stakeholder-example.html --theme-toggle --toc-sidebar"
+        )
         print("  --inline:       Embed CSS directly (default: external link)")
         print("  --force:        Skip confirmation prompts")
         print("  --theme-toggle: Add dark mode toggle button in top-right corner")
-        print("  --toc-sidebar:  Add sticky table of contents sidebar with collapsible sections")
+        print(
+            "  --toc-sidebar:  Add sticky table of contents sidebar with collapsible sections"
+        )
         sys.exit(1)
 
     # Parse arguments
     args = sys.argv[1:]
-    inline = '--inline' in args
-    force = '--force' in args
-    theme_toggle = '--theme-toggle' in args
-    toc_sidebar = '--toc-sidebar' in args
+    inline = "--inline" in args
+    force = "--force" in args
+    theme_toggle = "--theme-toggle" in args
+    toc_sidebar = "--toc-sidebar" in args
 
     # Remove flags from args
-    file_args = [arg for arg in args if not arg.startswith('--')]
+    file_args = [arg for arg in args if not arg.startswith("--")]
 
     input_file = file_args[0]
     output_file = file_args[1] if len(file_args) > 1 else None
 
-    add_css_to_html(input_file, output_file, inline=inline, force=force, theme_toggle=theme_toggle, toc_sidebar=toc_sidebar)
+    add_css_to_html(
+        input_file,
+        output_file,
+        inline=inline,
+        force=force,
+        theme_toggle=theme_toggle,
+        toc_sidebar=toc_sidebar,
+    )
