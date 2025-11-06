@@ -34,6 +34,45 @@ fi
 GITCONFIG_OUT="$CONF_DIR/.gitconfig"
 GITCONFIG_GLOBAL="$CONF_DIR/.gitconfig.global"
 
+# Validate git configuration before proceeding
+echo "Validating git configuration..."
+GIT_CONFIG_MISSING=false
+
+if ! git config --global user.name >/dev/null 2>&1; then
+	echo ""
+	echo "❌ ERROR: Git user.name is not configured on your host machine"
+	echo ""
+	echo "To fix this, run the following command on your HOST machine:"
+	echo "  git config --global user.name \"Your Name\""
+	echo ""
+	GIT_CONFIG_MISSING=true
+fi
+
+if ! git config --global user.email >/dev/null 2>&1; then
+	echo ""
+	echo "❌ ERROR: Git user.email is not configured on your host machine"
+	echo ""
+	echo "To fix this, run the following command on your HOST machine:"
+	echo "  git config --global user.email \"your.email@example.com\""
+	echo ""
+	GIT_CONFIG_MISSING=true
+fi
+
+if [ "$GIT_CONFIG_MISSING" = "true" ]; then
+	echo "================================================================"
+	echo "Git configuration is incomplete!"
+	echo ""
+	echo "Please see the 'Required Git Configuration' section in:"
+	echo "  docs/DEV_CONTAINER_SETUP.md#required-git-configuration"
+	echo ""
+	echo "After configuring git, run this script again:"
+	echo "  .devcontainer/setup-user-conf.sh"
+	echo "================================================================"
+	exit 1
+fi
+
+echo "✅ Git configuration is valid"
+
 git config --list --global --include >"$GITCONFIG_GLOBAL"
 
 # Parse key-value pairs and reconstruct .gitconfig with correct section/subsection syntax

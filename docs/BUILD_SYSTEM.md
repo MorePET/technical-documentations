@@ -7,6 +7,7 @@ Complete automated build system for technical documentation with diagrams, dark 
 ## Quick Start
 
 ### Option 1: Makefile (Recommended)
+
 ```bash
 make              # Build everything (same as 'make all')
 make help         # Show all available targets
@@ -16,6 +17,7 @@ make rebuild      # Clean and rebuild everything
 ```
 
 ### Option 2: Shell Script
+
 ```bash
 ./build-all.sh    # Complete build with colored output
 ```
@@ -40,7 +42,7 @@ make rebuild      # Clean and rebuild everything
 
 The build system follows this dependency chain:
 
-```
+```text
 colors.json
     ↓
 [build-colors.py]
@@ -65,11 +67,13 @@ technical-doc-example.pdf   technical-doc-example.html
 ## Pre-Commit Hook
 
 ### Installation
+
 ```bash
 make install-hook
 ```
 
 ### What It Does
+
 The pre-commit hook automatically rebuilds components when source files change:
 
 | Changed File | Triggers |
@@ -80,12 +84,14 @@ The pre-commit hook automatically rebuilds components when source files change:
 | `build-*.py` | Rebuilds everything (safety) |
 
 ### How It Works
+
 1. **Detects changes** in staged files
 2. **Rebuilds** affected components
 3. **Stages updated outputs** for commit
 4. **Commits** with all outputs in sync
 
 ### Example
+
 ```bash
 # Edit a diagram
 vim diagrams/architecture.typ
@@ -112,6 +118,7 @@ git commit -m "Update architecture diagram"
 ## Build Scripts
 
 ### Core Scripts
+
 | Script | Purpose |
 |--------|---------|
 | `build-colors.py` | Generates CSS and Typst files from colors.json |
@@ -121,6 +128,7 @@ git commit -m "Update architecture diagram"
 | `add-styling.py` | Adds theme toggle, TOC sidebar, and general styling |
 
 ### Build Orchestration
+
 | File | Purpose |
 |------|---------|
 | `Makefile` | GNU Make build system with targets and dependencies |
@@ -130,7 +138,9 @@ git commit -m "Update architecture diagram"
 ## Configuration Files
 
 ### colors.json
+
 Master color palette for both light and dark modes:
+
 ```json
 {
   "colors": {
@@ -147,6 +157,7 @@ Master color palette for both light and dark modes:
 **Edit this file** to change colors across all outputs (PDF, HTML, diagrams).
 
 ### Diagram Sources
+
 - `diagrams/architecture.typ` - System architecture diagram
 - `diagrams/data-flow.typ` - Data flow diagram
 - `diagrams/state-machine.typ` - State machine diagram
@@ -156,10 +167,12 @@ Edit these files to modify diagram content.
 ## Output Files
 
 ### Primary Outputs
+
 - `technical-doc-example.pdf` - Complete documentation (PDF)
 - `technical-doc-example.html` - Interactive HTML with dark mode
 
 ### Generated Assets
+
 - `generated/colors.css` - CSS variables for dark/light modes
 - `generated/colors.typ` - Typst color definitions
 - `diagrams/*.svg` - Diagram SVGs with dark mode support
@@ -168,17 +181,20 @@ Edit these files to modify diagram content.
 ## Cleaning Up
 
 ### Remove Build Artifacts
+
 ```bash
 make clean
 ```
 
 Removes:
+
 - PDF and HTML outputs
 - Generated SVGs
 - Generated color files
 - Temporary files
 
 ### Rebuild from Scratch
+
 ```bash
 make rebuild
 ```
@@ -188,6 +204,7 @@ Equivalent to `make clean && make all`.
 ## Troubleshooting
 
 ### Build Fails
+
 ```bash
 # Check configuration
 make check
@@ -197,6 +214,7 @@ make rebuild
 ```
 
 ### Pre-commit Hook Not Working
+
 ```bash
 # Reinstall
 make install-hook
@@ -206,6 +224,7 @@ ls -la .git/hooks/
 ```
 
 ### Colors Not Updating
+
 ```bash
 # Force regenerate
 make colors diagrams
@@ -215,7 +234,9 @@ make rebuild
 ```
 
 ### Dark Mode Not Switching
+
 Check that `colors.css` is properly inlined in HTML:
+
 ```bash
 grep "data-theme" technical-doc-example.html
 ```
@@ -223,7 +244,9 @@ grep "data-theme" technical-doc-example.html
 ## Integration with IDEs
 
 ### VS Code
+
 Add to `.vscode/tasks.json`:
+
 ```json
 {
   "version": "2.0.0",
@@ -244,6 +267,7 @@ Add to `.vscode/tasks.json`:
 Press `Ctrl+Shift+B` to build.
 
 ### Continuous Build (Watch Mode)
+
 ```bash
 # Using entr (if installed)
 ls colors.json diagrams/*.typ *.typ | entr -c make all
@@ -257,6 +281,7 @@ done
 ## CI/CD Integration
 
 ### GitHub Actions
+
 ```yaml
 name: Build Documentation
 on: [push, pull_request]
@@ -278,6 +303,7 @@ jobs:
 ## Performance
 
 Typical build times on modern hardware:
+
 - Colors: ~0.5s
 - Diagrams: ~2s (3 diagrams)
 - PDF: ~1s
@@ -297,6 +323,7 @@ Incremental builds (only changed components) are faster.
 ## Advanced Usage
 
 ### Custom Build Order
+
 ```bash
 # Just update colors and diagrams
 make colors diagrams
@@ -306,18 +333,21 @@ make colors diagrams html
 ```
 
 ### Parallel Builds
+
 ```bash
 # Use -j for parallel execution
 make -j4 all
 ```
 
 ### Dry Run
+
 ```bash
 # See what would be built
 make -n all
 ```
 
 ### Debug Mode
+
 ```bash
 # Verbose output
 make all V=1
@@ -327,7 +357,8 @@ make all V=1
 ```
 
 ## File Structure
-```
+
+```text
 /workspace/
 ├── Makefile                          # GNU Make build system
 ├── build-all.sh                      # Shell script builder
@@ -356,6 +387,7 @@ make all V=1
 ## Support
 
 For issues or questions:
+
 1. Run `make check` to validate configuration
 2. Run `make rebuild` for a clean build
 3. Check individual scripts: `python3 build-*.py`
@@ -383,4 +415,3 @@ make install-hook       # Install pre-commit hook
 # Help
 make help               # Show all targets
 ```
-

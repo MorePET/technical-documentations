@@ -11,6 +11,9 @@ SCRIPTS_DIR="/workspace/.devcontainer/scripts"
 # Set up git configuration
 "$SCRIPTS_DIR/setup-git-conf.sh"
 
+# Set up GitHub CLI authentication (common script for SOLID principle)
+"$SCRIPTS_DIR/setup-gh-auth.sh" || true  # Don't fail if auth fails
+
 # Set up project with dynamic naming
 "$SCRIPTS_DIR/setup-project.sh"
 

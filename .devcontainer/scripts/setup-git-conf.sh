@@ -1,5 +1,5 @@
 #!/bin/bash
-set -e
+set -euo pipefail
 
 # Script to set up git configuration and hooks within the dev container
 # This is used to ensure that the git configuration and hooks are consistent

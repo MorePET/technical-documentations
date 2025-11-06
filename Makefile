@@ -2,7 +2,7 @@
 # Builds diagrams, colors, PDF, and HTML with dark mode support
 # Supports multiple projects
 
-.PHONY: all clean colors diagrams pdf html help check test example technical-documentation rebuild all-projects view-example view-technical-documentation install-hook build-project build-summary check-outputs clean-outputs clean-generated
+.PHONY: all clean colors diagrams pdf html help check test example technical-documentation rebuild all-projects install-hook build-project build-summary check-outputs clean-outputs clean-generated server-start server-stop server-status
 
 # Default project
 PROJECT ?= technical-documentation
@@ -34,9 +34,9 @@ build-summary:
 	@echo "✅ Build Complete!"
 	@echo "=================================================="
 	@echo "📄 PDF:  $(OUT).pdf"
-	@echo "🌐 HTML: file://$(shell pwd)/$(OUT).html"
+	@echo "🌐 HTML: http://localhost:8000/$(OUT).html"
 	@echo ""
-	@echo "💡 Output files ready to view"
+	@echo "💡 Click the HTML link above to open in browser"
 
 # Build technical-documentation project (the default for real work)
 technical-documentation:
@@ -44,6 +44,7 @@ technical-documentation:
 	@echo "🚀 Building Technical Documentation Project"
 	@echo "=================================================="
 	@$(MAKE) build-project SRC=$(TECH_DOC_SRC) OUT=$(TECH_DOC_OUT) PROJECT=technical-documentation
+	@$(MAKE) server-start
 	@$(MAKE) build-summary OUT=$(TECH_DOC_OUT)
 	@echo "🌓 Toggle dark mode with the button in top-right"
 
@@ -53,6 +54,7 @@ example:
 	@echo "🎨 Building Example Project"
 	@echo "=================================================="
 	@$(MAKE) build-project SRC=$(EXAMPLE_SRC) OUT=$(EXAMPLE_OUT) PROJECT=example
+	@$(MAKE) server-start
 	@$(MAKE) build-summary OUT=$(EXAMPLE_OUT)
 
 # Build all projects
@@ -141,8 +143,10 @@ clean-generated:
 # Clean build artifacts
 clean:
 	@echo "🧹 Cleaning build artifacts..."
+	@$(MAKE) server-stop 2>/dev/null || true
 	@$(MAKE) clean-outputs
 	@$(MAKE) clean-generated
+	@rm -f .server.pid
 	@echo "✓ Clean complete"
 
 # Clean and rebuild everything
@@ -176,13 +180,18 @@ help:
 	@echo "  make rebuild            - Clean and rebuild everything"
 	@echo "  make help               - Show this help message"
 	@echo ""
+	@echo "Server targets:"
+	@echo "  make server-start       - Start HTTP server on port 8000"
+	@echo "  make server-stop        - Stop the HTTP server"
+	@echo "  make server-status      - Check server status"
+	@echo ""
 	@echo "Pre-commit hook:"
 	@echo "  make install-hook       - Install git pre-commit hook"
 	@echo ""
 	@echo "Examples:"
-	@echo "  make                           # Build technical-documentation (your real work)"
-	@echo "  make example                   # Build the example project"
-	@echo "  make example && make view-example  # Build and open example"
+	@echo "  make                           # Build technical-documentation (starts server)"
+	@echo "  make example                   # Build example project (starts server)"
+	@echo "  make server-stop               # Stop the HTTP server"
 	@echo "  make THEME_TOGGLE=no           # Build without theme toggle (auto only)"
 	@echo "  make diagrams PROJECT=example  # Just compile example diagrams"
 	@echo "  make rebuild                   # Clean and rebuild"
@@ -200,3 +209,47 @@ install-hook:
 	@echo "  2. Check if diagram .typ files were modified"
 	@echo "  3. Rebuild affected components"
 	@echo "  4. Stage updated files for commit"
+
+# HTTP Server Management
+server-start:
+	@if [ -f .server.pid ] && kill -0 $$(cat .server.pid) 2>/dev/null; then \
+		echo "✅ Server already running (PID: $$(cat .server.pid))"; \
+	else \
+		rm -f .server.pid; \
+		python3 -m http.server 8000 > /dev/null 2>&1 & echo $$! > .server.pid; \
+		sleep 1; \
+		if [ -f .server.pid ] && kill -0 $$(cat .server.pid) 2>/dev/null; then \
+			echo "🌐 Server started (PID: $$(cat .server.pid))"; \
+		else \
+			echo "❌ Failed to start server (port may be in use)"; \
+			rm -f .server.pid; \
+			exit 1; \
+		fi; \
+	fi
+
+server-stop:
+	@if [ -f .server.pid ]; then \
+		if kill -0 $$(cat .server.pid) 2>/dev/null; then \
+			kill $$(cat .server.pid) 2>/dev/null && echo "🛑 Server stopped (PID: $$(cat .server.pid))"; \
+		else \
+			echo "ℹ️  Server not running (stale PID file)"; \
+		fi; \
+		rm -f .server.pid; \
+	else \
+		echo "ℹ️  No PID file found (.server.pid)"; \
+		echo "   If server is still running, kill it manually"; \
+	fi
+
+server-status:
+	@if [ -f .server.pid ]; then \
+		if kill -0 $$(cat .server.pid) 2>/dev/null; then \
+			echo "✅ Server is running (PID: $$(cat .server.pid))"; \
+			echo "📖 http://localhost:8000/"; \
+		else \
+			echo "❌ Server not running (stale PID file found)"; \
+			rm -f .server.pid; \
+		fi; \
+	else \
+		echo "ℹ️  Server not running (no PID file)"; \
+		echo "   Start with: make server-start"; \
+	fi

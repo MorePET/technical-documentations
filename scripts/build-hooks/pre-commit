@@ -5,6 +5,7 @@
 set -e
 
 # Colors for output
+# shellcheck disable=SC2034
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
@@ -80,7 +81,7 @@ if [ "$REBUILD_DOCS" = true ]; then
     typst compile --root . example/technical-doc-example.typ technical-doc-example.pdf > /dev/null 2>&1
     git add technical-doc-example.pdf
     echo -e "${GREEN}  ✓ PDF updated${NC}"
-    
+
     echo -e "${YELLOW}  → Recompiling HTML...${NC}"
     python3 scripts/build-html.py example/technical-doc-example.typ technical-doc-example.html > /dev/null 2>&1
     git add technical-doc-example.html colors.css styles.css
@@ -93,4 +94,3 @@ echo -e "${BLUE}Updated files have been staged for commit${NC}"
 echo ""
 
 exit 0
-

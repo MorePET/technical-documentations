@@ -8,7 +8,10 @@ set -euo pipefail
 
 echo "Running post-attach setup..."
 
-# Note: Git configuration and pre-commit setup are now handled in post-create.sh
-# This script can be used for per-attach operations if needed in the future
+# Set up git configuration
+/workspace/.devcontainer/scripts/setup-git-conf.sh
+
+# Verify GitHub CLI authentication status (common script for SOLID principle)
+/workspace/.devcontainer/scripts/setup-gh-auth.sh || true  # Don't fail if auth fails
 
 echo "Post-attach setup complete"

@@ -33,13 +33,10 @@ fi
 
 # Add styling
 echo "🎨 Adding CSS styling..."
-python add-styling.py "${FILENAME}.html" --force
-
-if [ $? -ne 0 ]; then
+if ! python add-styling.py "${FILENAME}.html" --force; then
     echo "❌ Styling failed"
     exit 1
 fi
 
 echo "✅ Done! Open ${FILENAME}.html in your browser"
 echo "📁 Files: ${FILENAME}.html + styles.css"
-

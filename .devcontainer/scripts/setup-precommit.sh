@@ -9,7 +9,7 @@ if [ -f "/workspace/.pre-commit-config.yaml" ]; then
     pre-commit install-hooks || {
         echo "⚠️  Pre-commit install failed"
         echo "    You can manually run 'pre-commit install-hooks' later"
-        return 1
+        exit 1
     }
     echo "Pre-commit hooks installed successfully"
 else

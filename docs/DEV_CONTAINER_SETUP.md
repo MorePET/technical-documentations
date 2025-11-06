@@ -193,7 +193,67 @@ The dev container uses a pre-built image from GitHub Container Registry (`ghcr.i
 
 **Reference:** [Working with the Container registry](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-container-registry)
 
-### 4. Git Configuration and SSH Keys
+### 4. GitHub CLI Authentication (Automatic)
+
+The dev container automatically handles GitHub CLI (`gh`) authentication by extracting your token from the host machine.
+
+**How it works:**
+
+1. During initialization, if `gh` is authenticated on your host machine, the setup extracts your authentication token
+2. The token is passed to the container via an environment variable (never written to disk)
+3. Inside the container, `gh auth login` is called to persist the authentication
+4. You're automatically authenticated for all GitHub CLI operations
+
+**Setup on Host Machine:**
+
+To enable automatic authentication, ensure GitHub CLI is authenticated on your host:
+
+```bash
+# Check if already authenticated
+gh auth status
+
+# If not authenticated, login on your host machine
+gh auth login --web
+```
+
+**Benefits:**
+
+- **Zero configuration** - Works automatically if `gh` is authenticated on host
+- **Secure** - Token never written to disk, passed only via environment variable
+- **Seamless** - Container is ready to use `gh` commands immediately
+- **No git commits** - Token cannot be accidentally committed to repository
+
+**Fallback to Interactive Authentication:**
+
+If `gh` is not authenticated on your host, the container will prompt for interactive authentication:
+
+1. The container will display a device code and URL
+2. **Important:** Due to container limitations, pressing Enter to open the browser will fail
+3. Instead, manually copy the URL and paste it into your host browser
+4. Complete the authentication flow in the browser
+5. The container will automatically detect successful authentication
+
+**Security Notes:**
+
+- The authentication token extracted from your host has the same scopes as your host `gh` authentication
+- Token is only accessible during container initialization
+- Authentication is persisted using standard `gh` CLI methods in `~/.config/gh/hosts.yml`
+- The token environment variable is unset after successful authentication
+
+**Manual Token Setup (Alternative):**
+
+If you prefer to use a dedicated token for the container, you can set it manually on your host:
+
+```bash
+# On host machine, set environment variable in your shell profile
+export DEVCONTAINER_GH_TOKEN="ghp_your_token_here"
+```
+
+Then the container will use this token instead of extracting from `gh`.
+
+**Reference:** [GitHub CLI manual](https://cli.github.com/manual/)
+
+### 5. Git Configuration and SSH Keys
 
 The dev container automatically syncs your git configuration and SSH keys from your host machine.
 

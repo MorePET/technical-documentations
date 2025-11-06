@@ -23,18 +23,18 @@ repos:
   # Python Linting and Formatting (Ruff via uv)
   - repo: local
     hooks:
-      - id: ruff-check
-        name: ruff check
-        entry: uv run ruff check --fix --ignore=D
+      - id: ruff
+        name: ruff (legacy alias)
+        entry: uv run ruff check --fix
         language: system
         types: [python]
-        stages: [pre-commit]
+        require_serial: true
       - id: ruff-format
         name: ruff format
         entry: uv run ruff format
         language: system
         types: [python]
-        stages: [pre-commit]
+        require_serial: true
 
   # YAML Linting
   - repo: https://github.com/adrienverge/yamllint
@@ -57,7 +57,8 @@ repos:
       - id: pymarkdown
         name: pymarkdown
         args: ["scan"]
-        additional_dependencies: ["pyjson5==1.6.6"]
+        exclude: ^\.github_data/
+        additional_dependencies: ["pyjson5"]
 
   # Dockerfile Linting (using Podman instead of Docker)
   - repo: local
@@ -73,13 +74,21 @@ repos:
           done' --
         files: (Containerfile|Dockerfile)$
 
-# Makefile
-# Note: checkmake disabled in pre-commit due to config file issues
-# Run manually with: checkmake Makefile
-# The .checkmake.ini file will be respected when run manually
-# - repo: https://github.com/checkmake/checkmake
-#   rev: 0.2.2
-#   hooks:
-#     - id: checkmake
-#       name: checkmake (lint Makefile)
-#       files: ^Makefile$
+  # Makefile
+  - repo: https://github.com/checkmake/checkmake
+    rev: 0.2.2
+    hooks:
+      - id: checkmake
+        name: checkmake (lint Makefile)
+        files: ^Makefile$
+        args: ["--config=.checkmake.ini"]
+
+  # GitHub Data Sync
+  - repo: local
+    hooks:
+      - id: sync-github-data
+        name: Sync GitHub Issues and PRs
+        entry: .github/scripts/sync-prs-issues.sh
+        language: system
+        pass_filenames: false
+        always_run: true

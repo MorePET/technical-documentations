@@ -22,4 +22,3 @@
     edge((1, 1), (0, 0), [revise], "->", bend: -25deg, label-pos: 0.5, label-side: left),
   )
 ]
-

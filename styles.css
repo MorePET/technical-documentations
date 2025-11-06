@@ -329,19 +329,19 @@ table tr:not(:first-child) td strong {
   body {
     padding: 1rem;
   }
-  
+
   table {
     font-size: 0.9rem;
   }
-  
+
   td {
     padding: 1rem 0.75rem;
   }
-  
+
   h2 {
     font-size: 1.75rem;
   }
-  
+
   h3 {
     font-size: 1.25rem;
   }
@@ -353,24 +353,24 @@ table tr:not(:first-child) td strong {
     display: block;
     width: 100%;
   }
-  
+
   table tr:first-child {
     display: none; /* Hide header on mobile */
   }
-  
+
   table tr {
     margin-bottom: 2rem;
     border: 1px solid var(--border-color);
     border-radius: var(--border-radius);
     overflow: hidden;
   }
-  
+
   td {
     border-bottom: 1px solid var(--border-color);
     position: relative;
     padding-left: 40%;
   }
-  
+
   td::before {
     content: attr(data-label);
     position: absolute;
@@ -381,7 +381,7 @@ table tr:not(:first-child) td strong {
     background: var(--bg-tertiary);
     color: var(--text-color);
   }
-  
+
   table td:first-child {
     background: var(--table-header-bg);
     color: white;
@@ -399,19 +399,19 @@ table tr:not(:first-child) td strong {
     max-width: 100%;
     color: black !important;
   }
-  
+
   table {
     box-shadow: none !important;
     page-break-inside: avoid;
     border: 1px solid #ccc !important;
   }
-  
+
   h2, h3 {
     page-break-after: avoid;
     color: black !important;
     text-shadow: none !important;
   }
-  
+
   /* Force light mode colors for printing */
   :root {
     --text-color: #1f2937 !important;
@@ -420,4 +420,3 @@ table tr:not(:first-child) td strong {
     --border-color: #e5e7eb !important;
   }
 }
-

@@ -14,13 +14,18 @@ This is your main workspace for creating technical documentation.
 Import from the package:
 
 ```typst
-#import "../lib/technical-documentation-package.typ": tech-doc, architecture-diagram, data-flow-diagram, state-diagram
+#import "../lib/technical-documentation-package.typ": (
+  tech-doc,
+  architecture-diagram,
+  data-flow-diagram,
+  state-diagram
+)
 ```
 
 ### Diagram Functions
 
 - `#architecture-diagram()` - System architecture diagrams
-- `#data-flow-diagram()` - Data flow diagrams  
+- `#data-flow-diagram()` - Data flow diagrams
 - `#state-diagram()` - State machine diagrams
 
 ### Creating Custom Diagrams
@@ -63,7 +68,7 @@ make clean            # Remove build artifacts
 
 ## Directory Structure
 
-```
+```text
 technical-documentation/
 ├── README.md                           (this file)
 ├── technical-documentation.typ         (main document)
@@ -74,6 +79,7 @@ technical-documentation/
 ## Example Reference
 
 See the `example/` folder for a complete reference with three diagram examples:
+
 - System Architecture
 - Data Flow
 - State Machine
@@ -81,6 +87,7 @@ See the `example/` folder for a complete reference with three diagram examples:
 ## Dark Mode
 
 HTML output automatically supports dark mode:
+
 - System preference detection
 - Manual toggle button (top-right)
 - All diagrams switch colors automatically
@@ -97,4 +104,3 @@ HTML output automatically supports dark mode:
 - Run `make help` for all available commands
 - Check `example/` for working diagram examples
 - See `docs/` for detailed documentation on the build system
-

@@ -210,4 +210,3 @@ The dark mode colors follow industry standards (GitHub, VS Code, Material Design
 6. *CSS variables* update automatically
 
 This ensures diagrams adapt seamlessly to the selected theme!
-

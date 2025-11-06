@@ -27,4 +27,3 @@ You can add diagrams in the `diagrams/` folder and reference them here.
 = Content
 
 Add your content here...
-

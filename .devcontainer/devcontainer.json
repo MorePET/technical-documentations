@@ -1,9 +1,10 @@
 {
-    "name": "Python Base Dev",
+    "name": "Typst Dev",
     "image": "ghcr.io/morepet/containers/dev/typst:1.3-dev",
-    "dockerComposeFile": "../docker-compose.yaml",
-    "service": "dev",
     "workspaceFolder": "/workspace",
+    "remoteEnv": {
+        "DEVCONTAINER_GH_TOKEN": "${localEnv:DEVCONTAINER_GH_TOKEN}"
+    },
     "customizations": {
         "vscode": {
             "extensions": [
@@ -12,7 +13,7 @@
                 "ms-vscode.vscode-json",
                 "redhat.vscode-yaml",
                 "GitHub.vscode-pull-request-github",
-                "ritwickdey.LiveServer"
+                "myriad-dreamin.tinymist"
             ],
             "settings": {
                 "python.defaultInterpreterPath": "/usr/local/bin/python",
