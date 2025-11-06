@@ -7,9 +7,16 @@ set -euo pipefail
 
 echo "Checking GitHub CLI authentication..."
 
-# Priority 1: Check for token from host via environment variable
-if [ -n "${DEVCONTAINER_GH_TOKEN:-}" ]; then
+# Priority 1: Check for token file from host
+TOKEN_FILE="/workspace/.devcontainer/.conf/gh_token"
+if [ -f "$TOKEN_FILE" ]; then
 	echo "Found GitHub token from host, authenticating..."
+
+	# Read token from file
+	DEVCONTAINER_GH_TOKEN=$(cat "$TOKEN_FILE")
+
+	# Immediately remove token file for security
+	rm -f "$TOKEN_FILE"
 
 	# Use gh auth login with token to persist authentication
 	if echo "$DEVCONTAINER_GH_TOKEN" | gh auth login --with-token --hostname github.com --git-protocol ssh 2>/dev/null; then
@@ -18,13 +25,10 @@ if [ -n "${DEVCONTAINER_GH_TOKEN:-}" ]; then
 		# Verify authentication worked
 		if gh auth status >/dev/null 2>&1; then
 			echo "✅ Authentication persisted to container"
-			# Unset the env var for security
-			unset DEVCONTAINER_GH_TOKEN
 			exit 0
 		fi
 	else
 		echo "⚠️  Token authentication failed, falling back to other methods..."
-		unset DEVCONTAINER_GH_TOKEN
 	fi
 fi
 

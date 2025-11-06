@@ -19,9 +19,12 @@ if command -v gh >/dev/null 2>&1; then
 	if gh auth status >/dev/null 2>&1; then
 		echo "Extracting GitHub token from host gh CLI..."
 		DEVCONTAINER_GH_TOKEN=$(gh auth token 2>/dev/null || echo "")
-		export DEVCONTAINER_GH_TOKEN
 		if [ -n "$DEVCONTAINER_GH_TOKEN" ]; then
 			echo "✅ GitHub token extracted (will be passed to container)"
+			# Write to temporary file for container to read
+			# File will be deleted by container after authentication
+			echo "$DEVCONTAINER_GH_TOKEN" > "$SCRIPT_DIR/.conf/gh_token"
+			chmod 600 "$SCRIPT_DIR/.conf/gh_token"
 		fi
 	else
 		echo "ℹ️  GitHub CLI not authenticated on host"

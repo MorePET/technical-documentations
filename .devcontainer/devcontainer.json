@@ -2,9 +2,6 @@
     "name": "Typst Dev",
     "image": "ghcr.io/morepet/containers/dev/typst:1.3-dev",
     "workspaceFolder": "/workspace",
-    "remoteEnv": {
-        "DEVCONTAINER_GH_TOKEN": "${localEnv:DEVCONTAINER_GH_TOKEN}"
-    },
     "customizations": {
         "vscode": {
             "extensions": [
