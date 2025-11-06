@@ -2,7 +2,7 @@
 # Builds diagrams, colors, PDF, and HTML with dark mode support
 # Supports multiple projects
 
-.PHONY: all clean colors diagrams pdf html help check test example technical-documentation
+.PHONY: all clean colors diagrams pdf html help check test example technical-documentation rebuild all-projects view-example view-technical-documentation install-hook build-project build-summary check-outputs clean-outputs clean-generated
 
 # Default project
 PROJECT ?= technical-documentation
@@ -20,23 +20,31 @@ EXAMPLE_OUT = technical-doc-example
 # Default target - builds the technical-documentation project
 all: technical-documentation
 
+# Internal: Build a project (called with SRC, OUT, and PROJECT parameters)
+build-project:
+	@$(MAKE) colors
+	@$(MAKE) diagrams PROJECT=$(PROJECT)
+	@$(MAKE) pdf-only SRC=$(SRC) OUT=$(OUT)
+	@$(MAKE) html-only SRC=$(SRC) OUT=$(OUT)
+
+# Internal: Show build completion summary
+build-summary:
+	@echo ""
+	@echo "=================================================="
+	@echo "✅ Build Complete!"
+	@echo "=================================================="
+	@echo "📄 PDF:  $(OUT).pdf"
+	@echo "🌐 HTML: file://$(shell pwd)/$(OUT).html"
+	@echo ""
+	@echo "💡 Output files ready to view"
+
 # Build technical-documentation project (the default for real work)
 technical-documentation:
 	@echo "=================================================="
 	@echo "🚀 Building Technical Documentation Project"
 	@echo "=================================================="
-	@$(MAKE) colors
-	@$(MAKE) diagrams PROJECT=technical-documentation
-	@$(MAKE) pdf-only SRC=$(TECH_DOC_SRC) OUT=$(TECH_DOC_OUT)
-	@$(MAKE) html-only SRC=$(TECH_DOC_SRC) OUT=$(TECH_DOC_OUT)
-	@echo ""
-	@echo "=================================================="
-	@echo "✅ Technical Documentation Build Complete!"
-	@echo "=================================================="
-	@echo "📄 PDF:  $(TECH_DOC_OUT).pdf"
-	@echo "🌐 HTML: $(TECH_DOC_OUT).html"
-	@echo ""
-	@echo "To view HTML: open $(TECH_DOC_OUT).html"
+	@$(MAKE) build-project SRC=$(TECH_DOC_SRC) OUT=$(TECH_DOC_OUT) PROJECT=technical-documentation
+	@$(MAKE) build-summary OUT=$(TECH_DOC_OUT)
 	@echo "🌓 Toggle dark mode with the button in top-right"
 
 # Build example project (the original demo)
@@ -44,16 +52,8 @@ example:
 	@echo "=================================================="
 	@echo "🎨 Building Example Project"
 	@echo "=================================================="
-	@$(MAKE) colors
-	@$(MAKE) diagrams PROJECT=example
-	@$(MAKE) pdf-only SRC=$(EXAMPLE_SRC) OUT=$(EXAMPLE_OUT)
-	@$(MAKE) html-only SRC=$(EXAMPLE_SRC) OUT=$(EXAMPLE_OUT)
-	@echo ""
-	@echo "=================================================="
-	@echo "✅ Example Build Complete!"
-	@echo "=================================================="
-	@echo "📄 PDF:  $(EXAMPLE_OUT).pdf"
-	@echo "🌐 HTML: $(EXAMPLE_OUT).html"
+	@$(MAKE) build-project SRC=$(EXAMPLE_SRC) OUT=$(EXAMPLE_OUT) PROJECT=example
+	@$(MAKE) build-summary OUT=$(EXAMPLE_OUT)
 
 # Build all projects
 all-projects: technical-documentation example
@@ -107,30 +107,42 @@ check:
 	@python3 -c "from pathlib import Path; assert Path('technical-documentation/technical-documentation.typ').exists(); print('✓ Main document exists')"
 	@echo "✅ All checks passed"
 
-# Quick test - compile everything and check outputs exist
-test: technical-documentation example
-	@echo "🧪 Testing build outputs..."
+# Internal: Check that build outputs exist
+check-outputs:
 	@test -f technical-documentation.pdf && echo "✓ Technical doc PDF exists" || echo "❌ Technical doc PDF missing"
 	@test -f technical-documentation.html && echo "✓ Technical doc HTML exists" || echo "❌ Technical doc HTML missing"
 	@test -f technical-doc-example.pdf && echo "✓ Example PDF exists" || echo "❌ Example PDF missing"
 	@test -f technical-doc-example.html && echo "✓ Example HTML exists" || echo "❌ Example HTML missing"
 	@test -f lib/generated/colors.css && echo "✓ Colors generated" || echo "❌ Colors missing"
+
+# Quick test - compile everything and check outputs exist
+test: technical-documentation example
+	@echo "🧪 Testing build outputs..."
+	@$(MAKE) check-outputs
 	@echo "✅ All tests passed"
 
-# Clean build artifacts
-clean:
-	@echo "🧹 Cleaning build artifacts..."
+# Internal: Remove PDF and HTML outputs
+clean-outputs:
 	@rm -f technical-documentation.pdf
 	@rm -f technical-documentation.html
 	@rm -f technical-doc-example.pdf
 	@rm -f technical-doc-example.html
 	@rm -f technical-doc-example_temp.html
+
+# Internal: Remove generated files
+clean-generated:
 	@rm -f colors.css
 	@rm -f styles.css
 	@rm -f technical-documentation/diagrams/*.svg
 	@rm -f example/diagrams/*.svg
 	@rm -f lib/generated/colors.css
 	@rm -f lib/generated/colors.typ
+
+# Clean build artifacts
+clean:
+	@echo "🧹 Cleaning build artifacts..."
+	@$(MAKE) clean-outputs
+	@$(MAKE) clean-generated
 	@echo "✓ Clean complete"
 
 # Clean and rebuild everything
@@ -170,6 +182,7 @@ help:
 	@echo "Examples:"
 	@echo "  make                           # Build technical-documentation (your real work)"
 	@echo "  make example                   # Build the example project"
+	@echo "  make example && make view-example  # Build and open example"
 	@echo "  make THEME_TOGGLE=no           # Build without theme toggle (auto only)"
 	@echo "  make diagrams PROJECT=example  # Just compile example diagrams"
 	@echo "  make rebuild                   # Clean and rebuild"

@@ -6,13 +6,15 @@ Create professional technical documentation with diagrams in both PDF and HTML w
 
 ### 1. Setup
 
-**Option A: Native Installation (Recommended for beginners)**
+**Option A: Native Installation**
+
 ```bash
 # Install Typst, Python 3, and Make on your system (see Requirements below)
 # Clone this repo and you're ready!
 ```
 
 **Option B: Dev Container**
+
 ```bash
 # Open in VS Code with Dev Containers extension
 # Or use GitHub Codespaces
@@ -28,8 +30,9 @@ open technical-doc-example.pdf      # View PDF
 ```
 
 The example shows:
+
 - System Architecture diagram
-- Data Flow diagram  
+- Data Flow diagram
 - State Machine diagram
 - Stakeholder tables (CSV/JSON/YAML)
 - Dark mode toggle
@@ -69,6 +72,7 @@ make                                # Builds technical-documentation (default)
 | `THEME_TOGGLE` | `yes` (default) / `no` | Include theme toggle button or use auto mode only |
 
 **Examples:**
+
 ```bash
 make THEME_TOGGLE=no          # Build without theme toggle (auto mode only)
 make THEME_TOGGLE=no example  # Build example without toggle
@@ -76,7 +80,7 @@ make THEME_TOGGLE=no example  # Build example without toggle
 
 ## 📁 Project Structure
 
-```
+```text
 workspace/
 ├── technical-documentation/    ← YOUR WORK (default)
 │   ├── technical-documentation.typ
@@ -131,34 +135,37 @@ This project uses **only Python standard library** - no pip packages required!
 - **Typst** (>= 0.14.0) - [Download here](https://github.com/typst/typst/releases)
   - Version 0.14.0+ required for HTML export
 - **Python 3** (any recent version)
-- **Make** (or run scripts manually with `python3 scripts/...`)
+  - **Recommended:** Use `uv` for fast Python management - [Install uv](https://docs.astral.sh/uv/getting-started/installation/)
+- **Make** - Usually pre-installed on macOS/Linux (install via `xcode-select --install` on macOS or `sudo apt install make` on Linux/WSL if missing)
+  - Optional: Run scripts manually with `python3 scripts/...` if Make unavailable
 
-### Platform-Specific Setup
+#### Platform-Specific Installation
 
-#### Linux
-```bash
-# Install via package manager
-sudo apt install make python3  # Debian/Ubuntu
-# Install Typst >= 0.14.0 from https://github.com/typst/typst/releases
-```
+**macOS:**
 
-#### macOS
 ```bash
 brew install typst make python3
 ```
 
-#### Windows
-**Recommended: WSL2** (Ubuntu inside Windows)
+**Linux/WSL:**
+
 ```bash
-# Inside WSL2:
-sudo apt install make python3
+sudo apt install make python3  # Debian/Ubuntu
 # Install Typst >= 0.14.0 from https://github.com/typst/typst/releases
 ```
 
-**Alternative: Native Windows**
-- Install Python from python.org
-- Install Typst >= 0.14.0 from typst.app
-- Use PowerShell (may need to adapt Make commands)
+**Windows:** Use WSL2 (recommended) or install Python/Typst from python.org and typst.app
+
+#### Quick Setup with uv
+
+Use [`uv`](https://docs.astral.sh/uv/) for modern Python environment management (recommended):
+
+```bash
+# Install uv and create venv
+curl -LsSf https://astral.sh/uv/install.sh | sh
+uv venv && source .venv/bin/activate
+make example
+```
 
 ### Dev Container Option
 
@@ -173,6 +180,7 @@ If you prefer containers (optional):
 - **Windows**: Docker Desktop (auto-installs WSL2)
 
 **Without VS Code:**
+
 ```bash
 # Build and run container manually:
 docker build -f .devcontainer/Containerfile -t typst-dev .
