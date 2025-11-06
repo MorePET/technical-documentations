@@ -341,20 +341,6 @@ The workflow state machine represents a document review process:
 
 Transitions between states are triggered by user actions (submit, approve, reject) or system events (timeout, validation failure). The "revise" transition creates a feedback loop, allowing iterative improvement until approval is achieved.
 
-== Benefits of Diagram-Driven Documentation
-
-Using diagrams in technical documentation provides several advantages:
-
-*Clarity*: Visual representations often communicate complex concepts more effectively than text alone. A single diagram can replace pages of description.
-
-*Maintenance*: Diagrams created with code (like these Fletcher examples) can be version-controlled, diffed, and automatically regenerated when system designs change.
-
-*Accessibility*: Modern diagram tools produce semantic markup that works with screen readers and other assistive technologies.
-
-*Consistency*: Using a standardized diagramming library ensures visual consistency across all documentation, making it easier for readers to understand different sections.
-
-*Collaboration*: Text-based diagram definitions can be reviewed in pull requests just like code, enabling better team collaboration.
-
 == Customizing Diagrams
 
 These diagrams are defined in simple Typst code and can be customized with different layouts, labels, and spacing to match your specific use case.
@@ -364,7 +350,6 @@ These diagrams are defined in simple Typst code and can be customized with diffe
   - Edit `lib/colors.json` to add/modify color pairs
   - Run `make colors` to regenerate CSS and Typst files
   - Use the predefined colors: `node-bg-blue`, `node-bg-green`, `node-bg-orange`, `node-bg-purple`, `node-bg-red`, `node-bg-neutral`
-  
+
   See `docs/DARK_MODE_COLOR_STANDARDS.md` for details on the color system and `technical-documentation/README.md` for diagram examples.
 ])
-
