@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-      
+
 
     <style>
 /* Diagram colors - inlined for data-theme support */
@@ -112,7 +112,7 @@
     </style>
 
     <link rel="stylesheet" href="styles.css">
-  
+
     <style>
       /* Theme Toggle Button */
       .theme-toggle {
@@ -135,22 +135,22 @@
         gap: 0.5rem;
         font-family: system-ui, -apple-system, sans-serif;
       }
-      
+
       .theme-toggle:hover {
         transform: translateY(-2px);
         box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
         background: var(--primary-hover, #2563eb);
       }
-      
+
       .theme-toggle:active {
         transform: translateY(0);
       }
-      
+
       #theme-icon {
         font-size: 1.1rem;
         line-height: 1;
       }
-      
+
       /* Auto dark mode (system preference) */
       @media (prefers-color-scheme: dark) {
         body:not([data-theme]) {
@@ -158,37 +158,37 @@
           color: #e2e8f0;
           color-scheme: dark;
         }
-        
+
         body:not([data-theme]) main {
           background: #1e293b;
           color: #e2e8f0;
         }
       }
-      
+
       /* Dark mode forced styles */
       body[data-theme="dark"] {
         background: #0f172a;
         color: #e2e8f0;
         color-scheme: dark;
       }
-      
+
       body[data-theme="dark"] main {
         background: #1e293b;
         color: #e2e8f0;
       }
-      
+
       /* Light mode forced styles */
       body[data-theme="light"] {
         background: #ffffff;
         color: #1e293b;
         color-scheme: light;
       }
-      
+
       body[data-theme="light"] main {
         background: #ffffff;
         color: #1e293b;
       }
-      
+
       /* Responsive design */
       @media (max-width: 768px) {
         .theme-toggle {
@@ -199,7 +199,7 @@
         }
       }
     </style>
-  
+
     <style>
       /* TOC Sidebar */
       .toc-sidebar {
@@ -215,11 +215,11 @@
         z-index: 999;
         box-shadow: 2px 0 10px var(--shadow-color, rgba(0, 0, 0, 0.1));
       }
-      
+
       .toc-sidebar.collapsed {
-        transform: translateX(-240px);
+        transform: translateX(-100%);
       }
-      
+
       .toc-header {
         position: sticky;
         top: 0;
@@ -231,13 +231,13 @@
         align-items: center;
         z-index: 10;
       }
-      
+
       .toc-header h3 {
         margin: 0;
         font-size: 1.1rem;
         color: var(--text-color, #1f2937);
       }
-      
+
       .toc-collapse-btn {
         background: var(--primary-color, #2563eb);
         color: white;
@@ -249,27 +249,27 @@
         font-weight: bold;
         transition: all 0.2s ease;
       }
-      
+
       .toc-collapse-btn:hover {
         background: var(--primary-hover, #1d4ed8);
         transform: scale(1.1);
       }
-      
+
       .toc-nav {
         padding: 1rem;
       }
-      
+
       .toc-list {
         list-style: none;
         padding: 0;
         margin: 0;
       }
-      
+
       .toc-item {
         margin: 0.25rem 0;
         position: relative;
       }
-      
+
       .toc-link {
         display: block;
         padding: 0.5rem 0.75rem;
@@ -280,24 +280,24 @@
         font-size: 0.9rem;
         line-height: 1.4;
       }
-      
+
       .toc-link:hover {
         background: var(--table-row-hover, rgba(37, 99, 235, 0.1));
         color: var(--primary-color, #2563eb);
         padding-left: 1rem;
       }
-      
+
       .toc-link.active {
         background: var(--primary-color, #2563eb);
         color: white;
         font-weight: 600;
         border-left: 3px solid var(--primary-hover, #1d4ed8);
       }
-      
+
       .toc-link.has-subsections {
         font-weight: 600;
       }
-      
+
       .toc-sublist {
         list-style: none;
         padding-left: 1.5rem;
@@ -308,17 +308,17 @@
         transition: max-height 0.3s ease, opacity 0.3s ease;
         opacity: 1;
       }
-      
+
       .toc-sublist.collapsed {
         max-height: 0;
         opacity: 0;
       }
-      
+
       .toc-sublist .toc-link {
         font-size: 0.85rem;
         padding: 0.4rem 0.5rem;
       }
-      
+
       /* Mobile toggle button */
       .toc-mobile-toggle {
         display: none;
@@ -337,94 +337,133 @@
         z-index: 998;
         transition: all 0.2s ease;
       }
-      
+
       .toc-mobile-toggle:hover {
         transform: scale(1.1);
         box-shadow: 0 6px 16px var(--shadow-color, rgba(0, 0, 0, 0.3));
       }
-      
+
       /* Adjust main content to make room for sidebar */
       body {
         margin-left: 280px;
         transition: margin-left 0.3s ease;
       }
-      
+
       body:has(.toc-sidebar.collapsed) {
-        margin-left: 40px;
+        margin-left: 0;
       }
-      
+
+      /* Expand button - appears when sidebar is collapsed */
+      .toc-expand-btn {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 50px;
+        height: 100px;
+        background: var(--primary-color, #2563eb);
+        color: white;
+        border: none;
+        border-radius: 0 8px 8px 0;
+        cursor: pointer;
+        font-size: 1.5rem;
+        z-index: 998;
+        opacity: 0;
+        pointer-events: none;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 2px 0 10px var(--shadow-color, rgba(0, 0, 0, 0.2));
+      }
+
+      .toc-sidebar.collapsed ~ .toc-expand-btn {
+        opacity: 1;
+        pointer-events: all;
+      }
+
+      .toc-expand-btn:hover {
+        width: 60px;
+        background: var(--primary-hover, #1d4ed8);
+        box-shadow: 4px 0 16px var(--shadow-color, rgba(0, 0, 0, 0.3));
+      }
+
       /* Adjust theme toggle button position when sidebar is open */
       .theme-toggle {
         right: 20px;
       }
-      
+
       /* Custom scrollbar for TOC */
       .toc-sidebar::-webkit-scrollbar {
         width: 8px;
       }
-      
+
       .toc-sidebar::-webkit-scrollbar-track {
         background: var(--bg-primary, #ffffff);
       }
-      
+
       .toc-sidebar::-webkit-scrollbar-thumb {
         background: var(--bg-tertiary, #f3f4f6);
         border-radius: 4px;
       }
-      
+
       .toc-sidebar::-webkit-scrollbar-thumb:hover {
         background: var(--border-light, #e5e7eb);
       }
-      
+
       /* Responsive design */
       @media (max-width: 1024px) {
         .toc-sidebar {
           width: 240px;
         }
-        
+
         body {
           margin-left: 240px;
         }
-        
+
         body:has(.toc-sidebar.collapsed) {
-          margin-left: 40px;
+          margin-left: 0;
         }
       }
-      
+
       @media (max-width: 768px) {
         .toc-sidebar {
           transform: translateX(-100%);
           width: 280px;
         }
-        
+
         .toc-sidebar.mobile-open {
           transform: translateX(0);
         }
-        
+
         .toc-sidebar.collapsed {
           transform: translateX(-100%);
         }
-        
+
         body {
           margin-left: 0 !important;
         }
-        
+
         .toc-mobile-toggle {
           display: block;
         }
-        
+
         .toc-collapse-btn {
           display: none !important;
         }
+
+        .toc-expand-btn {
+          display: none !important;
+        }
       }
-      
+
       /* Print: hide TOC */
       @media print {
         .toc-sidebar,
-        .toc-mobile-toggle {
+        .toc-mobile-toggle,
+        .toc-expand-btn {
           display: none !important;
         }
-        
+
         body {
           margin-left: 0 !important;
         }
@@ -445,8 +484,9 @@
         <!-- TOC will be generated by JavaScript -->
       </nav>
     </div>
+    <button id="toc-expand-btn" class="toc-expand-btn" aria-label="Expand sidebar">→</button>
     <button id="toc-mobile-toggle" class="toc-mobile-toggle" aria-label="Toggle table of contents">
-      
+
     </button>
     <div>
       <h2>1 Introduction</h2>
@@ -470,22 +510,22 @@
       <h2>3 Content</h2>
     </div>
     <p>Add your content here…</p>
-  
+
     <script>
       // Theme toggle functionality
       const body = document.body;
       const icon = document.getElementById('theme-icon');
-      
+
       // Load saved theme on page load
       const savedTheme = localStorage.getItem('theme');
       if (savedTheme) {
         body.setAttribute('data-theme', savedTheme);
         updateIcon(savedTheme);
       }
-      
+
       function toggleTheme() {
         const current = body.getAttribute('data-theme');
-        
+
         // Simple cycle: Auto → Dark → Light → Auto
         if (!current) {
           // Auto → Dark
@@ -504,7 +544,7 @@
           updateIcon('auto');
         }
       }
-      
+
       function updateIcon(theme) {
         if (theme === 'light') {
           icon.textContent = '☀️';
@@ -515,45 +555,46 @@
         }
       }
     </script>
-  
+
     <script>
       // TOC Sidebar functionality
       (function() {
         const sidebar = document.getElementById('toc-sidebar');
         const tocNav = document.getElementById('toc-nav');
         const tocToggle = document.getElementById('toc-toggle');
+        const tocExpandBtn = document.getElementById('toc-expand-btn');
         const mobileToggle = document.getElementById('toc-mobile-toggle');
-        
+
         // Extract headings and build TOC
         function buildTOC() {
           const headings = document.querySelectorAll('h2, h3');
           if (headings.length === 0) return;
-          
+
           const tocList = document.createElement('ul');
           tocList.className = 'toc-list';
           let currentH2Item = null;
           let currentSublist = null;
-          
+
           headings.forEach((heading, index) => {
             // Add ID if heading doesn't have one
             if (!heading.id) {
               heading.id = 'heading-' + index;
             }
-            
+
             const li = document.createElement('li');
             li.className = 'toc-item';
-            
+
             const link = document.createElement('a');
             link.href = '#' + heading.id;
             link.textContent = heading.textContent;
             link.className = 'toc-link';
-            
+
             // Smooth scroll on click
             link.addEventListener('click', (e) => {
               e.preventDefault();
-              
+
               const wasActive = link.classList.contains('active');
-              
+
               // If losing focus (clicking a different link), collapse ALL subsections
               // EXCEPT if clicking an H3 (subsection) - keep its parent's subsections open
               if (!wasActive && heading.tagName !== 'H3') {
@@ -561,23 +602,23 @@
                   sl.classList.add('collapsed');
                 });
               }
-              
+
               // Highlight active link
               document.querySelectorAll('.toc-link').forEach(l => l.classList.remove('active'));
               link.classList.add('active');
-              
+
               // Scroll to heading (unless toggling subsections)
               if (!wasActive || heading.tagName !== 'H2') {
                 heading.scrollIntoView({ behavior: 'smooth', block: 'start' });
                 history.pushState(null, null, '#' + heading.id);
               }
             });
-            
+
             if (heading.tagName === 'H2') {
               // Main section
               li.appendChild(link);
               tocList.appendChild(li);
-              
+
               currentH2Item = li;
               currentSublist = null;
             } else if (heading.tagName === 'H3' && currentH2Item) {
@@ -586,19 +627,19 @@
                 currentSublist = document.createElement('ul');
                 currentSublist.className = 'toc-sublist collapsed'; // Start collapsed
                 currentH2Item.appendChild(currentSublist);
-                
+
                 // Make the parent H2 link toggleable
                 const parentLink = currentH2Item.querySelector('.toc-link');
                 if (parentLink) {
                   parentLink.classList.add('has-subsections');
-                  
+
                   // Capture the sublist in closure properly
                   const thisSublist = currentSublist;
-                  
+
                   // Add click handler for subsection behavior
                   parentLink.addEventListener('click', (e) => {
                     const wasActive = parentLink.classList.contains('active');
-                    
+
                     if (wasActive) {
                       // Already active: toggle subsections (show/hide)
                       e.preventDefault();
@@ -610,15 +651,15 @@
                   });
                 }
               }
-              
+
               li.appendChild(link);
               currentSublist.appendChild(li);
             }
           });
-          
+
           tocNav.appendChild(tocList);
         }
-        
+
         // Toggle sidebar collapsed state
         function toggleSidebar() {
           sidebar.classList.toggle('collapsed');
@@ -627,19 +668,19 @@
           tocToggle.setAttribute('aria-label', isCollapsed ? 'Expand sidebar' : 'Collapse sidebar');
           localStorage.setItem('tocSidebarCollapsed', isCollapsed);
         }
-        
+
         // Highlight active section on scroll
         function highlightActiveSection() {
           const headings = document.querySelectorAll('h2, h3');
           const scrollPos = window.scrollY + 100;
-          
+
           let activeHeading = null;
           headings.forEach(heading => {
             if (heading.offsetTop <= scrollPos) {
               activeHeading = heading;
             }
           });
-          
+
           if (activeHeading) {
             document.querySelectorAll('.toc-link').forEach(link => {
               link.classList.remove('active');
@@ -649,30 +690,31 @@
             });
           }
         }
-        
+
         // Event listeners
         tocToggle.addEventListener('click', toggleSidebar);
+        tocExpandBtn.addEventListener('click', toggleSidebar);
         mobileToggle.addEventListener('click', () => {
           sidebar.classList.toggle('mobile-open');
         });
-        
+
         // Restore collapsed state from localStorage
         const savedState = localStorage.getItem('tocSidebarCollapsed');
         if (savedState === 'true') {
           sidebar.classList.add('collapsed');
           tocToggle.innerHTML = '→';
         }
-        
+
         // Build TOC on page load
         buildTOC();
-        
+
         // Highlight on scroll (debounced)
         let scrollTimeout;
         window.addEventListener('scroll', () => {
           clearTimeout(scrollTimeout);
           scrollTimeout = setTimeout(highlightActiveSection, 50);
         });
-        
+
         // Initial highlight
         highlightActiveSection();
       })();
