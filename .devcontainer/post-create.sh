@@ -1,38 +1,20 @@
-#!/usr/bin/env bash
+#!/bin/bash
 set -euo pipefail
-
-# Post-create script - runs once when container is created
-# This script is called from postCreateCommand
 
 echo "Running post-create setup..."
 
-CONF_DIR="/workspace/.devcontainer/.conf"
+SCRIPTS_DIR="/workspace/.devcontainer/scripts"
 
-# Import git configuration if available
-if [ -f "$CONF_DIR/.gitconfig" ]; then
-    echo "Importing git configuration..."
-    cp "$CONF_DIR/.gitconfig" /root/.gitconfig
-    chmod 600 /root/.gitconfig
-fi
+# Initialize git repository if needed
+"$SCRIPTS_DIR/setup-git-init.sh"
 
-# Configure SSH for git operations
-echo "Configuring SSH..."
-mkdir -p /root/.ssh
-chmod 700 /root/.ssh
+# Set up git configuration
+"$SCRIPTS_DIR/setup-git-conf.sh"
 
-# Create SSH config for git operations
-cat > /root/.ssh/config <<'EOF'
-# SSH configuration for git operations
-Host *
-    StrictHostKeyChecking accept-new
-    AddKeysToAgent yes
-EOF
+# Set up project with dynamic naming
+"$SCRIPTS_DIR/setup-project.sh"
 
-chmod 600 /root/.ssh/config
+# Install pre-commit hooks
+"$SCRIPTS_DIR/setup-precommit.sh"
 
-echo "✓ SSH configured"
-echo ""
-echo "ℹ Git SSH signing will be configured automatically when you attach to the container"
-echo "  (See post-attach.sh for details)"
-echo ""
 echo "Post-create setup complete"
