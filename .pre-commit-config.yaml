@@ -106,6 +106,15 @@ repos:
         pass_filenames: true
         stages: [manual]
 
+  # Commit Message Linting
+  - repo: local
+    hooks:
+      - id: gitlint
+        name: gitlint (conventional commits)
+        entry: uv run gitlint --msg-filename
+        language: system
+        stages: [commit-msg]
+
   # GitHub Data Sync
   - repo: local
     hooks:
