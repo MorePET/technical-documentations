@@ -192,16 +192,17 @@ We observed a 42% increase in efficiency.
 **Bad:**
 
 ```typst
-The experiment was conducted over three months. Results showed significant improvement. We observed a 42% increase in efficiency.
+The experiment was conducted over three months. Results showed
+significant improvement. We observed a 42% increase in efficiency.
 ```
 
 **Why?** Git diffs show exactly which sentence changed, making code reviews and collaboration much easier.
 
 **Exceptions - Don't break lines in:**
 
-- Code blocks: ````python ... ````
+- Code blocks: ` ```python ... ``` `
 - Math blocks: `$ ... $`
-- Inline functions: `#link(...)[...]`, `#note[...]`
+- Inline functions: `#link(...)`, `#note[]`
 - Definition lists: `/ Term: Definition`
 - Abbreviations: Dr., Prof., Fig., e.g., i.e., etc.
 - URLs and paths
@@ -275,7 +276,9 @@ Typst syntax checking is **automatically enforced** via pre-commit hooks. Every 
 ```yaml
 - id: typst-check
   name: Typst Syntax Check
-  entry: bash -c 'for file in "$@"; do typst compile "$file" /dev/null || exit 1; done' --
+  entry: >
+    bash -c 'for file in "$@"; do
+    typst compile "$file" /dev/null || exit 1; done' --
   language: system
   files: '\.typ$'
 ```

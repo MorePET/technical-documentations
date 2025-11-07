@@ -15,9 +15,11 @@ When creating an issue, follow these steps:
    - Otherwise, detect current repo with: `gh repo view --json nameWithOwner --jq .nameWithOwner`
 
 2. **Verify the repository exists:**
+
    ```bash
    gh repo view ORG/REPO --json nameWithOwner,description
    ```
+
    - If successful, show repo name and description
    - If failed, inform user the repo doesn't exist or isn't accessible
 
@@ -81,6 +83,7 @@ gh repo view ORG/REPO --json nameWithOwner,description
 ```
 
 Example output:
+
 ```json
 {
   "description": "Repository description",

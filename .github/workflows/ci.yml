@@ -1,7 +1,7 @@
 ---
 name: CI
 
-on:
+"on":
   push:
     branches: [main]
   pull_request:
@@ -10,4 +10,3 @@ on:
 jobs:
   test:
     uses: MorePET/github-actions/.github/workflows/ci-python-reusable.yml@main
-

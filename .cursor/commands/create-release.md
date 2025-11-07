@@ -27,6 +27,7 @@ Follow [Keep a Changelog](https://keepachangelog.com/) format:
 
 **First release (0.x.0)**: Use only "Added" section
 **Subsequent releases**: Use appropriate sections:
+
 - Added: New features
 - Changed: Changes in existing functionality
 - Deprecated: Soon-to-be removed features
@@ -191,7 +192,7 @@ gh release create v2.0.0 --title "v2.0.0 - Major API update" --generate-notes
 - **MINOR** (0.X.0): New features, backwards compatible
 - **PATCH** (0.0.X): Bug fixes, backwards compatible
 
-### When to Increment:
+### When to Increment
 
 **Major (X.0.0):**
 - Breaking API changes

@@ -5,6 +5,7 @@ This command guides you through setting up a new MorePET repository with all req
 For complete documentation on each setup component, see:
 
 **Related Documentation:**
+
 - **[GitHub Actions](./../github-actions.md)**
 - **[Git Workflow](./../git-workflow.md)**
 - **[Python Development](./../python.md)**
@@ -16,6 +17,7 @@ For complete documentation on each setup component, see:
 ### 1. Create Repository
 
 **Option A: Using GitHub CLI (Recommended)**
+
 ```bash
 # Create private repo (MorePET standard)
 gh repo create MorePET/new-repo-name \
@@ -26,7 +28,8 @@ gh repo create MorePET/new-repo-name \
 ```
 
 **Option B: Using Web Interface**
-- Go to https://github.com/MorePET
+
+- Go to <https://github.com/MorePET>
 - Click "New repository"
 - Name: `new-repo-name`
 - Description: Brief project description
@@ -158,7 +161,9 @@ repos:
     hooks:
       - id: typst-check
         name: Typst Syntax Check
-        entry: bash -c 'for file in "$@"; do typst compile "$file" /dev/null || exit 1; done' --
+        entry: >
+          bash -c 'for file in "$@"; do
+          typst compile "$file" /dev/null || exit 1; done' --
         language: system
         files: '\.typ$'
         pass_filenames: true
@@ -182,6 +187,7 @@ pre-commit install
 ### 5. Set Up GitHub Actions Workflows
 
 **Create CI workflow:**
+
 ```bash
 mkdir -p .github/workflows
 
@@ -262,13 +268,19 @@ EOF
 ### 6. Configure Branch Protection
 
 **Using GitHub CLI:**
+
 ```bash
 # Enable branch protection on main
 gh api repos/MorePET/new-repo-name/branches/main/protection \
   --method PUT \
   --field required_status_checks='{"strict":true,"contexts":["test"]}' \
   --field enforce_admins=false \
-  --field required_pull_requests='{"required_approving_review_count":1,"dismiss_stale_reviews":true,"require_code_owner_reviews":false,"dismissal_restrictions":{}}' \
+  --field required_pull_requests='{
+    "required_approving_review_count":1,
+    "dismiss_stale_reviews":true,
+    "require_code_owner_reviews":false,
+    "dismissal_restrictions":{}
+  }' \
   --field restrictions=null \
   --field allow_force_pushes=false \
   --field allow_deletions=false \
@@ -412,7 +424,7 @@ Brief description of what this project does.
 
 ## Installation
 
-```bash
+\`\`\`bash
 # Clone the repository
 git clone https://github.com/MorePET/new-repo-name.git
 cd new-repo-name
@@ -422,11 +434,11 @@ uv pip install -r requirements-dev.txt
 
 # Install pre-commit hooks
 pre-commit install
-```
+\`\`\`
 
 ## Development
 
-```bash
+\`\`\`bash
 # Run tests
 uv run pytest
 
@@ -435,7 +447,7 @@ uv run ruff check .
 
 # Format code
 uv run ruff format .
-```
+\`\`\`
 
 ## Contributing
 
@@ -445,8 +457,11 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for development guidelines.
 
 [License information]
 EOF
+```
 
-# Create CHANGELOG.md
+### Create CHANGELOG.md File
+
+```bash
 cat > CHANGELOG.md << 'EOF'
 # Changelog
 
@@ -464,8 +479,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - CI/CD workflows
 - Pre-commit hooks
 EOF
+```
 
-# Create CONTRIBUTING.md
+### Create CONTRIBUTING.md
+
+```bash
 cat > CONTRIBUTING.md << 'EOF'
 # Contributing
 

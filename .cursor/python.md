@@ -40,6 +40,7 @@ uv run pytest
 ```
 
 **Why different approaches?**
+
 - **Host**: Virtual environments isolate project dependencies from system Python
 - **Container**: Already isolated, so `--system` install is safe and simpler
 
@@ -114,6 +115,7 @@ See `pyproject.toml` or `ruff.toml` for project-specific rules.
 ### Common Ruff Rules
 
 **Import ordering (I):**
+
 ```python
 # Standard library
 import os
@@ -132,6 +134,7 @@ from myapp.models import User
 - Let Ruff format handle it
 
 **Unused imports/variables (F401, F841):**
+
 ```python
 # ❌ Bad
 import os  # unused
@@ -144,6 +147,7 @@ print(x)
 ```
 
 **Type annotations:**
+
 ```python
 # ✅ Prefer annotated code
 def process_data(items: list[str], count: int) -> dict[str, int]:
@@ -304,6 +308,7 @@ logging.basicConfig(
 Use appropriate log levels:
 
 **DEBUG** - Detailed diagnostic information:
+
 ```python
 logger.debug("Processing item %d of %d", current, total)
 logger.debug("Cache hit for key: %s", cache_key)
@@ -311,6 +316,7 @@ logger.debug("Query parameters: %s", params)
 ```
 
 **INFO** - General informational messages:
+
 ```python
 logger.info("Starting data processing")
 logger.info("User %s logged in successfully", username)
@@ -318,6 +324,7 @@ logger.info("Processed %d records in %.2f seconds", count, duration)
 ```
 
 **WARNING** - Something unexpected but not critical:
+
 ```python
 logger.warning("API rate limit approaching: %d/%d", current, limit)
 logger.warning("Configuration file not found, using defaults")
@@ -325,6 +332,7 @@ logger.warning("Deprecated function called: %s", func_name)
 ```
 
 **ERROR** - Error occurred but application continues:
+
 ```python
 logger.error("Failed to process record %d: %s", record_id, error)
 logger.error("Database connection lost, retrying...")
@@ -332,6 +340,7 @@ logger.error("Invalid input data: %s", validation_error)
 ```
 
 **CRITICAL** - Critical error, application may fail:
+
 ```python
 logger.critical("Database connection failed, cannot continue")
 logger.critical("Out of memory, shutting down")
@@ -341,6 +350,7 @@ logger.critical("Critical configuration missing: %s", config_key)
 ### Logging Best Practices
 
 **DO:**
+
 ```python
 # ✅ Use proper log levels
 logger.info("Operation completed successfully")
@@ -364,6 +374,7 @@ logger.info("Batch processing completed in %.2fs", elapsed)
 ```
 
 **DON'T:**
+
 ```python
 # ❌ Don't use print()
 print("User logged in")  # Use logger.info() instead
@@ -434,6 +445,7 @@ logger.addHandler(handler)
 ### Logging Configuration
 
 **Per-module loggers:**
+
 ```python
 # myapp/users.py
 logger = logging.getLogger(__name__)  # Gets 'myapp.users'
@@ -443,6 +455,7 @@ logger = logging.getLogger(__name__)  # Gets 'myapp.api'
 ```
 
 **Hierarchical control:**
+
 ```python
 # Set different levels for different modules
 logging.getLogger('myapp.users').setLevel(logging.DEBUG)
@@ -480,6 +493,7 @@ def process_items(
 ```
 
 **Use modern type hints** (Python 3.10+):
+
 ```python
 # ✅ Modern (preferred)
 def func(items: list[str]) -> dict[str, int]:
@@ -518,6 +532,7 @@ def test_process_data_invalid_type():
 ## Code Organization
 
 **Module structure:**
+
 ```python
 """Module docstring."""
 

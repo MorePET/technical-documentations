@@ -3,6 +3,7 @@
 ## When to Create an Issue
 
 Create issues for:
+
 - ✅ Bug reports
 - ✅ Feature requests
 - ✅ Documentation improvements
@@ -110,7 +111,7 @@ Instead:
 2. Use GitHub Security Advisories
 3. Contact maintainers privately
 
-## Issue Types
+## GitHub Native Issue Types
 
 MorePET repositories use GitHub's native issue types (not labels) for categorization:
 
@@ -306,7 +307,7 @@ gh api \
   --field type="Bug"
 ```
 
-### Issue Types
+### Available Issue Types
 
 GitHub supports three issue types:
 

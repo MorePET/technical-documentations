@@ -7,6 +7,7 @@
 Follow the format: `<type>/<short-description>`
 
 Types:
+
 - `feature/` - New features
 - `fix/` - Bug fixes
 - `docs/` - Documentation changes
@@ -24,7 +25,7 @@ Examples:
 
 Use clear, descriptive titles:
 
-```
+```text
 <type>: Brief description of changes
 ```
 

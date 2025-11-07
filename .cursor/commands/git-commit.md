@@ -10,7 +10,7 @@ For complete documentation on commit conventions, workflow, and best practices, 
 
 **ALWAYS use conventional commits** with this format:
 
-```
+```text
 <type>(<scope>): <description>
 
 <body>
@@ -48,6 +48,7 @@ For complete documentation on commit conventions, workflow, and best practices, 
 ## Scope Guidelines
 
 **Use scope for:**
+
 - Component/module names: `feat(auth):`, `fix(db):`
 - File types: `docs(readme):`, `test(unit):`
 - Areas: `refactor(api):`, `style(imports):`
@@ -151,6 +152,7 @@ git push origin your-branch
 **Each commit should be one logical change:**
 
 ✅ **Good:**
+
 ```bash
 git commit -m "feat(auth): add password validation"
 git commit -m "feat(auth): add password strength meter"
@@ -158,6 +160,7 @@ git commit -m "test(auth): add validation tests"
 ```
 
 ❌ **Bad:**
+
 ```bash
 git commit -m "add auth features and tests and fix docs"
 ```
@@ -214,6 +217,7 @@ s ghi9012 add tests
 - End-of-file fixes
 
 **Skip hooks only when necessary:**
+
 ```bash
 git commit --no-verify -m "urgent fix"
 ```
@@ -283,6 +287,7 @@ git cherry-pick commit-hash
 ### Large Commit
 
 **Split into smaller commits:**
+
 ```bash
 # Unstage everything
 git reset HEAD~
@@ -299,7 +304,7 @@ git commit -m "feat: add user model"
 
 ### Commit Types Cheat Sheet
 
-```
+```text
 feat:     New feature
 fix:      Bug fix
 docs:     Documentation

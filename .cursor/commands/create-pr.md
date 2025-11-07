@@ -5,6 +5,7 @@ This command helps you create pull requests following the project's standards an
 For complete documentation on pull request guidelines, templates, and review process, see:
 
 **Related Documentation:**
+
 - **[Pull Request Guidelines](./../pr-template.md)**
 - **[Git Workflow](./../git-workflow.md)**
 
@@ -17,6 +18,7 @@ When creating a pull request, follow these steps:
    - Example: `feature/add-user-authentication`
 
 2. **Verify branch is up to date:**
+
    ```bash
    git checkout main
    git pull origin main
@@ -25,6 +27,7 @@ When creating a pull request, follow these steps:
    ```
 
 3. **Run pre-commit hooks and tests:**
+
    ```bash
    # Ensure all checks pass
    git status  # Should show clean working directory
@@ -37,11 +40,13 @@ When creating a pull request, follow these steps:
    - Run pre-commit hooks
 
 5. **Push your branch:**
+
    ```bash
    git push origin your-branch
    ```
 
 6. **Create the pull request:**
+
    ```bash
    gh pr create
    ```
@@ -100,7 +105,8 @@ gh pr create \
   --title "fix: Resolve authentication timeout issue" \
   --body "## Description
 
-Fixed authentication session timeout bug that was causing users to be logged out unexpectedly.
+Fixed authentication session timeout bug that was causing users to be
+logged out unexpectedly.
 
 ## Changes
 
@@ -151,7 +157,7 @@ Updated README.md with clearer installation instructions for new developers.
 
 Use clear, descriptive titles following conventional commit format:
 
-```
+```text
 <type>: Brief description of changes
 ```
 
