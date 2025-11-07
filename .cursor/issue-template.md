@@ -247,7 +247,7 @@ What should happen.
 ## Actual Behavior
 
 What actually happens." \
-  --field issue_type="bug"
+  --field type="Bug"
 ```
 
 **Feature request:**
@@ -268,7 +268,7 @@ Describe your proposed solution.
 ## Alternatives Considered
 
 What other solutions have you thought about." \
-  --field issue_type="feature"
+  --field type="Feature"
 ```
 
 **Task:**
@@ -286,7 +286,7 @@ What needs to be done.
 
 - [ ] Subtask 1
 - [ ] Subtask 2" \
-  --field issue_type="task"
+  --field type="Task"
 ```
 
 **From a file:**
@@ -303,7 +303,7 @@ gh api \
   /repos/ORG/REPO/issues \
   --field title="Brief description" \
   --field body="$(cat issue.md)" \
-  --field issue_type="bug"
+  --field type="Bug"
 ```
 
 ### Issue Types
@@ -322,7 +322,7 @@ GitHub supports three issue types:
 |-----------|-------------|---------|
 | `title` | Issue title | `--field title="Fix auth bug"` |
 | `body` | Issue description | `--field body="Description..."` |
-| `issue_type` | Type (bug/feature/task) | `--field issue_type="bug"` |
+| `type` | Type (Bug/Feature/Task) | `--field type="Bug"` |
 | `assignees` | Assign users (array) | `--field assignees[]=username` |
 | `milestone` | Milestone number | `--field milestone=5` |
 
@@ -334,7 +334,7 @@ GitHub supports three issue types:
 gh api --method POST /repos/{owner}/{repo}/issues \
   --field title="Title" \
   --field body="Body" \
-  --field issue_type="bug"
+  --field type="Bug"
 ```
 
 **Different repo:**
@@ -343,7 +343,7 @@ gh api --method POST /repos/{owner}/{repo}/issues \
 gh api --method POST /repos/MorePET/containers/issues \
   --field title="Add Renovate support" \
   --field body="$(cat issue-body.md)" \
-  --field issue_type="feature"
+  --field type="Feature"
 ```
 
 ### Assign to Yourself
@@ -352,6 +352,6 @@ gh api --method POST /repos/MorePET/containers/issues \
 gh api --method POST /repos/ORG/REPO/issues \
   --field title="Title" \
   --field body="Body" \
-  --field issue_type="task" \
+  --field type="Task" \
   --field assignees[]="@me"
 ```
