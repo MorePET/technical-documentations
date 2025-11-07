@@ -121,26 +121,26 @@ Open these professional tools in dark mode for reference:
 
 ### Signs colors are TOO BRIGHT
 
-- ❌ Colors appear to "glow" or "pop out"
-- ❌ Eyes feel strained after 5-10 minutes
-- ❌ Colors look neon or "RGB gaming setup"
-- ❌ Text is hard to read on the node backgrounds
+- [ ] Colors appear to "glow" or "pop out"
+- [ ] Eyes feel strained after 5-10 minutes
+- [ ] Colors look neon or "RGB gaming setup"
+- [ ] Text is hard to read on the node backgrounds
 
 ### Signs colors are TOO DARK
 
-- ❌ Can't distinguish between different node types
-- ❌ Nodes blend into the page background
-- ❌ Need to squint to see the diagram
-- ❌ All colors look like shades of gray
+- [ ] Can't distinguish between different node types
+- [ ] Nodes blend into the page background
+- [ ] Need to squint to see the diagram
+- [ ] All colors look like shades of gray
 
 ### Signs colors are JUST RIGHT
 
-- ✅ Comfortable to view for extended periods
-- ✅ Each color is clearly identifiable
-- ✅ Professional, polished appearance
-- ✅ Similar feel to GitHub/VS Code/Material dark themes
-- ✅ Text is highly readable
-- ✅ Nodes stand out from background without being harsh
+- [x] Comfortable to view for extended periods
+- [x] Each color is clearly identifiable
+- [x] Professional, polished appearance
+- [x] Similar feel to GitHub/VS Code/Material dark themes
+- [x] Text is highly readable
+- [x] Nodes stand out from background without being harsh
 
 ## Quick Reference: HSL Values
 
