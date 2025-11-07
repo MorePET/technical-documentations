@@ -20,21 +20,13 @@ repos:
       - id: mixed-line-ending
       - id: trailing-whitespace
 
-  # Python Linting and Formatting (Ruff via uv)
-  - repo: local
+  # Python Linting and Formatting (Ruff)
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.14.3
     hooks:
       - id: ruff
-        name: ruff (legacy alias)
-        entry: uv run ruff check --fix
-        language: system
-        types: [python]
-        require_serial: true
+        args: [--fix]
       - id: ruff-format
-        name: ruff format
-        entry: uv run ruff format
-        language: system
-        types: [python]
-        require_serial: true
 
   # YAML Linting
   - repo: https://github.com/adrienverge/yamllint
@@ -58,7 +50,6 @@ repos:
         name: pymarkdown
         args: ["scan"]
         exclude: ^\.github_data/
-        additional_dependencies: ["pyjson5"]
 
   # Dockerfile Linting (using Podman instead of Docker)
   - repo: local
@@ -81,39 +72,6 @@ repos:
       - id: checkmake
         name: checkmake (lint Makefile)
         files: ^Makefile$
-        args: ["--config=.checkmake.ini"]
-
-  # Typst Syntax Check
-  - repo: local
-    hooks:
-      - id: typst-check
-        name: Typst Syntax Check
-        entry: bash -c 'for file in "$@"; do typst compile --root . --format pdf "$file" /dev/null || exit 1; done' --
-        language: system
-        files: '\.typ$'
-        pass_filenames: true
-      - id: sembr-check
-        name: Check semantic line breaks (warning only)
-        entry: bash -c 'uv run sembr check "$@" 2>&1 || exit 0' --
-        language: system
-        files: '\.typ$'
-        pass_filenames: true
-      - id: sembr-fix
-        name: Format with semantic line breaks (manual)
-        entry: bash -c 'uv run sembr format --in-place "$@"' --
-        language: system
-        files: '\.typ$'
-        pass_filenames: true
-        stages: [manual]
-
-  # Commit Message Linting
-  - repo: local
-    hooks:
-      - id: gitlint
-        name: gitlint (conventional commits)
-        entry: uv run gitlint --msg-filename
-        language: system
-        stages: [commit-msg]
 
   # GitHub Data Sync
   - repo: local
