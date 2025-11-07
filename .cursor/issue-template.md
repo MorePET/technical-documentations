@@ -110,35 +110,18 @@ Instead:
 2. Use GitHub Security Advisories
 3. Contact maintainers privately
 
-## Issue Labels
+## Issue Types
 
-Use appropriate labels:
+MorePET repositories use GitHub's native issue types (not labels) for categorization:
 
-**Type:**
-- `bug` - Something isn't working
-- `feature` - New feature request
-- `task` - task
+**Available Types:**
+- `bug` - Something isn't working (crashes, errors, unexpected behavior)
+- `feature` - New feature request (enhancements, new functionality)
+- `task` - Work item or chore (documentation, refactoring, maintenance)
 
-**Priority:**
-- `critical` - Blocking, needs immediate attention
-- `high` - Important, should be addressed soon
-- `medium` - Normal priority
-- `low` - Nice to have
+**Setting types:** Use the REST API (see "Creating Issues via CLI" section below).
 
-**Status:**
-- `needs-triage` - Needs initial review
-- `confirmed` - Bug confirmed or feature approved
-- `in-progress` - Someone is working on it
-- `blocked` - Waiting on something else
-- `help-wanted` - Open for contributions
-- `good-first-issue` - Good for newcomers
-
-**Area:**
-- `devcontainer` - Dev container related
-- `documentation` - Documentation
-- `ci-cd` - CI/CD pipeline
-- `tooling` - Development tools
-- `build` - Build system
+**Note:** MorePET does not use labels for categorization. Use issue types instead.
 
 ## Issue Title Guidelines
 
@@ -237,16 +220,18 @@ Use the appropriate template when creating issues.
 
 ## Creating Issues via CLI
 
-### Using `gh` CLI
+### Using GitHub REST API (with issue types)
 
-The `gh` CLI allows programmatic issue creation, useful for automation and scripts.
+GitHub now supports **issue types** (bug, feature, task) via the REST API. This is the recommended approach for MorePET repos.
 
 **Bug report:**
 
 ```bash
-gh issue create \
-  --title "bug: Brief description of the problem" \
-  --body "## Description
+gh api \
+  --method POST \
+  /repos/ORG/REPO/issues \
+  --field title="Brief description of the problem" \
+  --field body="## Description
 
 Detailed bug description here.
 
@@ -262,15 +247,17 @@ What should happen.
 ## Actual Behavior
 
 What actually happens." \
-  --label "bug,needs-triage"
+  --field issue_type="bug"
 ```
 
 **Feature request:**
 
 ```bash
-gh issue create \
-  --title "feat: Add support for new feature" \
-  --body "## Problem Statement
+gh api \
+  --method POST \
+  /repos/ORG/REPO/issues \
+  --field title="Add support for new feature" \
+  --field body="## Problem Statement
 
 Describe the problem this feature would solve.
 
@@ -280,8 +267,26 @@ Describe your proposed solution.
 
 ## Alternatives Considered
 
-What other solutions have you thought about?" \
-  --label "feature,needs-triage"
+What other solutions have you thought about." \
+  --field issue_type="feature"
+```
+
+**Task:**
+
+```bash
+gh api \
+  --method POST \
+  /repos/ORG/REPO/issues \
+  --field title="Task: Brief description" \
+  --field body="## Task Description
+
+What needs to be done.
+
+## Checklist
+
+- [ ] Subtask 1
+- [ ] Subtask 2" \
+  --field issue_type="task"
 ```
 
 **From a file:**
@@ -293,52 +298,60 @@ cat > issue.md << 'EOF'
 Bug details here...
 EOF
 
-gh issue create \
-  --title "Bug: Title here" \
-  --body-file issue.md \
-  --label "bug,high"
+gh api \
+  --method POST \
+  /repos/ORG/REPO/issues \
+  --field title="Brief description" \
+  --field body="$(cat issue.md)" \
+  --field issue_type="bug"
 ```
 
-**Important:** Labels must exist in the repository. Use `gh label list` to see available labels.
+### Issue Types
 
-### Common `gh` CLI Options
+GitHub supports three issue types:
 
-| Flag | Description | Example |
+| Type | When to Use | Example |
 |------|-------------|---------|
-| `--title` | Issue title | `--title "Bug: Auth fails"` |
-| `--body` | Issue body (inline) | `--body "Description..."` |
-| `--body-file` | Issue body (from file) | `--body-file issue.md` |
-| `--label` | Comma-separated labels | `--label "bug,critical"` |
-| `--assignee` | Assign to user | `--assignee @me` |
-| `--milestone` | Set milestone | `--milestone "v1.0"` |
-| `--project` | Add to project | `--project "Sprint 1"` |
-| `--repo` | Target repo | `--repo ORG/REPO` |
-| `--web` | Open in browser | `--web` |
+| `bug` | Something isn't working | Auth fails, crashes, errors |
+| `feature` | New functionality request | Add dark mode, API endpoint |
+| `task` | Work item or chore | Update docs, refactor code |
 
-### Check Available Labels
+### Common REST API Parameters
 
-Before creating issues, check what labels exist:
+| Parameter | Description | Example |
+|-----------|-------------|---------|
+| `title` | Issue title | `--field title="Fix auth bug"` |
+| `body` | Issue description | `--field body="Description..."` |
+| `issue_type` | Type (bug/feature/task) | `--field issue_type="bug"` |
+| `assignees` | Assign users (array) | `--field assignees[]=username` |
+| `milestone` | Milestone number | `--field milestone=5` |
+
+### Examples for Different Repos
+
+**Current repo:**
 
 ```bash
-# List all labels in current repo
-gh label list
-
-# List labels in another repo
-gh label list --repo ORG/REPO
+gh api --method POST /repos/{owner}/{repo}/issues \
+  --field title="Title" \
+  --field body="Body" \
+  --field issue_type="bug"
 ```
 
-### Create Missing Labels
-
-If needed labels don't exist:
+**Different repo:**
 
 ```bash
-# Create label
-gh label create "dependencies" --color "0366d6" --description "Dependency updates"
+gh api --method POST /repos/MorePET/containers/issues \
+  --field title="Add Renovate support" \
+  --field body="$(cat issue-body.md)" \
+  --field issue_type="feature"
+```
 
-# Common labels for MorePET repos
-gh label create "bug" --color "d73a4a"
-gh label create "feature" --color "0e8a16"
-gh label create "documentation" --color "0075ca"
-gh label create "dependencies" --color "0366d6"
-gh label create "devcontainer" --color "1d76db"
+### Assign to Yourself
+
+```bash
+gh api --method POST /repos/ORG/REPO/issues \
+  --field title="Title" \
+  --field body="Body" \
+  --field issue_type="task" \
+  --field assignees[]="@me"
 ```
