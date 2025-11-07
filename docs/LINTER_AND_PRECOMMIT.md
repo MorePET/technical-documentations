@@ -45,19 +45,19 @@ These hooks from `pre-commit-hooks` ensure basic file hygiene:
 
 | Hook | What it does | Auto-fixes |
 |------|-------------|------------|
-| `check-added-large-files` | Prevents accidentally committing large files | ❌ |
-| `check-case-conflict` | Checks for files with case conflicts | ❌ |
-| `check-json` | Validates JSON syntax | ❌ |
-| `check-merge-conflict` | Detects merge conflict markers | ❌ |
-| `check-symlinks` | Checks for broken symlinks | ❌ |
-| `check-toml` | Validates TOML syntax | ❌ |
-| `check-yaml` | Validates YAML syntax | ❌ |
-| `debug-statements` | Detects debug statements in Python | ❌ |
-| `destroyed-symlinks` | Detects destroyed symlinks | ❌ |
-| `detect-private-key` | Prevents committing private keys | ❌ |
-| `end-of-file-fixer` | Ensures files end with newline | ✅ |
-| `mixed-line-ending` | Normalizes line endings | ✅ |
-| `trailing-whitespace` | Removes trailing whitespace | ✅ |
+| `check-added-large-files` | Prevents accidentally committing large files | No |
+| `check-case-conflict` | Checks for files with case conflicts | No |
+| `check-json` | Validates JSON syntax | No |
+| `check-merge-conflict` | Detects merge conflict markers | No |
+| `check-symlinks` | Checks for broken symlinks | No |
+| `check-toml` | Validates TOML syntax | No |
+| `check-yaml` | Validates YAML syntax | No |
+| `debug-statements` | Detects debug statements in Python | No |
+| `destroyed-symlinks` | Detects destroyed symlinks | No |
+| `detect-private-key` | Prevents committing private keys | No |
+| `end-of-file-fixer` | Ensures files end with newline | Yes |
+| `mixed-line-ending` | Normalizes line endings | Yes |
+| `trailing-whitespace` | Removes trailing whitespace | Yes |
 
 ### Python: Ruff
 
@@ -244,11 +244,11 @@ generated HTML files pass linter checks without manual intervention.
 
 ## Benefits
 
-✅ **Consistency** - Enforces coding standards automatically
-✅ **Quality** - Catches common errors before they're committed
-✅ **Time-saving** - Auto-fixes many issues (whitespace, formatting)
-✅ **Learning** - Helpful error messages teach best practices
-✅ **CI-ready** - Same checks can run in CI/CD pipelines
+- [x] **Consistency** - Enforces coding standards automatically
+- [x] **Quality** - Catches common errors before they're committed
+- [x] **Time-saving** - Auto-fixes many issues (whitespace, formatting)
+- [x] **Learning** - Helpful error messages teach best practices
+- [x] **CI-ready** - Same checks can run in CI/CD pipelines
 
 ## Best Practices
 
