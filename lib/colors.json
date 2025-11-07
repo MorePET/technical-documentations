@@ -16,49 +16,49 @@
       "description": "Node and edge strokes (arrows, outlines)"
     },
   "node-bg-blue": {
-    "light": "#cce3f7",
-    "dark": "#1e3a5f",
-    "description": "Blue node background (blue.lighten(80%))"
+    "light": "#cfe2ff",
+    "dark": "#084298",
+    "description": "Blue node background (Bootstrap primary-subtle)"
   },
   "node-bg-blue-light": {
-    "light": "#e6f1fb",
-    "dark": "#1a2f4a",
-    "description": "Lighter blue node background (blue.lighten(90%))"
+    "light": "#e7f1ff",
+    "dark": "#052c65",
+    "description": "Lighter blue node background (Bootstrap primary lighter)"
   },
   "node-bg-green": {
-    "light": "#d5f5d9",
-    "dark": "#1e3d1e",
-    "description": "Green node background (green.lighten(80%))"
+    "light": "#d1e7dd",
+    "dark": "#0f5132",
+    "description": "Green node background (Bootstrap success-subtle)"
   },
   "node-bg-orange": {
-    "light": "#ffe7d1",
-    "dark": "#4a3420",
-    "description": "Orange node background (orange.lighten(80%))"
+    "light": "#ffe5d0",
+    "dark": "#664d03",
+    "description": "Orange node background (Bootstrap warning-subtle)"
   },
   "node-bg-purple": {
-    "light": "#efcff4",
-    "dark": "#3a2651",
-    "description": "Purple node background (purple.lighten(80%))"
+    "light": "#e2d9f3",
+    "dark": "#432874",
+    "description": "Purple node background (Bootstrap purple-subtle)"
   },
   "node-bg-red": {
-    "light": "#ffd9d7",
-    "dark": "#4a2020",
-    "description": "Red node background (red.lighten(80%))"
+    "light": "#f8d7da",
+    "dark": "#842029",
+    "description": "Red node background (Bootstrap danger-subtle)"
   },
     "node-bg-neutral": {
-      "light": "#f0f0f0",
-      "dark": "#2d3748",
-      "description": "Neutral/gray node background"
+      "light": "#e9ecef",
+      "dark": "#495057",
+      "description": "Neutral/gray node background (Bootstrap secondary)"
     },
     "gradient-start": {
       "light": "#ffffff",
-      "dark": "#1a202c",
-      "description": "Gradient start (light center)"
+      "dark": "#212529",
+      "description": "Gradient start (Bootstrap body-bg)"
     },
     "gradient-end-blue": {
-      "light": "#99ccff",
-      "dark": "#1e3a5f",
-      "description": "Blue gradient end"
+      "light": "#9ec5fe",
+      "dark": "#084298",
+      "description": "Blue gradient end (Bootstrap primary-tint)"
     },
     "link-color": {
       "light": "#000000",

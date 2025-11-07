@@ -57,8 +57,34 @@ def generate_css(colors: dict, output_file: Path):
     css_lines.append("}")
     css_lines.append("")
 
-    # Add explicit dark theme override (for toggle button)
-    css_lines.append("/* Dark theme via manual toggle */")
+    # Add explicit dark theme override (Bootstrap data-bs-theme attribute)
+    css_lines.append("/* Dark theme via Bootstrap data-bs-theme */")
+    css_lines.append("[data-bs-theme='dark'] {")
+
+    for name, config in colors["colors"].items():
+        css_name = f"--color-{name}"
+        dark_value = config["dark"]
+        css_lines.append(f"  {css_name}: {dark_value};")
+
+    css_lines.append("}")
+    css_lines.append("")
+
+    # Add explicit light theme override (Bootstrap data-bs-theme attribute)
+    css_lines.append(
+        "/* Light theme via Bootstrap data-bs-theme (overrides system dark mode) */"
+    )
+    css_lines.append("[data-bs-theme='light'] {")
+
+    for name, config in colors["colors"].items():
+        css_name = f"--color-{name}"
+        light_value = config["light"]
+        css_lines.append(f"  {css_name}: {light_value};")
+
+    css_lines.append("}")
+    css_lines.append("")
+
+    # Also support legacy data-theme for backward compatibility
+    css_lines.append("/* Legacy data-theme support (backward compatibility) */")
     css_lines.append("[data-theme='dark'] {")
 
     for name, config in colors["colors"].items():
@@ -69,8 +95,6 @@ def generate_css(colors: dict, output_file: Path):
     css_lines.append("}")
     css_lines.append("")
 
-    # Add explicit light theme override (to override system dark mode)
-    css_lines.append("/* Light theme via manual toggle (overrides system dark mode) */")
     css_lines.append("[data-theme='light'] {")
 
     for name, config in colors["colors"].items():
@@ -119,6 +143,11 @@ def generate_typst(colors: dict, output_file: Path):
     typ_lines.append("// Light mode colors (default)")
     for name, config in colors["colors"].items():
         typ_name = name.replace("-", "_")
+
+        # Add _color suffix for names that conflict with Typst built-ins
+        if typ_name in ["text", "stroke", "background", "link", "label"]:
+            typ_name = typ_name + "_color"
+
         light_value = config["light"]
 
         typ_value = "none" if light_value == "transparent" else f'rgb("{light_value}")'
@@ -133,7 +162,13 @@ def generate_typst(colors: dict, output_file: Path):
     typ_lines.append("// Note: Use these when generating dark mode variants")
 
     for name, config in colors["colors"].items():
-        typ_name = f"{name.replace('-', '_')}_dark"
+        base_name = name.replace("-", "_")
+
+        # Add _color suffix for names that conflict with Typst built-ins
+        if base_name in ["text", "stroke", "background", "link", "label"]:
+            base_name = base_name + "_color"
+
+        typ_name = f"{base_name}_dark"
         dark_value = config["dark"]
 
         typ_value = "none" if dark_value == "transparent" else f'rgb("{dark_value}")'
