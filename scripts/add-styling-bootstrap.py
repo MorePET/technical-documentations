@@ -38,17 +38,16 @@ def add_bootstrap_to_html(
     html_content = input_path.read_text(encoding="utf-8")
 
     # Check if Bootstrap already exists
-    if 'bootstrap' in html_content:
-        if not force:
-            print("⚠️  Bootstrap already exists in the HTML file.")
-            try:
-                response = input("Do you want to replace it? (y/n): ")
-                if response.lower() != "y":
-                    print("Aborted.")
-                    return
-            except EOFError:
-                # Non-interactive mode, skip
-                pass
+    if "bootstrap" in html_content and not force:
+        print("⚠️  Bootstrap already exists in the HTML file.")
+        try:
+            response = input("Do you want to replace it? (y/n): ")
+            if response.lower() != "y":
+                print("Aborted.")
+                return
+        except EOFError:
+            # Non-interactive mode, skip
+            pass
 
     # Remove existing style/link tags from the head section (except diagram colors CSS)
     head_end = html_content.find("</head>")
@@ -82,7 +81,9 @@ def add_bootstrap_to_html(
 
     # Add viewport meta tag if not present
     if 'name="viewport"' not in html_content:
-        viewport_tag = '\n    <meta name="viewport" content="width=device-width, initial-scale=1">'
+        viewport_tag = (
+            '\n    <meta name="viewport" content="width=device-width, initial-scale=1">'
+        )
         if "<head>" in html_content:
             html_content = html_content.replace("<head>", f"<head>{viewport_tag}", 1)
 
@@ -99,6 +100,14 @@ def add_bootstrap_to_html(
         )
 
     print("✅ Added Bootstrap 5.3.2 CSS from CDN")
+
+    # Add colors.css first (needed for theme-aware diagram colors)
+    colors_link = '\n    <link rel="stylesheet" href="colors.css">'
+    if "</head>" in html_content:
+        html_content = html_content.replace("</head>", f"{colors_link}\n  </head>", 1)
+    else:
+        html_content = html_content.replace("<head>", f"<head>{colors_link}", 1)
+    print("✅ Added link to colors.css")
 
     # Add custom CSS
     if inline:
@@ -135,14 +144,16 @@ def add_bootstrap_to_html(
     bootstrap_js = '    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>'
 
     if "</body>" in html_content:
-        html_content = html_content.replace("</body>", f"\n{bootstrap_js}\n  </body>", 1)
+        html_content = html_content.replace(
+            "</body>", f"\n{bootstrap_js}\n  </body>", 1
+        )
     else:
         html_content = html_content.replace("</html>", f"{bootstrap_js}\n</html>", 1)
 
     print("✅ Added Bootstrap 5.3.2 JS from CDN")
 
     # Wrap main content in Bootstrap container if not already wrapped
-    if '<div class="container">' not in html_content and '<body>' in html_content:
+    if '<div class="container">' not in html_content and "<body>" in html_content:
         # Find body content (after any injected elements like theme toggle)
         body_start = html_content.find("<body>") + len("<body>")
         body_end = html_content.find("</body>")
@@ -157,10 +168,10 @@ def add_bootstrap_to_html(
                 idx = body_content.find(marker)
                 if idx != -1:
                     # Find the end of this element
-                    if 'theme-toggle' in marker:
-                        end_idx = body_content.find('</button>', idx) + len('</button>')
+                    if "theme-toggle" in marker:
+                        end_idx = body_content.find("</button>", idx) + len("</button>")
                     else:
-                        end_idx = body_content.find('</div>', idx) + len('</div>')
+                        end_idx = body_content.find("</div>", idx) + len("</div>")
                     content_start = max(content_start, end_idx)
 
             prefix = body_content[:content_start]
@@ -182,9 +193,9 @@ def add_bootstrap_to_html(
     # Collect elements to inject after <body>
     body_injections = []
 
-    # Add theme toggle if requested
-    if theme_toggle:
-        # Bootstrap-compatible theme toggle
+    # Add theme toggle if requested (but NOT if sidebar is enabled - it goes in navbar)
+    if theme_toggle and not toc_sidebar:
+        # Standalone Bootstrap-compatible theme toggle (only when no navbar)
         toggle_html = """
     <button class="theme-toggle btn btn-primary" onclick="toggleTheme()" aria-label="Toggle theme">
       <span id="theme-icon">🌓</span> <span class="d-none d-sm-inline">Theme</span>
@@ -277,7 +288,9 @@ def add_bootstrap_to_html(
 
         # Insert CSS before </head>
         if "</head>" in html_content:
-            html_content = html_content.replace("</head>", f"{toggle_css}\n  </head>", 1)
+            html_content = html_content.replace(
+                "</head>", f"{toggle_css}\n  </head>", 1
+            )
 
         # Insert JavaScript before </body>
         if "</body>" in html_content:
@@ -290,20 +303,164 @@ def add_bootstrap_to_html(
 
     # Add TOC sidebar if requested (using Bootstrap offcanvas)
     if toc_sidebar:
-        # Bootstrap offcanvas TOC sidebar
+        # Bootstrap navbar with burger menu for mobile + theme toggle dropdown
+        navbar_html = """
+    <!-- Bootstrap Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary fixed-top">
+      <div class="container-fluid">
+        <button class="btn btn-outline-light me-2 d-lg-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Toggle sidebar">
+          <span class="navbar-toggler-icon d-inline-block" style="width: 1.2em; height: 1.2em; vertical-align: middle;"></span>
+        </button>
+        <a class="navbar-brand" href="#">Technical Documentation</a>"""
+
+        if theme_toggle:
+            navbar_html += """
+        <div class="dropdown ms-auto">
+          <button class="btn btn-outline-light dropdown-toggle d-flex align-items-center" type="button" id="bd-theme" data-bs-toggle="dropdown" aria-expanded="false">
+            <svg class="bi theme-icon-active" width="1em" height="1em"><use href="#circle-half"></use></svg>
+          </button>
+          <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="bd-theme">
+            <li>
+              <button class="dropdown-item d-flex align-items-center" type="button" data-bs-theme-value="light">
+                <svg class="bi me-2 opacity-50" width="1em" height="1em"><use href="#sun-fill"></use></svg>
+                Light
+                <svg class="bi ms-auto d-none" width="1em" height="1em"><use href="#check2"></use></svg>
+              </button>
+            </li>
+            <li>
+              <button class="dropdown-item d-flex align-items-center" type="button" data-bs-theme-value="dark">
+                <svg class="bi me-2 opacity-50" width="1em" height="1em"><use href="#moon-stars-fill"></use></svg>
+                Dark
+                <svg class="bi ms-auto d-none" width="1em" height="1em"><use href="#check2"></use></svg>
+              </button>
+            </li>
+            <li>
+              <button class="dropdown-item d-flex align-items-center active" type="button" data-bs-theme-value="auto">
+                <svg class="bi me-2 opacity-50" width="1em" height="1em"><use href="#circle-half"></use></svg>
+                Auto
+                <svg class="bi ms-auto d-none" width="1em" height="1em"><use href="#check2"></use></svg>
+              </button>
+            </li>
+          </ul>
+        </div>"""
+
+        navbar_html += """
+      </div>
+    </nav>
+
+    <!-- Bootstrap Icons SVG Sprites -->
+    <svg xmlns="http://www.w3.org/2000/svg" class="d-none">
+      <symbol id="check2" viewBox="0 0 16 16">
+        <path d="M13.854 3.646a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 0 1 1 .708-.708L6.5 10.293l6.646-6.647a.5.5 0 0 1 .708 0z"/>
+      </symbol>
+      <symbol id="circle-half" viewBox="0 0 16 16">
+        <path d="M8 15A7 7 0 1 0 8 1v14zm0 1A8 8 0 1 1 8 0a8 8 0 0 1 0 16z"/>
+      </symbol>
+      <symbol id="moon-stars-fill" viewBox="0 0 16 16">
+        <path d="M6 .278a.768.768 0 0 1 .08.858 7.208 7.208 0 0 0-.878 3.46c0 4.021 3.278 7.277 7.318 7.277.527 0 1.04-.055 1.533-.16a.787.787 0 0 1 .81.316.733.733 0 0 1-.031.893A8.349 8.349 0 0 1 8.344 16C3.734 16 0 12.286 0 7.71 0 4.266 2.114 1.312 5.124.06A.752.752 0 0 1 6 .278z"/>
+        <path d="M10.794 3.148a.217.217 0 0 1 .412 0l.387 1.162c.173.518.579.924 1.097 1.097l1.162.387a.217.217 0 0 1 0 .412l-1.162.387a1.734 1.734 0 0 0-1.097 1.097l-.387 1.162a.217.217 0 0 1-.412 0l-.387-1.162A1.734 1.734 0 0 0 9.31 6.593l-1.162-.387a.217.217 0 0 1 0-.412l1.162-.387a1.734 1.734 0 0 0 1.097-1.097l.387-1.162zM13.863.099a.145.145 0 0 1 .274 0l.258.774c.115.346.386.617.732.732l.774.258a.145.145 0 0 1 0 .274l-.774.258a1.156 1.156 0 0 0-.732.732l-.258.774a.145.145 0 0 1-.274 0l-.258-.774a1.156 1.156 0 0 0-.732-.732l-.774-.258a.145.145 0 0 1 0-.274l.774-.258c.346-.115.617-.386.732-.732L13.863.1z"/>
+      </symbol>
+      <symbol id="sun-fill" viewBox="0 0 16 16">
+        <path d="M8 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM8 0a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 0zm0 13a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 13zm8-5a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2a.5.5 0 0 1 .5.5zM3 8a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2A.5.5 0 0 1 3 8zm10.657-5.657a.5.5 0 0 1 0 .707l-1.414 1.415a.5.5 0 1 1-.707-.708l1.414-1.414a.5.5 0 0 1 .707 0zm-9.193 9.193a.5.5 0 0 1 0 .707L3.05 13.657a.5.5 0 0 1-.707-.707l1.414-1.414a.5.5 0 0 1 .707 0zm9.193 2.121a.5.5 0 0 1-.707 0l-1.414-1.414a.5.5 0 0 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .707zM4.464 4.465a.5.5 0 0 1-.707 0L2.343 3.05a.5.5 0 1 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .708z"/>
+      </symbol>
+    </svg>"""
+        body_injections.append(navbar_html)
+
+        # Add theme toggle JavaScript if theme toggle is enabled (Bootstrap dropdown style)
+        if theme_toggle:
+            theme_toggle_js = """
+    <script>
+      /*!
+       * Color mode toggler for Bootstrap's docs (https://getbootstrap.com/)
+       * Copyright 2011-2024 The Bootstrap Authors
+       * Licensed under Creative Commons Attribution 3.0 Unported License.
+       */
+
+      (() => {
+        'use strict'
+
+        const getStoredTheme = () => localStorage.getItem('theme')
+        const setStoredTheme = theme => localStorage.setItem('theme', theme)
+
+        const getPreferredTheme = () => {
+          const storedTheme = getStoredTheme()
+          if (storedTheme) {
+            return storedTheme
+          }
+
+          return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+        }
+
+        const setTheme = theme => {
+          if (theme === 'auto') {
+            document.documentElement.setAttribute('data-bs-theme', (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'))
+          } else {
+            document.documentElement.setAttribute('data-bs-theme', theme)
+          }
+        }
+
+        setTheme(getPreferredTheme())
+
+        const showActiveTheme = (theme, focus = false) => {
+          const themeSwitcher = document.querySelector('#bd-theme')
+
+          if (!themeSwitcher) {
+            return
+          }
+
+          const activeThemeIcon = document.querySelector('.theme-icon-active use')
+          const btnToActive = document.querySelector(`[data-bs-theme-value="${theme}"]`)
+          const svgOfActiveBtn = btnToActive.querySelector('svg use').getAttribute('href')
+
+          document.querySelectorAll('[data-bs-theme-value]').forEach(element => {
+            element.classList.remove('active')
+            element.querySelector('svg.bi.ms-auto').classList.add('d-none')
+          })
+
+          btnToActive.classList.add('active')
+          btnToActive.querySelector('svg.bi.ms-auto').classList.remove('d-none')
+          activeThemeIcon.setAttribute('href', svgOfActiveBtn)
+          const themeSwitcherLabel = `Toggle theme (${btnToActive.dataset.bsThemeValue})`
+          themeSwitcher.setAttribute('aria-label', themeSwitcherLabel)
+
+          if (focus) {
+            themeSwitcher.focus()
+          }
+        }
+
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+          const storedTheme = getStoredTheme()
+          if (storedTheme !== 'light' && storedTheme !== 'dark') {
+            setTheme(getPreferredTheme())
+          }
+        })
+
+        window.addEventListener('DOMContentLoaded', () => {
+          showActiveTheme(getPreferredTheme())
+
+          document.querySelectorAll('[data-bs-theme-value]')
+            .forEach(toggle => {
+              toggle.addEventListener('click', () => {
+                const theme = toggle.getAttribute('data-bs-theme-value')
+                setStoredTheme(theme)
+                setTheme(theme)
+                showActiveTheme(theme, true)
+              })
+            })
+        })
+      })()
+    </script>"""
+
+        # Bootstrap offcanvas TOC sidebar (visible on large screens, offcanvas on mobile)
         toc_html = """
     <!-- TOC Sidebar (Bootstrap Offcanvas) -->
-    <button class="btn btn-primary toc-mobile-toggle d-lg-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Toggle table of contents">
-      📋
-    </button>
-
-    <div class="offcanvas offcanvas-start show d-none d-lg-block" data-bs-scroll="true" data-bs-backdrop="false" tabindex="-1" id="tocOffcanvas" style="width: 280px; position: fixed; height: 100vh;">
-      <div class="offcanvas-header border-bottom">
-        <h5 class="offcanvas-title">Contents</h5>
-        <button type="button" class="btn-close d-lg-none" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    <div class="offcanvas-lg offcanvas-start" data-bs-scroll="true" data-bs-backdrop="false" tabindex="-1" id="tocOffcanvas">
+      <div class="offcanvas-header border-bottom d-lg-none">
+        <h5 class="offcanvas-title fw-bold">Contents</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
       </div>
-      <div class="offcanvas-body" style="overflow-y: auto;">
-        <nav id="toc-nav" class="nav flex-column">
+      <div class="offcanvas-body p-0 py-lg-3">
+        <nav id="toc-nav" class="nav flex-column px-3 pt-2">
           <!-- TOC will be generated by JavaScript -->
         </nav>
       </div>
@@ -360,10 +517,13 @@ def add_bootstrap_to_html(
               heading.scrollIntoView({ behavior: 'smooth', block: 'start' });
               history.pushState(null, null, '#' + heading.id);
 
-              // Close offcanvas on mobile
-              const offcanvas = bootstrap.Offcanvas.getInstance(document.getElementById('tocOffcanvas'));
-              if (offcanvas && window.innerWidth < 992) {
-                offcanvas.hide();
+              // Close offcanvas after navigation (only on mobile)
+              if (window.innerWidth < 992) {
+                const offcanvasElement = document.getElementById('tocOffcanvas');
+                const offcanvas = bootstrap.Offcanvas.getInstance(offcanvasElement);
+                if (offcanvas) {
+                  offcanvas.hide();
+                }
               }
             });
 
@@ -419,60 +579,135 @@ def add_bootstrap_to_html(
       })();
     </script>"""
 
-        # TOC CSS
+        # TOC CSS (Bootstrap.com inspired)
         toc_css = """
     <style>
-      /* TOC Sidebar adjustments */
+      /* Fixed navbar spacing */
       body {
-        margin-left: 0;
+        padding-top: 60px; /* Space for fixed navbar */
       }
 
+      /* Navbar styling */
+      .navbar {
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        z-index: 1030;
+      }
+
+      [data-bs-theme="dark"] .navbar {
+        box-shadow: 0 2px 4px rgba(0,0,0,0.5);
+      }
+
+      /* Theme toggle button styling */
+      #bd-theme {
+        border: none !important;
+        box-shadow: none !important;
+      }
+
+      #bd-theme:hover,
+      #bd-theme:focus,
+      #bd-theme:active {
+        border: none !important;
+        box-shadow: none !important;
+        outline: none !important;
+      }
+
+      /* Make theme icons always white */
+      #bd-theme svg,
+      #bd-theme .theme-icon-active {
+        fill: white;
+        color: white;
+      }
+
+      /* Burger menu button styling - remove outline */
+      .navbar .btn-outline-light.me-2 {
+        border: none !important;
+        box-shadow: none !important;
+      }
+
+      .navbar .btn-outline-light.me-2:hover,
+      .navbar .btn-outline-light.me-2:focus,
+      .navbar .btn-outline-light.me-2:active {
+        border: none !important;
+        box-shadow: none !important;
+        outline: none !important;
+      }
+
+      /* Make navbar toggler icon visible */
+      .navbar-toggler-icon {
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28255, 255, 255, 0.85%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+      }
+
+      /* Sidebar layout on large screens */
       @media (min-width: 992px) {
-        body {
-          margin-left: 280px;
+        #tocOffcanvas {
+          position: fixed !important;
+          top: 60px;
+          left: 0;
+          width: 280px;
+          height: calc(100vh - 60px);
+          border-right: 1px solid var(--bs-border-color);
+          background: var(--bs-body-bg);
+          overflow-y: auto;
+          display: block !important;
+          visibility: visible !important;
+          transform: none !important;
         }
 
-        .offcanvas.show {
-          visibility: visible;
+        /* Push main content to the right on large screens */
+        body .container {
+          margin-left: 280px !important;
+          margin-right: 0 !important;
+          max-width: calc(100% - 280px) !important;
         }
       }
 
-      .toc-mobile-toggle {
-        position: fixed;
-        bottom: 20px;
-        left: 20px;
-        z-index: 1040;
-        border-radius: 50%;
-        width: 50px;
-        height: 50px;
-        padding: 0;
-        font-size: 1.5rem;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      /* Mobile offcanvas styling */
+      @media (max-width: 991.98px) {
+        #tocOffcanvas {
+          width: 280px;
+        }
       }
 
+      /* TOC link styling using Bootstrap colors */
       #toc-nav .nav-link {
-        padding: 0.5rem 0.75rem;
-        border-radius: 0.25rem;
+        padding: 0.375rem 0;
+        border-left: 2px solid transparent;
+        padding-left: 1rem;
         transition: all 0.2s ease;
+        margin-bottom: 0.125rem;
+        color: var(--bs-body-color);
+        font-size: 0.875rem;
       }
 
       #toc-nav .nav-link:hover {
-        background-color: rgba(var(--bs-primary-rgb), 0.1);
+        color: var(--bs-primary);
+        border-left-color: var(--bs-primary);
       }
 
       #toc-nav .nav-link.active {
-        background-color: var(--bs-primary);
-        color: white !important;
+        color: var(--bs-primary);
+        border-left-color: var(--bs-primary);
+        font-weight: 600;
       }
 
-      /* Print: hide TOC */
+      /* H3 links indented more */
+      #toc-nav .nav-link.ms-3 {
+        padding-left: 1.5rem;
+        font-size: 0.8125rem;
+      }
+
+      /* Print: hide interactive elements */
       @media print {
-        .offcanvas,
-        .toc-mobile-toggle {
+        .navbar,
+        #tocOffcanvas {
           display: none !important;
         }
 
         body {
+          padding-top: 0 !important;
+        }
+
+        body .container {
           margin-left: 0 !important;
         }
       }
@@ -483,10 +718,17 @@ def add_bootstrap_to_html(
             html_content = html_content.replace("</head>", f"{toc_css}\n  </head>", 1)
 
         # Insert JavaScript before Bootstrap JS
-        if bootstrap_js in html_content:
-            html_content = html_content.replace(bootstrap_js, f"{toc_js}\n{bootstrap_js}")
+        scripts_to_insert = toc_js
+        if theme_toggle and "theme_toggle_js" in locals():
+            scripts_to_insert = theme_toggle_js + "\n" + toc_js
 
-        print("✅ Added Bootstrap offcanvas TOC sidebar")
+        if bootstrap_js in html_content:
+            html_content = html_content.replace(
+                bootstrap_js, f"{scripts_to_insert}\n{bootstrap_js}"
+            )
+
+        print("✅ Added Bootstrap navbar with burger menu")
+        print("✅ Added Bootstrap offcanvas TOC sidebar (collapsible)")
 
     # Inject all body elements at once (after <body> tag)
     if body_injections:
@@ -495,6 +737,20 @@ def add_bootstrap_to_html(
             html_content = html_content.replace(
                 "<body>", f"<body>{combined_injection}", 1
             )
+
+    # Remove old emoji-based theme toggle button (if present from post-processing)
+    # Remove the script that creates the toggle button with 🌓 emoji
+    html_content = re.sub(
+        r'<script>[\s\S]*?toggleBtn\.innerHTML\s*=\s*[\'"]🌓[\'"][\s\S]*?</script>',
+        "",
+        html_content,
+    )
+    # Remove the style tag for theme-toggle-btn (more specific pattern)
+    html_content = re.sub(
+        r"<style>\s*/\*\s*Theme toggle button styling\s*\*/[\s\S]*?\.theme-toggle-btn[\s\S]*?</style>",
+        "",
+        html_content,
+    )
 
     # Write the modified HTML
     output_path.write_text(html_content, encoding="utf-8")
@@ -520,9 +776,7 @@ if __name__ == "__main__":
         print("  --inline:       Embed CSS directly (default: external link)")
         print("  --force:        Skip confirmation prompts")
         print("  --theme-toggle: Add dark mode toggle button in top-right corner")
-        print(
-            "  --toc-sidebar:  Add Bootstrap offcanvas table of contents sidebar"
-        )
+        print("  --toc-sidebar:  Add Bootstrap offcanvas table of contents sidebar")
         sys.exit(1)
 
     # Parse arguments

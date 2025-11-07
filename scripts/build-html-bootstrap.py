@@ -111,7 +111,7 @@ def add_bootstrap_classes(input_html: Path, output_html: Path) -> bool:
 
 
 def copy_css(output_html: Path):
-    """Copy Bootstrap custom CSS to the same directory as the HTML."""
+    """Copy Bootstrap custom CSS and colors.css to the same directory as the HTML."""
     project_root = Path(__file__).parent.parent
 
     # Copy styles-bootstrap.css
@@ -122,9 +122,19 @@ def copy_css(output_html: Path):
         print(f"\n⚠ Warning: {styles_source} not found")
         return False
 
+    # Copy colors.css
+    colors_source = project_root / "lib" / "generated" / "colors.css"
+    colors_dest = output_html.parent / "colors.css"
+
+    if not colors_source.exists():
+        print(f"\n⚠ Warning: {colors_source} not found")
+        return False
+
     try:
         shutil.copy(styles_source, styles_dest)
         print(f"\n✓ Copied styles-bootstrap.css to {styles_dest}")
+        shutil.copy(colors_source, colors_dest)
+        print(f"✓ Copied colors.css to {colors_dest}")
         return True
     except Exception as e:
         print(f"\n✗ Error copying CSS: {e}")
@@ -221,7 +231,9 @@ def main():
     # Copy temp file to final output first
     shutil.copy(temp_html3, html_file)
 
-    if not add_bootstrap_styling(html_file, theme_toggle=theme_toggle, toc_sidebar=toc_sidebar):
+    if not add_bootstrap_styling(
+        html_file, theme_toggle=theme_toggle, toc_sidebar=toc_sidebar
+    ):
         sys.exit(1)
 
     # Step 6: Fix trailing whitespace

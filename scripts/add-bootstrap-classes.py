@@ -14,8 +14,8 @@ Usage:
 
 import re
 import sys
-from pathlib import Path
 from html.parser import HTMLParser
+from pathlib import Path
 
 
 class BootstrapClassAdder(HTMLParser):
@@ -138,9 +138,23 @@ def add_bootstrap_classes(html_content: str) -> str:
     This is a simpler approach than full HTML parsing.
     """
 
+    # Wrap tables in responsive div first
+    html_content = re.sub(
+        r"<table",
+        '<div class="table-responsive"><table',
+        html_content,
+    )
+
+    # Close the table-responsive div after tables
+    html_content = re.sub(
+        r"</table>",
+        "</table></div>",
+        html_content,
+    )
+
     # Add Bootstrap table classes
     html_content = re.sub(
-        r"<table(?![^>]*class=['\"])",
+        r'<table(?![^>]*class=[\'"])',
         '<table class="table table-hover table-bordered"',
         html_content,
     )
@@ -165,9 +179,7 @@ def add_bootstrap_classes(html_content: str) -> str:
         if "<thead>" not in table_tag:
             # Add class to first tr
             if 'class="' in first_tr:
-                first_tr = first_tr.replace(
-                    'class="', 'class="table-primary ', 1
-                )
+                first_tr = first_tr.replace('class="', 'class="table-primary ', 1)
             else:
                 first_tr = first_tr.replace("<tr", '<tr class="table-primary"', 1)
 
