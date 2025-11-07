@@ -1,5 +1,9 @@
+# Build outputs
+*.pdf
+*.html
+
 # macOS
-.DS_Store
+**/.DS_Store
 .AppleDouble
 .LSOverride
 
@@ -19,7 +23,6 @@ dist/
 downloads/
 eggs/
 .eggs/
-lib/
 lib64/
 parts/
 sdist/
@@ -30,6 +33,9 @@ share/python-wheels/
 .installed.cfg
 *.egg
 MANIFEST
+
+# Our lib/ directory contains source files, only ignore generated/
+lib/generated/
 
 # PyInstaller
 #  Usually these files are written by a python script from a template
@@ -222,3 +228,16 @@ __marimo__/
 
 # Pre-commit cache
 .pre-commit-cache/
+
+# ===== Technical Documentation Build System =====
+# Build outputs (root level) - but keep example/ outputs to show results
+/technical-documentation.pdf
+/technical-documentation.html
+/technical-doc-example.pdf
+/technical-doc-example.html
+/colors.css
+/styles.css
+/technical-documentation/diagrams/*.svg
+
+# Server process ID
+.server.pid
