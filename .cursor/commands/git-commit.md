@@ -290,10 +290,9 @@ Split if you have:
 git rebase -i HEAD~3
 
 # Mark commits to squash with 's'
-pick abc1234 feat: add feature
-s def5678 fix typo
-s ghi9012 add tests
-s ghi9012 add tests
+pick abc1234 feat(auth): add user authentication
+s def5678 style(auth): fix typo in auth module
+s ghi9012 test(auth): add authentication tests
 ```
 
 ## Pre-commit Hooks
