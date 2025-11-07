@@ -21,11 +21,11 @@ For complete documentation on commit conventions, workflow, and best practices, 
 ### Required Elements
 
 **Type** (required): What kind of change
+**Scope** (required): Module/component affected (must be from allowed list)
 **Description** (required): Brief summary (50 chars max)
 
 ### Optional Elements
 
-**Scope** (optional): Module/component affected
 **Body** (optional): Detailed explanation
 **Footer** (optional): Breaking changes, issue references
 
@@ -47,16 +47,23 @@ For complete documentation on commit conventions, workflow, and best practices, 
 
 ## Scope Guidelines
 
-**Use scope for:**
+**Scopes are REQUIRED** for all commits and must be from the allowed list.
 
-- Component/module names: `feat(auth):`, `fix(db):`
-- File types: `docs(readme):`, `test(unit):`
-- Areas: `refactor(api):`, `style(imports):`
+**See [.gitlint](../.gitlint) for the complete list of allowed scopes.**
 
-**Don't use scope for:**
-- Generic changes: `chore: update deps`
-- Multiple areas: Choose most relevant or omit
-- File paths: `fix(src/auth.py):` → `fix(auth):`
+Common scopes include:
+
+- Code areas: `auth`, `api`, `ui`, `cli`
+- Documentation: `docs`, `readme`, `changelog`
+- Infrastructure: `deps`, `devcontainer`, `build`, `config`
+- Tools: `typst`, `python`, `markdown`, `yaml`, `pre-commit`, `gitlint`
+
+**Scope rules:**
+- Always use lowercase
+- No spaces allowed
+- Use hyphens for multi-word scopes (e.g., `pre-commit`)
+- Choose the most specific scope for your change
+- If the scope you need isn't in the list, discuss adding it to `.gitlint`
 
 ## Commit Message Examples
 
@@ -210,6 +217,7 @@ s ghi9012 add tests
 ## Pre-commit Hooks
 
 **Hooks run automatically on commit:**
+- Gitlint (commit message validation)
 - Ruff (Python linting/formatting)
 - Shellcheck (shell script linting)
 - Pymarkdown (markdown linting)
@@ -266,9 +274,12 @@ uv run ruff check --fix .
 # Check shell scripts
 shellcheck script.sh
 
+# Commit rejected for missing/invalid scope?
+# Use a scope from the allowed list (see Scope Guidelines)
+
 # Then commit
 git add .
-git commit -m "fix: resolve linting issues"
+git commit -m "fix(linter): resolve linting issues"
 ```
 
 ### Wrong Branch
@@ -305,30 +316,32 @@ git commit -m "feat: add user model"
 ### Commit Types Cheat Sheet
 
 ```text
-feat:     New feature
-fix:      Bug fix
-docs:     Documentation
-style:    Formatting
-refactor: Code restructure
-perf:     Performance
-test:     Tests
-chore:    Maintenance
-ci:       CI/CD
-build:    Build system
-revert:   Revert commit
+feat(scope):     New feature
+fix(scope):      Bug fix
+docs(scope):     Documentation
+style(scope):    Formatting
+refactor(scope): Code restructure
+perf(scope):     Performance
+test(scope):     Tests
+chore(scope):    Maintenance
+ci(scope):       CI/CD
+build(scope):    Build system
+revert(scope):   Revert commit
 ```
+
+**Note:** All commits REQUIRE a scope from the allowed list (see Scope Guidelines above).
 
 ### Fast Commit Commands
 
 ```bash
 # Quick fix
-git add . && git commit -m "fix: quick bug fix"
+git add . && git commit -m "fix(api): quick bug fix"
 
 # Feature commit
 git add src/ && git commit -m "feat(ui): add new component"
 
 # Documentation
-git add docs/ && git commit -m "docs: update API guide"
+git add docs/ && git commit -m "docs(readme): update API guide"
 ```
 
 ---

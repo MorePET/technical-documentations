@@ -49,7 +49,7 @@ release/v0.2.0
 
    ```bash
    git add .
-   git commit -m "feat: add new feature"
+   git commit -m "feat(api): add new feature"
    ```
 
 3. **Keep branch updated**
@@ -96,12 +96,10 @@ Format: `<type>(<scope>): <description>`
 - `build` - Build system changes
 - `revert` - Revert previous commit
 
-**Scope (optional):**
-- `devcontainer`
-- `auth`
-- `docs`
-- `ci`
-- `build`
+**Scope (required):**
+- Must be from the allowed list defined in `.gitlint`
+- Common scopes: `auth`, `api`, `docs`, `readme`, `deps`, `ci`, `workflow`, `python`, `typst`
+- See `.gitlint` file for the complete list of 24 allowed scopes
 
 **Examples:**
 
@@ -109,10 +107,10 @@ Format: `<type>(<scope>): <description>`
 feat(auth): add automatic GitHub CLI authentication
 fix(devcontainer): resolve SSH key path mismatch
 docs(readme): update installation instructions
-refactor(scripts): extract common auth logic to shared function
+refactor(python): extract common auth logic to shared function
 test(auth): add unit tests for token extraction
 chore(deps): update pre-commit hooks to latest versions
-ci: add shellcheck to CI pipeline
+ci(workflow): add shellcheck to CI pipeline
 ```
 
 ### Commit Message Structure
@@ -288,6 +286,7 @@ Use when:
 ### Pre-commit Hook
 
 Automatically runs on `git commit`:
+- Gitlint (commit message validation - enforces scopes)
 - Ruff (Python linting/formatting)
 - Shellcheck (shell script linting)
 - Pymarkdown (markdown linting)
