@@ -3,9 +3,7 @@ name = "workspace"
 version = "0.1.0"
 description = "workspace - Python project"
 requires-python = ">=3.12"
-dependencies = [
-    "pyjson5>=2.0.0",
-]
+dependencies = []
 
 [dependency-groups]
 dev = [
