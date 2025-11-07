@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Diagrams - Dual Theme Demo</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #ffffff;
+            color: #000000;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        [data-bs-theme="dark"] body,
+        [data-theme="dark"] body {
+            background: #1a1a1a;
+            color: #ffffff;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        h3 {
+            margin-top: 3rem;
+            margin-bottom: 1rem;
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 0.5rem;
+        }
+
+        p {
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+    <h1>Interactive System Diagrams</h1>
+
+    <p>These diagrams demonstrate dual-theme support with automatic theme switching based on system preferences or user selection.</p>
+
+    <h3>System Architecture Diagram</h3>
+    <p>This diagram illustrates the high-level architecture of our system, showing how the frontend, API gateway, backend services, and data storage layers interact.</p>
+    <img src="diagrams/architecture.svg" alt="System Architecture">
+
+    <h3>Data Flow Diagram</h3>
+    <p>This diagram shows how data flows through our system, from initial user input through validation, processing, and storage.</p>
+    <img src="diagrams/data-flow.svg" alt="Data Flow">
+
+    <h3>State Machine Diagram</h3>
+    <p>This state machine illustrates the workflow for document approval, showing the transitions between Draft, Review, Approved, and Rejected states.</p>
+    <img src="diagrams/state-machine.svg" alt="State Machine">
+
+    <hr style="margin: 3rem 0;">
+
+    <p style="text-align: center; color: #666;">
+        <small>Click the 🌓 button in the top-right corner to toggle between light and dark themes.</small>
+    </p>
+</body>
+</html>
