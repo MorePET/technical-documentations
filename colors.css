@@ -8,24 +8,24 @@
   --color-text: #000000;
   /* Node and edge strokes (arrows, outlines) */
   --color-stroke: #000000;
-  /* Blue node background (blue.lighten(80%)) */
-  --color-node-bg-blue: #cce3f7;
-  /* Lighter blue node background (blue.lighten(90%)) */
-  --color-node-bg-blue-light: #e6f1fb;
-  /* Green node background (green.lighten(80%)) */
-  --color-node-bg-green: #d5f5d9;
-  /* Orange node background (orange.lighten(80%)) */
-  --color-node-bg-orange: #ffe7d1;
-  /* Purple node background (purple.lighten(80%)) */
-  --color-node-bg-purple: #efcff4;
-  /* Red node background (red.lighten(80%)) */
-  --color-node-bg-red: #ffd9d7;
-  /* Neutral/gray node background */
-  --color-node-bg-neutral: #f0f0f0;
-  /* Gradient start (light center) */
+  /* Blue node background (Bootstrap primary-subtle) */
+  --color-node-bg-blue: #cfe2ff;
+  /* Lighter blue node background (Bootstrap primary lighter) */
+  --color-node-bg-blue-light: #e7f1ff;
+  /* Green node background (Bootstrap success-subtle) */
+  --color-node-bg-green: #d1e7dd;
+  /* Orange node background (Bootstrap warning-subtle) */
+  --color-node-bg-orange: #ffe5d0;
+  /* Purple node background (Bootstrap purple-subtle) */
+  --color-node-bg-purple: #e2d9f3;
+  /* Red node background (Bootstrap danger-subtle) */
+  --color-node-bg-red: #f8d7da;
+  /* Neutral/gray node background (Bootstrap secondary) */
+  --color-node-bg-neutral: #e9ecef;
+  /* Gradient start (Bootstrap body-bg) */
   --color-gradient-start: #ffffff;
-  /* Blue gradient end */
-  --color-gradient-end-blue: #99ccff;
+  /* Blue gradient end (Bootstrap primary-tint) */
+  --color-gradient-end-blue: #9ec5fe;
   /* Link and arrow colors */
   --color-link-color: #000000;
   /* Edge label text color */
@@ -37,52 +37,87 @@
     --color-background: transparent;
     --color-text: #ffffff;
     --color-stroke: #ffffff;
-    --color-node-bg-blue: #1e3a5f;
-    --color-node-bg-blue-light: #1a2f4a;
-    --color-node-bg-green: #1e3d1e;
-    --color-node-bg-orange: #4a3420;
-    --color-node-bg-purple: #3a2651;
-    --color-node-bg-red: #4a2020;
-    --color-node-bg-neutral: #2d3748;
-    --color-gradient-start: #1a202c;
-    --color-gradient-end-blue: #1e3a5f;
+    --color-node-bg-blue: #084298;
+    --color-node-bg-blue-light: #052c65;
+    --color-node-bg-green: #0f5132;
+    --color-node-bg-orange: #664d03;
+    --color-node-bg-purple: #432874;
+    --color-node-bg-red: #842029;
+    --color-node-bg-neutral: #495057;
+    --color-gradient-start: #212529;
+    --color-gradient-end-blue: #084298;
     --color-link-color: #ffffff;
     --color-label-color: #ffffff;
   }
 }
 
-/* Dark theme via manual toggle */
-[data-theme='dark'] {
+/* Dark theme via Bootstrap data-bs-theme */
+[data-bs-theme='dark'] {
   --color-background: transparent;
   --color-text: #ffffff;
   --color-stroke: #ffffff;
-  --color-node-bg-blue: #1e3a5f;
-  --color-node-bg-blue-light: #1a2f4a;
-  --color-node-bg-green: #1e3d1e;
-  --color-node-bg-orange: #4a3420;
-  --color-node-bg-purple: #3a2651;
-  --color-node-bg-red: #4a2020;
-  --color-node-bg-neutral: #2d3748;
-  --color-gradient-start: #1a202c;
-  --color-gradient-end-blue: #1e3a5f;
+  --color-node-bg-blue: #084298;
+  --color-node-bg-blue-light: #052c65;
+  --color-node-bg-green: #0f5132;
+  --color-node-bg-orange: #664d03;
+  --color-node-bg-purple: #432874;
+  --color-node-bg-red: #842029;
+  --color-node-bg-neutral: #495057;
+  --color-gradient-start: #212529;
+  --color-gradient-end-blue: #084298;
   --color-link-color: #ffffff;
   --color-label-color: #ffffff;
 }
 
-/* Light theme via manual toggle (overrides system dark mode) */
+/* Light theme via Bootstrap data-bs-theme (overrides system dark mode) */
+[data-bs-theme='light'] {
+  --color-background: transparent;
+  --color-text: #000000;
+  --color-stroke: #000000;
+  --color-node-bg-blue: #cfe2ff;
+  --color-node-bg-blue-light: #e7f1ff;
+  --color-node-bg-green: #d1e7dd;
+  --color-node-bg-orange: #ffe5d0;
+  --color-node-bg-purple: #e2d9f3;
+  --color-node-bg-red: #f8d7da;
+  --color-node-bg-neutral: #e9ecef;
+  --color-gradient-start: #ffffff;
+  --color-gradient-end-blue: #9ec5fe;
+  --color-link-color: #000000;
+  --color-label-color: #000000;
+}
+
+/* Legacy data-theme support (backward compatibility) */
+[data-theme='dark'] {
+  --color-background: transparent;
+  --color-text: #ffffff;
+  --color-stroke: #ffffff;
+  --color-node-bg-blue: #084298;
+  --color-node-bg-blue-light: #052c65;
+  --color-node-bg-green: #0f5132;
+  --color-node-bg-orange: #664d03;
+  --color-node-bg-purple: #432874;
+  --color-node-bg-red: #842029;
+  --color-node-bg-neutral: #495057;
+  --color-gradient-start: #212529;
+  --color-gradient-end-blue: #084298;
+  --color-link-color: #ffffff;
+  --color-label-color: #ffffff;
+}
+
 [data-theme='light'] {
   --color-background: transparent;
   --color-text: #000000;
   --color-stroke: #000000;
-  --color-node-bg-blue: #cce3f7;
-  --color-node-bg-blue-light: #e6f1fb;
-  --color-node-bg-green: #d5f5d9;
-  --color-node-bg-orange: #ffe7d1;
-  --color-node-bg-purple: #efcff4;
-  --color-node-bg-red: #ffd9d7;
-  --color-node-bg-neutral: #f0f0f0;
+  --color-node-bg-blue: #cfe2ff;
+  --color-node-bg-blue-light: #e7f1ff;
+  --color-node-bg-green: #d1e7dd;
+  --color-node-bg-orange: #ffe5d0;
+  --color-node-bg-purple: #e2d9f3;
+  --color-node-bg-red: #f8d7da;
+  --color-node-bg-neutral: #e9ecef;
   --color-gradient-start: #ffffff;
-  --color-gradient-end-blue: #99ccff;
+  --color-gradient-end-blue: #9ec5fe;
   --color-link-color: #000000;
   --color-label-color: #000000;
 }
