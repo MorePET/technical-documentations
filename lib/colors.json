@@ -1,0 +1,81 @@
+{
+  "colors": {
+    "background": {
+      "light": "transparent",
+      "dark": "transparent",
+      "description": "Page background (transparent for embedding)"
+    },
+    "text": {
+      "light": "#000000",
+      "dark": "#ffffff",
+      "description": "Primary text color"
+    },
+    "stroke": {
+      "light": "#000000",
+      "dark": "#ffffff",
+      "description": "Node and edge strokes (arrows, outlines)"
+    },
+  "node-bg-blue": {
+    "light": "#cfe2ff",
+    "dark": "#084298",
+    "description": "Blue node background (Bootstrap primary-subtle)"
+  },
+  "node-bg-blue-light": {
+    "light": "#e7f1ff",
+    "dark": "#052c65",
+    "description": "Lighter blue node background (Bootstrap primary lighter)"
+  },
+  "node-bg-green": {
+    "light": "#d1e7dd",
+    "dark": "#0f5132",
+    "description": "Green node background (Bootstrap success-subtle)"
+  },
+  "node-bg-orange": {
+    "light": "#ffe5d0",
+    "dark": "#664d03",
+    "description": "Orange node background (Bootstrap warning-subtle)"
+  },
+  "node-bg-purple": {
+    "light": "#e2d9f3",
+    "dark": "#432874",
+    "description": "Purple node background (Bootstrap purple-subtle)"
+  },
+  "node-bg-red": {
+    "light": "#f8d7da",
+    "dark": "#842029",
+    "description": "Red node background (Bootstrap danger-subtle)"
+  },
+    "node-bg-neutral": {
+      "light": "#e9ecef",
+      "dark": "#495057",
+      "description": "Neutral/gray node background (Bootstrap secondary)"
+    },
+    "gradient-start": {
+      "light": "#ffffff",
+      "dark": "#212529",
+      "description": "Gradient start (Bootstrap body-bg)"
+    },
+    "gradient-end-blue": {
+      "light": "#9ec5fe",
+      "dark": "#084298",
+      "description": "Blue gradient end (Bootstrap primary-tint)"
+    },
+    "link-color": {
+      "light": "#000000",
+      "dark": "#ffffff",
+      "description": "Link and arrow colors"
+    },
+    "label-color": {
+      "light": "#000000",
+      "dark": "#ffffff",
+      "description": "Edge label text color"
+    }
+  },
+  "semantic": {
+    "primary": "node-bg-blue",
+    "success": "node-bg-green",
+    "warning": "node-bg-orange",
+    "danger": "node-bg-red",
+    "info": "node-bg-purple"
+  }
+}

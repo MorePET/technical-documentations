@@ -2,7 +2,7 @@
 # Builds diagrams, colors, PDF, and HTML with dark mode support
 # Supports multiple projects
 
-.PHONY: all clean colors diagrams pdf html help check test example technical-documentation rebuild all-projects install-hook build-project build-summary check-outputs clean-outputs clean-generated server-start server-stop server-status
+.PHONY: all clean colors diagrams pdf html html-bootstrap example-bootstrap help check test example technical-documentation rebuild all-projects install-hook build-project build-summary check-outputs clean-outputs clean-generated server-start server-stop server-status
 
 # Default project
 PROJECT ?= technical-documentation
@@ -101,6 +101,23 @@ html:
 	@$(MAKE) diagrams PROJECT=$(PROJECT)
 	@$(MAKE) html-only SRC=$(TECH_DOC_SRC) OUT=$(TECH_DOC_OUT)
 
+# Bootstrap HTML targets
+html-bootstrap:
+	@echo "🚀 Building HTML with Bootstrap styling..."
+	@$(MAKE) colors
+	@$(MAKE) diagrams PROJECT=$(PROJECT)
+	@python3 scripts/build-html-bootstrap.py $(TECH_DOC_SRC) $(TECH_DOC_OUT)-bootstrap.html
+	@echo "✓ Bootstrap HTML created: $(TECH_DOC_OUT)-bootstrap.html"
+
+example-bootstrap:
+	@echo "🚀 Building example with Bootstrap styling..."
+	@$(MAKE) colors
+	@$(MAKE) diagrams PROJECT=example
+	@python3 scripts/build-html-bootstrap.py $(EXAMPLE_SRC) $(EXAMPLE_OUT)-bootstrap.html
+	@echo "✓ Bootstrap HTML created: $(EXAMPLE_OUT)-bootstrap.html"
+	@$(MAKE) server-start
+	@$(MAKE) build-summary OUT=$(EXAMPLE_OUT)-bootstrap
+
 # Check for errors without building
 check:
 	@echo "🔍 Checking configuration..."
@@ -127,14 +144,18 @@ test: technical-documentation example
 clean-outputs:
 	@rm -f technical-documentation.pdf
 	@rm -f technical-documentation.html
+	@rm -f technical-documentation-bootstrap.html
 	@rm -f technical-doc-example.pdf
 	@rm -f technical-doc-example.html
-	@rm -f technical-doc-example_temp.html
+	@rm -f technical-doc-example-bootstrap.html
+	@rm -f technical-doc-example-with-classes.html
+	@rm -f *_temp*.html
 
 # Internal: Remove generated files
 clean-generated:
 	@rm -f colors.css
 	@rm -f styles.css
+	@rm -f styles-bootstrap.css
 	@rm -f technical-documentation/diagrams/*.svg
 	@rm -f example/diagrams/*.svg
 	@rm -f lib/generated/colors.css
@@ -168,6 +189,8 @@ help:
 	@echo "  make diagrams PROJECT=xxx - Compile diagrams for specific project"
 	@echo "  make pdf                - Compile PDF for default project"
 	@echo "  make html               - Compile HTML for default project"
+	@echo "  make html-bootstrap     - Compile HTML with Bootstrap styling"
+	@echo "  make example-bootstrap  - Compile example with Bootstrap styling"
 	@echo ""
 	@echo "Configuration:"
 	@echo "  THEME_TOGGLE=yes|no     - Include theme toggle button (default: yes)"

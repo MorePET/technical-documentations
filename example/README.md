@@ -150,6 +150,36 @@ example/
 └── README.md                     # This file
 ```
 
+## Advantages
+
+### vs. CSS Variables (Old Approach)
+
+- ✅ **No post-processing**: Colors are native Typst, not regex-replaced
+- ✅ **Perfect accuracy**: No risk of missing colors or false matches
+- ✅ **Instant switching**: No CSS calculation needed
+- ✅ **Better compatibility**: Works in all browsers
+
+### vs. WASM Approach
+
+- ✅ **Works offline**: No 5MB WASM bundle needed
+- ✅ **Instant load**: Pre-rendered, no compilation
+- ✅ **Smaller file**: ~350KB vs 5MB+
+- ✅ **Better compatibility**: No ES6 modules required
+
+### Trade-offs
+
+- ❌ **2x SVG size**: Both themes embedded
+- ❌ **No dynamic filtering**: Would need WASM for that
+- ❌ **Build step required**: Can't generate on-the-fly
+
+## For Production
+
+This workflow is ideal for:
+- 📄 **Documentation sites**: Beautiful diagrams that match site theme
+- 📊 **Technical reports**: Professional PDFs with embedded diagrams
+- 📱 **Offline viewing**: Single HTML file, no dependencies
+- 🔗 **Sharing**: Email or file share, works immediately
+
 ## Customization
 
 ### Add New Diagrams
