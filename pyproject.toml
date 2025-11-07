@@ -34,12 +34,12 @@ quote-style = "double"
 indent-style = "space"
 
 [tool.pytest.ini_options]
-testpaths = ["tests"]
+testpaths = ["example/python-project/tests"]
 python_files = ["test_*.py"]
 python_classes = ["Test*"]
 python_functions = ["test_*"]
-addopts = "--cov=src --cov-report=term-missing --cov-report=html"
+addopts = "--cov=example/python-project/src --cov-report=term-missing --cov-report=html"
 
 [tool.coverage.run]
-source = ["src"]
+source = ["example/python-project/src"]
 omit = ["*/tests/*", "*/__pycache__/*"]

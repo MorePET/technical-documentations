@@ -1,0 +1,63 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["config:recommended"],
+  "packageRules": [
+    {
+      "description": "Internal MorePET packages - security patches immediate",
+      "matchUpdateTypes": ["patch"],
+      "matchManagers": ["pep621"],
+      "matchPackagePatterns": ["^morepet-", "^MorePET/"],
+      "vulnerabilityAlerts": {
+        "enabled": true
+      },
+      "automerge": true,
+      "automergeType": "pr",
+      "minimumReleaseAge": null,
+      "schedule": ["at any time"],
+      "labels": ["dependencies", "internal", "security", "patch", "automerge"]
+    },
+    {
+      "description": "Internal MorePET packages - patch updates with 3 day soak",
+      "matchUpdateTypes": ["patch"],
+      "matchManagers": ["pep621"],
+      "matchPackagePatterns": ["^morepet-", "^MorePET/"],
+      "groupName": "MorePET internal patch updates",
+      "automerge": true,
+      "automergeType": "pr",
+      "minimumReleaseAge": "3 days",
+      "schedule": ["at any time"],
+      "labels": ["dependencies", "internal", "patch", "automerge"]
+    },
+    {
+      "description": "Internal MorePET packages - minor updates manual review",
+      "matchUpdateTypes": ["minor"],
+      "matchManagers": ["pep621"],
+      "matchPackagePatterns": ["^morepet-", "^MorePET/"],
+      "groupName": "MorePET internal minor updates",
+      "automerge": false,
+      "schedule": ["at any time"],
+      "labels": ["dependencies", "internal", "minor"]
+    },
+    {
+      "description": "Internal MorePET packages - major updates manual review",
+      "matchUpdateTypes": ["major"],
+      "matchManagers": ["pep621"],
+      "matchPackagePatterns": ["^morepet-", "^MorePET/"],
+      "groupName": "MorePET internal major updates",
+      "automerge": false,
+      "schedule": ["at any time"],
+      "labels": ["dependencies", "internal", "major"]
+    }
+  ],
+  "hostRules": [
+    {
+      "matchHost": "https://github.com",
+      "hostType": "github-packages"
+    }
+  ],
+  "prConcurrentLimit": 5,
+  "prHourlyLimit": 2,
+  "labels": ["dependencies", "internal"],
+  "assignees": [],
+  "reviewers": []
+}

@@ -1,7 +1,7 @@
 ---
-name: Renovate
+name: Renovate (External Dependencies)
 
-on:
+'on':
   schedule:
     # Run every Monday at 2:00 AM UTC
     - cron: '0 2 * * 1'
@@ -10,6 +10,7 @@ on:
 jobs:
   renovate:
     uses: MorePET/github-actions/.github/workflows/renovate-reusable.yml@main
+    with:
+      config_file: '.github/renovate-external-dependencies.json'
     secrets:
       token: ${{ secrets.RENOVATE_TOKEN }}
-

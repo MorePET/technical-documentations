@@ -2,23 +2,53 @@
 
 This repository uses centralized reusable workflows from [MorePET/github-actions](https://github.com/MorePET/github-actions) to automatically manage dependency updates.
 
+## Architecture Overview
+
+Dependencies are managed through **three specialized Renovate workflows**:
+
+| Workflow | Trigger | Purpose | Config File |
+|----------|---------|---------|-------------|
+| `renovate-external-dependencies.yml` | Scheduled (weekly) | PyPI, pre-commit, GitHub Actions | `renovate-external-dependencies.json` |
+| `renovate-internal-dependencies.yml` | Triggered by package releases | MorePET internal packages/tools | `renovate-internal-dependencies.json` |
+| `renovate-internal-containers.yml` | Triggered by container releases | MorePET container images | `renovate-internal-containers.json` |
+
+### External Dependencies (Scheduled)
+
+Runs **every Monday at 2 AM UTC** to check for updates from:
+
+- Python packages on PyPI
+- Pre-commit hooks
+- GitHub Actions
+
+### Internal Dependencies (Triggered)
+
+Triggered automatically when any MorePET internal package/tool is released:
+
+- **Producer repos** (with internal packages) trigger all repos with this workflow on release
+- **Consumer repos** (using internal packages) have this workflow to receive updates
+- **Repos can be BOTH** producer and consumer (loose coupling via workflow presence)
+- Requires semantic versioned tags/releases (GitHub hygiene)
+
+### Internal Containers (Triggered)
+
+Triggered automatically when MorePET/containers releases new images:
+
+- Monitors **all container types**: Docker, Podman, devcontainer, docker-compose
+- Checks `Dockerfile`, `Containerfile`, `docker-compose.yml`, `.devcontainer/devcontainer.json`
+- Only updates images from `ghcr.io/morepet/containers/*`
+
 ## Prerequisites
 
-You need to create a **Fine-Grained Personal Access Token (PAT)** to allow Renovate to access this repository.
-
-## Step 1: Enable Auto-merge in Repository Settings
+### Step 1: Enable Auto-merge in Repository Settings
 
 **This is required for Renovate to auto-merge PRs after CI passes.**
 
 1. **Go to:** This repository's **Settings** → **General**
-
 2. **Scroll to** "Pull Requests" section
-
 3. **Check** ✅ **"Allow auto-merge"**
-
 4. **Click** "Save" if prompted
 
-## Step 2: Create Fine-Grained PAT
+### Step 2: Create Fine-Grained PAT
 
 1. **Go to:** [github.com/settings/tokens?type=beta](https://github.com/settings/tokens?type=beta)
 
@@ -29,7 +59,7 @@ You need to create a **Fine-Grained Personal Access Token (PAT)** to allow Renov
    - **Expiration:** 90 days (recommended for security)
    - **Repository access:** "Only select repositories"
      - Select this repository only
-   
+
 4. **Permissions → Repository permissions:**
    - **Contents:** Read and write ✅
    - **Pull requests:** Read and write ✅
@@ -40,7 +70,7 @@ You need to create a **Fine-Grained Personal Access Token (PAT)** to allow Renov
 
 6. **Copy the token** (you won't see it again!)
 
-## Step 3: Add Token to Repository Secrets
+### Step 3: Add Token to Repository Secrets
 
 1. **Go to:** This repository's **Settings** → **Secrets and variables** → **Actions**
 
@@ -48,15 +78,15 @@ You need to create a **Fine-Grained Personal Access Token (PAT)** to allow Renov
 
 3. **Configure the secret:**
    - **Name:** `RENOVATE_TOKEN`
-   - **Value:** Paste the fine-grained PAT from Step 1
+   - **Value:** Paste the fine-grained PAT from Step 2
 
 4. **Click** "Add secret"
 
-## Step 4: Test the Workflow
+### Step 4: Test the Workflows
 
 1. **Go to:** Actions tab in this repository
 
-2. **Select** "Renovate" workflow from the left sidebar
+2. **Select** "Renovate (External Dependencies)" workflow from the left sidebar
 
 3. **Click** "Run workflow" dropdown → "Run workflow"
 
@@ -64,27 +94,39 @@ You need to create a **Fine-Grained Personal Access Token (PAT)** to allow Renov
 
 5. **Check** for any PRs created by Renovate
 
-## How It Works
+## Auto-merge Strategy
 
-### Schedule
+Renovate automatically enables auto-merge on PRs it creates. When CI passes, GitHub will merge the PR automatically.
 
-- **Runs:** Every Monday at 2:00 AM UTC
-- **Manual trigger:** Available from Actions tab anytime
-
-### Auto-merge Strategy
-
-**Renovate automatically enables auto-merge** on PRs it creates. When CI passes, GitHub will merge the PR automatically.
-
-Renovate will auto-merge certain updates after CI passes:
+### External Dependencies
 
 | Update Type | Soak Time | Auto-merge? | Labels |
 |-------------|-----------|-------------|--------|
-| **Security** | Immediate | ✅ Yes | `security`, `automerge` |
+| **Security Patch** | Immediate | ✅ Yes | `security`, `patch`, `automerge` |
 | **Patch** (x.x.N) | 3 days | ✅ Yes | `patch`, `automerge` |
 | **Minor** (x.N.0) | - | ❌ No (manual review) | `minor` |
 | **Major** (N.0.0) | - | ❌ No (manual review) | `major` |
 
-### Soak Time
+### Internal Dependencies
+
+Same strategy as external, but applies to MorePET internal packages:
+
+| Update Type | Soak Time | Auto-merge? | Labels |
+|-------------|-----------|-------------|--------|
+| **Security Patch** | Immediate | ✅ Yes | `internal`, `security`, `patch`, `automerge` |
+| **Patch** (x.x.N) | 3 days | ✅ Yes | `internal`, `patch`, `automerge` |
+| **Minor** (x.N.0) | - | ❌ No (manual review) | `internal`, `minor` |
+| **Major** (N.0.0) | - | ❌ No (manual review) | `internal`, `major` |
+
+### Internal Containers
+
+All container updates require manual review (no auto-merge):
+
+| Update Type | Auto-merge? | Labels |
+|-------------|-------------|--------|
+| **All updates** | ❌ No (manual review) | `internal`, `container` |
+
+## Soak Time
 
 The **3-day soak time** for patch updates means:
 - Renovate detects a new patch version (e.g., `ruff 0.14.4`)
@@ -94,11 +136,45 @@ The **3-day soak time** for patch updates means:
 
 This protects you from being an early adopter of buggy releases.
 
-### What Gets Updated
+## Container Support
 
-- Python dependencies in `pyproject.toml` / `uv.lock`
-- Pre-commit hooks in `.pre-commit-config.yaml`
-- GitHub Actions in `.github/workflows/`
+The internal containers workflow monitors:
+- **Devcontainers:** `.devcontainer/devcontainer.json`
+- **Docker/Podman:** `Dockerfile`, `Containerfile`
+- **Compose:** `docker-compose.yml`, `docker-compose.yaml`, `podman-compose.yml`
+
+Only MorePET container images (`ghcr.io/morepet/containers/*`) are tracked.
+
+## Trigger Mechanisms
+
+### Auto-Discovery Pattern
+
+**Internal dependencies and containers use auto-discovery:**
+
+1. When a MorePET package/container is released
+2. Producer repo searches for all repos with the corresponding workflow file
+3. Triggers those workflows automatically
+4. Zero maintenance - new consumers are discovered automatically
+
+**Example:**
+- MorePET/containers releases new typst image
+- Searches for all repos with `renovate-internal-containers.yml`
+- Triggers those workflows
+- PRs created in consuming repos within minutes
+
+### Self-Triggering for Internal Dependencies
+
+Repos with `renovate-internal-dependencies.yml` can be:
+- **Producer:** Releases internal packages, triggers all repos with this workflow
+- **Consumer:** Uses internal packages, receives update PRs
+- **Both:** Produces package-a, consumes package-b (loose coupling)
+
+## GitHub Hygiene Requirement
+
+For internal dependencies to work, source repos must:
+- ✅ Use semantic versioning for releases (e.g., `v1.2.3`)
+- ✅ Create GitHub releases or tags
+- ✅ Follow semver conventions (MAJOR.MINOR.PATCH)
 
 ## Security
 
@@ -112,17 +188,19 @@ This protects you from being an early adopter of buggy releases.
 When the token expires (90 days):
 
 1. You'll get a workflow failure notification
-2. Follow Step 1-2 above to create and add a new token
+2. Follow Step 2-3 above to create and add a new token
 3. No other changes needed
 
-## Configuration
+## Configuration Files
 
-Configuration files:
-
-- **`.github/workflows/renovate.yml`** - Workflow schedule and settings
-- **`.github/renovate.json`** - Renovate behavior and rules
-
-To modify update strategy, edit `.github/renovate.json`.
+| File | Purpose |
+|------|---------|
+| `.github/workflows/renovate-external-dependencies.yml` | External deps workflow schedule |
+| `.github/workflows/renovate-internal-dependencies.yml` | Internal deps workflow (triggered) |
+| `.github/workflows/renovate-internal-containers.yml` | Container workflow (triggered) |
+| `.github/renovate-external-dependencies.json` | External deps behavior rules |
+| `.github/renovate-internal-dependencies.json` | Internal deps behavior rules |
+| `.github/renovate-internal-containers.json` | Container behavior rules |
 
 ## Troubleshooting
 
@@ -130,12 +208,19 @@ To modify update strategy, edit `.github/renovate.json`.
 
 → Token expired or invalid. Create a new PAT and update the secret.
 
-### No PRs created
+### No PRs created (External Dependencies)
 
 → Check workflow logs in Actions tab. May indicate:
 - No updates available
 - Configuration error
 - Rate limit reached (unlikely for single repo)
+
+### No PRs created (Internal Dependencies/Containers)
+
+→ Workflow must be triggered by producer repo. Check:
+- Producer repo has trigger logic implemented
+- This repo has the correct workflow file present
+- Token has correct permissions
 
 ### PR created but not auto-merging
 
@@ -143,6 +228,14 @@ To modify update strategy, edit `.github/renovate.json`.
 - CI tests are passing
 - Update type matches auto-merge rules
 - For patches: 3-day soak time has elapsed
+- Auto-merge is enabled in repository settings
+
+### Container updates not detected
+
+→ Check:
+- Container image is from `ghcr.io/morepet/containers/*`
+- Container file is in supported location
+- Renovate config includes correct manager type
 
 ## Support
 
