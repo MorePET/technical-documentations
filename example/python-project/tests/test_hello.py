@@ -4,7 +4,6 @@ import logging
 from pathlib import Path
 
 import pytest
-
 from src.hello import greet, process_file
 
 
