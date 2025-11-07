@@ -20,21 +20,13 @@ repos:
       - id: mixed-line-ending
       - id: trailing-whitespace
 
-  # Python Linting and Formatting (Ruff via uv)
-  - repo: local
+  # Python Linting and Formatting (Ruff)
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.14.3
     hooks:
       - id: ruff
-        name: ruff (legacy alias)
-        entry: uv run ruff check --fix
-        language: system
-        types: [python]
-        require_serial: true
+        args: [--fix]
       - id: ruff-format
-        name: ruff format
-        entry: uv run ruff format
-        language: system
-        types: [python]
-        require_serial: true
 
   # YAML Linting
   - repo: https://github.com/adrienverge/yamllint
@@ -58,7 +50,6 @@ repos:
         name: pymarkdown
         args: ["scan"]
         exclude: ^\.github_data/
-        additional_dependencies: ["pyjson5"]
 
   # Dockerfile Linting (using Podman instead of Docker)
   - repo: local
@@ -81,7 +72,6 @@ repos:
       - id: checkmake
         name: checkmake (lint Makefile)
         files: ^Makefile$
-        args: ["--config=.checkmake.ini"]
 
   # GitHub Data Sync
   - repo: local

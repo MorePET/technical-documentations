@@ -7,57 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [0.2.0]
-
-### Added
-
-- **Cursor AI Integration**
-  - Complete workflow automation with commands for git, PRs, releases, and issues
-  - `/git-commit` command for automated conventional commits
-  - `/create-pr` command for pull request creation
-  - `/create-release` command for release management
-  - `/create-issue` command for issue creation with templates
-  - Comprehensive documentation for all cursor commands
-
-- **Python Example Project**
-  - Example project demonstrating Typst documentation pipeline integration
-  - Python script integration with documentation generation
-  - Closes #2 (Python example doc generation)
-
-- **Enhanced Automation**
-  - Renovate split into 3 specialized workflows (external deps, internal deps, containers)
-  - CodeQL analysis workflow for security scanning
-  - Centralized GitHub Actions workflow templates
-  - Improved CI/CD pipeline configuration
-
-- **Issue & PR Management**
-  - Migration from labels to GitHub native issue types (Bug/Feature/Task)
-  - Enhanced issue templates with clear categorization
-  - Improved pull request templates and guidelines
-  - Comprehensive git workflow documentation
-
-- **Documentation Improvements**
-  - Language-specific rules (Python, Typst)
-  - Git workflow and GitHub Actions documentation
-  - Setup repository command for new projects
-  - Enhanced markdown documentation with proper formatting
-
-### Fixed
-
-- Markdown linter issues across all documentation files
-- YAML linter issues in GitHub workflow files
-- Typst pre-commit hook now uses correct project root
-- Line length and formatting issues in documentation
-- Nested code block handling in markdown heredocs
-
-### Changed
-
-- Switched from labels to GitHub native issue types
-- Reorganized Renovate configuration for better maintainability
-- Improved pre-commit hook configuration
-- Enhanced `.gitignore` patterns
-
-## [0.1.0]
+## [0.1.0] - 2025-01-06
 
 ### Added
 
@@ -93,6 +43,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Proper `.gitignore` patterns for sensitive files and macOS system files
   - SSH key permissions and validation
 
-[Unreleased]: https://github.com/MorePET/technical-documentations/compare/v0.2.0...HEAD
-[0.2.0]: https://github.com/MorePET/technical-documentations/compare/v0.1.0...v0.2.0
+[Unreleased]: https://github.com/MorePET/technical-documentations/compare/v0.1.0...HEAD
 [0.1.0]: https://github.com/MorePET/technical-documentations/releases/tag/v0.1.0
