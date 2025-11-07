@@ -42,36 +42,53 @@ ignore-merge-commits=true
 types=feat,fix,docs,style,refactor,perf,test,chore,ci,build,revert
 
 # Allowed scopes (ENFORCED - only these scopes are valid):
+#
+# Code/Feature Areas:
 # - auth: Authentication and authorization
 # - api: API endpoints and interfaces
 # - ui: User interface components
 # - cli: Command-line interface
-# - docs: Documentation files (general)
-# - readme: README files specifically
+#
+# Documentation:
+# - readme: README files
 # - changelog: CHANGELOG updates
-# - ci: CI/CD configuration
+#
+# Infrastructure:
 # - workflow: GitHub Actions workflows
-# - github: GitHub-specific features
+# - github: GitHub-specific features (issues, PRs)
 # - deps: Dependency updates
 # - devcontainer: Dev container configuration
-# - build: Build system and tooling
 # - config: Configuration files
+#
+# Languages/Tools:
 # - typst: Typst documentation system
 # - python: Python code
 # - markdown: Markdown files and linting
 # - yaml: YAML configuration
+#
+# Tooling:
 # - pre-commit: Pre-commit hooks
 # - gitlint: Commit message linting
-# - test: Test code and testing infrastructure
+# - linter: Generic linter configuration
+#
+# Other:
 # - security: Security-related changes
 # - release: Release preparation
-# - linter: Linter configuration
 #
 # Scopes are REQUIRED for all commits.
 # Only scopes from the above list are allowed.
+#
+# Example sensible combinations:
+# - feat(auth): add OAuth support
+# - fix(api): resolve timeout issue
+# - docs(readme): update installation steps
+# - style(python): format with ruff
+# - chore(deps): update dependencies
+# - ci(workflow): add caching
+# - test(auth): add unit tests
 
 [title-match-regex]
-# Enforce scope is required and must be from the allowed list
-# Allows: feat(auth): msg, fix(deps): msg
+# Enforce scope is required and must be from the allowed list (20 scopes)
+# Allows: feat(auth): msg, fix(deps): msg, docs(readme): msg
 # Rejects: feat: msg (no scope), feat(other): msg (invalid scope)
-regex=^(feat|fix|docs|style|refactor|perf|test|chore|ci|build|revert)\((auth|api|ui|cli|docs|readme|changelog|ci|workflow|github|deps|devcontainer|build|config|typst|python|markdown|yaml|pre-commit|gitlint|test|security|release|linter)\):\s.+
+regex=^(feat|fix|docs|style|refactor|perf|test|chore|ci|build|revert)\((auth|api|ui|cli|readme|changelog|workflow|github|deps|devcontainer|config|typst|python|markdown|yaml|pre-commit|gitlint|linter|security|release)\):\s.+

@@ -36,34 +36,46 @@ For complete documentation on commit conventions, workflow, and best practices, 
 | `feat` | New feature | `feat(auth): add user login` |
 | `fix` | Bug fix | `fix(api): resolve memory leak` |
 | `docs` | Documentation | `docs(readme): update install guide` |
-| `style` | Code formatting | `style: format with ruff` |
+| `style` | Code formatting | `style(python): format with ruff` |
 | `refactor` | Code restructure | `refactor(auth): extract validation` |
-| `perf` | Performance improvement | `perf(db): optimize query` |
+| `perf` | Performance improvement | `perf(api): optimize query` |
 | `test` | Test additions/changes | `test(auth): add login tests` |
 | `chore` | Maintenance tasks | `chore(deps): update packages` |
-| `ci` | CI/CD changes | `ci: add python matrix` |
-| `build` | Build system changes | `build: update pyproject.toml` |
-| `revert` | Revert previous commit | `revert: fix login bug` |
+| `ci` | CI/CD changes | `ci(workflow): add python matrix` |
+| `build` | Build system changes | `build(config): update pyproject.toml` |
+| `revert` | Revert previous commit | `revert(api): undo breaking change` |
 
 ## Scope Guidelines
 
 **Scopes are REQUIRED** for all commits and must be from the allowed list.
 
-**See [.gitlint](../.gitlint) for the complete list of allowed scopes.**
+**See [.gitlint](../.gitlint) for the complete list of 20 allowed scopes.**
 
-Common scopes include:
+Scopes are organized by category:
 
-- Code areas: `auth`, `api`, `ui`, `cli`
-- Documentation: `docs`, `readme`, `changelog`
-- Infrastructure: `deps`, `devcontainer`, `build`, `config`
-- Tools: `typst`, `python`, `markdown`, `yaml`, `pre-commit`, `gitlint`
+- **Code/Feature Areas:** `auth`, `api`, `ui`, `cli`
+- **Documentation:** `readme`, `changelog`
+- **Infrastructure:** `workflow`, `github`, `deps`, `devcontainer`, `config`
+- **Languages/Tools:** `typst`, `python`, `markdown`, `yaml`
+- **Tooling:** `pre-commit`, `gitlint`, `linter`
+- **Other:** `security`, `release`
 
 **Scope rules:**
 - Always use lowercase
 - No spaces allowed
 - Use hyphens for multi-word scopes (e.g., `pre-commit`)
 - Choose the most specific scope for your change
+- Scopes avoid redundancy with types (no `docs`, `ci`, `build`, `test` scopes)
 - If the scope you need isn't in the list, discuss adding it to `.gitlint`
+
+**Sensible combinations:**
+- `feat(auth):` - New authentication feature
+- `fix(api):` - Fix API bug
+- `docs(readme):` - Update README (not `docs(docs):`)
+- `style(python):` - Format Python code
+- `chore(deps):` - Update dependencies
+- `ci(workflow):` - Modify CI workflow (not `ci(ci):`)
+- `test(auth):` - Add auth tests (not `test(test):`)
 
 ## Commit Message Examples
 

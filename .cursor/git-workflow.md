@@ -97,9 +97,10 @@ Format: `<type>(<scope>): <description>`
 - `revert` - Revert previous commit
 
 **Scope (required):**
-- Must be from the allowed list defined in `.gitlint`
-- Common scopes: `auth`, `api`, `docs`, `readme`, `deps`, `ci`, `workflow`, `python`, `typst`
-- See `.gitlint` file for the complete list of 24 allowed scopes
+- Must be from the allowed list defined in `.gitlint` (20 scopes)
+- Common: `auth`, `api`, `readme`, `deps`, `workflow`, `python`, `typst`
+- Scopes avoid redundancy with types (use `ci(workflow):` not `ci(ci):`)
+- See `.gitlint` for complete list and sensible combinations
 
 **Examples:**
 
