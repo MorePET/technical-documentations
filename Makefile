@@ -115,6 +115,8 @@ example-bootstrap:
 	@$(MAKE) diagrams PROJECT=example
 	@python3 scripts/build-html-bootstrap.py $(EXAMPLE_SRC) $(EXAMPLE_OUT)-bootstrap.html
 	@echo "✓ Bootstrap HTML created: $(EXAMPLE_OUT)-bootstrap.html"
+	@$(MAKE) server-start
+	@$(MAKE) build-summary OUT=$(EXAMPLE_OUT)-bootstrap
 
 # Check for errors without building
 check:
