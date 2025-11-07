@@ -41,5 +41,37 @@ ignore-merge-commits=true
 # Supported types (matching your git-commit.md documentation)
 types=feat,fix,docs,style,refactor,perf,test,chore,ci,build,revert
 
-# Require a scope (optional, set to false if you want scopes to be optional)
-# Set to false since your docs show scope as optional
+# Allowed scopes (ENFORCED - only these scopes are valid):
+# - auth: Authentication and authorization
+# - api: API endpoints and interfaces
+# - ui: User interface components
+# - cli: Command-line interface
+# - docs: Documentation files (general)
+# - readme: README files specifically
+# - changelog: CHANGELOG updates
+# - ci: CI/CD configuration
+# - workflow: GitHub Actions workflows
+# - github: GitHub-specific features
+# - deps: Dependency updates
+# - devcontainer: Dev container configuration
+# - build: Build system and tooling
+# - config: Configuration files
+# - typst: Typst documentation system
+# - python: Python code
+# - markdown: Markdown files and linting
+# - yaml: YAML configuration
+# - pre-commit: Pre-commit hooks
+# - gitlint: Commit message linting
+# - test: Test code and testing infrastructure
+# - security: Security-related changes
+# - release: Release preparation
+# - linter: Linter configuration
+#
+# Scopes are REQUIRED for all commits.
+# Only scopes from the above list are allowed.
+
+[title-match-regex]
+# Enforce scope is required and must be from the allowed list
+# Allows: feat(auth): msg, fix(deps): msg
+# Rejects: feat: msg (no scope), feat(other): msg (invalid scope)
+regex=^(feat|fix|docs|style|refactor|perf|test|chore|ci|build|revert)\((auth|api|ui|cli|docs|readme|changelog|ci|workflow|github|deps|devcontainer|build|config|typst|python|markdown|yaml|pre-commit|gitlint|test|security|release|linter)\):\s.+
