@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **Python Documentation Generation**
+  - Automated extraction of Python docstrings (module, class, function level)
+  - Support for Google-style docstring format (Args, Returns, Raises)
+  - Type annotation capture from function signatures
+  - Dual output formats: JSON and Typst
+  - Integration with Makefile build pipeline (`make python-docs`)
+  - Beautiful formatted documentation blocks in Typst
+  - Example project demonstrating Python API documentation
+  - Comprehensive documentation in `docs/PYTHON_DOCS_GENERATION.md`
+  - New script: `scripts/build-python-docs.py`
+  - Demo document: `example/python-docs-demo.typ`
+
 ## [0.1.0] - 2025-01-06
 
 ### Added

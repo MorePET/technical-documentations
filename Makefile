@@ -2,7 +2,7 @@
 # Builds diagrams, colors, PDF, and HTML with dark mode support
 # Supports multiple projects
 
-.PHONY: all clean colors diagrams pdf html help check test example technical-documentation rebuild all-projects install-hook build-project build-summary check-outputs clean-outputs clean-generated server-start server-stop server-status
+.PHONY: all clean colors diagrams pdf html help check test example technical-documentation rebuild all-projects install-hook build-project build-summary check-outputs clean-outputs clean-generated server-start server-stop server-status python-docs
 
 # Default project
 PROJECT ?= technical-documentation
@@ -23,6 +23,7 @@ all: technical-documentation
 # Internal: Build a project (called with SRC, OUT, and PROJECT parameters)
 build-project:
 	@$(MAKE) colors
+	@$(MAKE) python-docs
 	@$(MAKE) diagrams PROJECT=$(PROJECT)
 	@$(MAKE) pdf-only SRC=$(SRC) OUT=$(OUT)
 	@$(MAKE) html-only SRC=$(SRC) OUT=$(OUT)
@@ -68,6 +69,11 @@ all-projects: technical-documentation example
 colors:
 	@echo "🎨 Generating color files..."
 	@python3 scripts/build-colors.py
+
+# Extract Python documentation and generate Typst/JSON output
+python-docs:
+	@echo "📚 Extracting Python documentation..."
+	@python3 scripts/build-python-docs.py
 
 # Compile diagrams to SVG (with project parameter)
 diagrams: colors
@@ -139,6 +145,8 @@ clean-generated:
 	@rm -f example/diagrams/*.svg
 	@rm -f lib/generated/colors.css
 	@rm -f lib/generated/colors.typ
+	@rm -f lib/generated/python-docs.json
+	@rm -f lib/generated/python-docs.typ
 
 # Clean build artifacts
 clean:
@@ -165,6 +173,7 @@ help:
 	@echo ""
 	@echo "Component targets:"
 	@echo "  make colors             - Generate color files from colors.json"
+	@echo "  make python-docs        - Extract Python documentation to JSON/Typst"
 	@echo "  make diagrams PROJECT=xxx - Compile diagrams for specific project"
 	@echo "  make pdf                - Compile PDF for default project"
 	@echo "  make html               - Compile HTML for default project"
