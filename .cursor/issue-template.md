@@ -117,9 +117,7 @@ Use appropriate labels:
 **Type:**
 - `bug` - Something isn't working
 - `feature` - New feature request
-- `documentation` - Documentation improvements
-- `question` - Questions about behavior
-- `security` - Security-related issues
+- `task` - task
 
 **Priority:**
 - `critical` - Blocking, needs immediate attention
@@ -236,3 +234,111 @@ The project provides issue templates in `.github/ISSUE_TEMPLATE/`:
 - `documentation.md` - For documentation issues
 
 Use the appropriate template when creating issues.
+
+## Creating Issues via CLI
+
+### Using `gh` CLI
+
+The `gh` CLI allows programmatic issue creation, useful for automation and scripts.
+
+**Bug report:**
+
+```bash
+gh issue create \
+  --title "bug: Brief description of the problem" \
+  --body "## Description
+
+Detailed bug description here.
+
+## Steps to Reproduce
+
+1. Step one
+2. Step two
+
+## Expected Behavior
+
+What should happen.
+
+## Actual Behavior
+
+What actually happens." \
+  --label "bug,needs-triage"
+```
+
+**Feature request:**
+
+```bash
+gh issue create \
+  --title "feat: Add support for new feature" \
+  --body "## Problem Statement
+
+Describe the problem this feature would solve.
+
+## Proposed Solution
+
+Describe your proposed solution.
+
+## Alternatives Considered
+
+What other solutions have you thought about?" \
+  --label "feature,needs-triage"
+```
+
+**From a file:**
+
+```bash
+# Create issue body in a file
+cat > issue.md << 'EOF'
+## Description
+Bug details here...
+EOF
+
+gh issue create \
+  --title "Bug: Title here" \
+  --body-file issue.md \
+  --label "bug,high"
+```
+
+**Important:** Labels must exist in the repository. Use `gh label list` to see available labels.
+
+### Common `gh` CLI Options
+
+| Flag | Description | Example |
+|------|-------------|---------|
+| `--title` | Issue title | `--title "Bug: Auth fails"` |
+| `--body` | Issue body (inline) | `--body "Description..."` |
+| `--body-file` | Issue body (from file) | `--body-file issue.md` |
+| `--label` | Comma-separated labels | `--label "bug,critical"` |
+| `--assignee` | Assign to user | `--assignee @me` |
+| `--milestone` | Set milestone | `--milestone "v1.0"` |
+| `--project` | Add to project | `--project "Sprint 1"` |
+| `--repo` | Target repo | `--repo ORG/REPO` |
+| `--web` | Open in browser | `--web` |
+
+### Check Available Labels
+
+Before creating issues, check what labels exist:
+
+```bash
+# List all labels in current repo
+gh label list
+
+# List labels in another repo
+gh label list --repo ORG/REPO
+```
+
+### Create Missing Labels
+
+If needed labels don't exist:
+
+```bash
+# Create label
+gh label create "dependencies" --color "0366d6" --description "Dependency updates"
+
+# Common labels for MorePET repos
+gh label create "bug" --color "d73a4a"
+gh label create "feature" --color "0e8a16"
+gh label create "documentation" --color "0075ca"
+gh label create "dependencies" --color "0366d6"
+gh label create "devcontainer" --color "1d76db"
+```
