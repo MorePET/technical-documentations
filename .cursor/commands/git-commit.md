@@ -202,8 +202,8 @@ git commit -m "add auth features and tests and fix docs"
 
 **Subject line:**
 - ✅ Imperative mood: "add", "fix", "update" (not "added", "fixed")
-- ✅ Capitalize first word? No
-- ✅ Period at end? No
+- ✅ Lowercase first word after colon: `feat(auth): add login`
+- ✅ No period at end
 - ✅ Under 50 characters
 
 **Body:**
@@ -317,10 +317,10 @@ git reset HEAD~
 
 # Stage in parts
 git add file1.py
-git commit -m "feat: add user validation"
+git commit -m "feat(auth): add user validation"
 
 git add file2.py file3.py
-git commit -m "feat: add user model"
+git commit -m "feat(auth): add user model"
 ```
 
 ## Quick Reference
