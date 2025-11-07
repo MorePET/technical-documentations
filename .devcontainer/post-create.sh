@@ -20,4 +20,7 @@ SCRIPTS_DIR="/workspace/.devcontainer/scripts"
 # Install pre-commit hooks
 "$SCRIPTS_DIR/setup-precommit.sh"
 
+# Protect linting configuration files (read-only)
+"$SCRIPTS_DIR/setup-protected-configs.sh"
+
 echo "Post-create setup complete"
