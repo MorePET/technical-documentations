@@ -78,4 +78,3 @@ echo ""
 echo "   Or manually:"
 echo "   chmod 644 <file> && vim <file> && chmod 444 <file>"
 echo ""
-
