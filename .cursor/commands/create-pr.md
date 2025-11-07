@@ -11,6 +11,11 @@ For complete documentation on pull request guidelines, templates, and review pro
 
 ## Workflow
 
+**Style Guidelines:**
+- Use standard markdown lists: `-` for bullets, `- [ ]` for unchecked, `- [x]` for checked
+- Never use emojis for lists or checkboxes
+- Keep PR descriptions clean and professional
+
 When creating a pull request, follow these steps:
 
 1. **Ensure your branch follows naming conventions:**
@@ -171,12 +176,12 @@ Examples:
 
 Before creating PR, ensure:
 
-- ✅ Branch follows naming convention
-- ✅ Commits follow conventional format
-- ✅ All pre-commit hooks pass
-- ✅ Tests are passing
-- ✅ CHANGELOG.md updated (if user-facing change)
-- ✅ No breaking changes without major version discussion
+- Branch follows naming convention
+- Commits follow conventional format
+- All pre-commit hooks pass
+- Tests are passing
+- CHANGELOG.md updated (if user-facing change)
+- No breaking changes without major version discussion
 
 ## After PR Creation
 
