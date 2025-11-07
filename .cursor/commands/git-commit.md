@@ -11,6 +11,7 @@ For complete documentation on commit conventions, workflow, and best practices, 
 **ALWAYS use conventional commits** with this format:
 
 ```text
+```text
 <type>(<scope>): <description>
 
 <body>
@@ -21,11 +22,11 @@ For complete documentation on commit conventions, workflow, and best practices, 
 ### Required Elements
 
 **Type** (required): What kind of change
+**Scope** (required): Module/component affected (must be from allowed list)
 **Description** (required): Brief summary (50 chars max)
 
 ### Optional Elements
 
-**Scope** (optional): Module/component affected
 **Body** (optional): Detailed explanation
 **Footer** (optional): Breaking changes, issue references
 
@@ -36,28 +37,46 @@ For complete documentation on commit conventions, workflow, and best practices, 
 | `feat` | New feature | `feat(auth): add user login` |
 | `fix` | Bug fix | `fix(api): resolve memory leak` |
 | `docs` | Documentation | `docs(readme): update install guide` |
-| `style` | Code formatting | `style: format with ruff` |
+| `style` | Code formatting | `style(python): format with ruff` |
 | `refactor` | Code restructure | `refactor(auth): extract validation` |
-| `perf` | Performance improvement | `perf(db): optimize query` |
+| `perf` | Performance improvement | `perf(api): optimize query` |
 | `test` | Test additions/changes | `test(auth): add login tests` |
 | `chore` | Maintenance tasks | `chore(deps): update packages` |
-| `ci` | CI/CD changes | `ci: add python matrix` |
-| `build` | Build system changes | `build: update pyproject.toml` |
-| `revert` | Revert previous commit | `revert: fix login bug` |
+| `ci` | CI/CD changes | `ci(workflow): add python matrix` |
+| `build` | Build system changes | `build(config): update pyproject.toml` |
+| `revert` | Revert previous commit | `revert(api): undo breaking change` |
 
 ## Scope Guidelines
 
-**Use scope for:**
+**Scopes are REQUIRED** for all commits and must be from the allowed list.
 
-- Component/module names: `feat(auth):`, `fix(db):`
-- File types: `docs(readme):`, `test(unit):`
-- Areas: `refactor(api):`, `style(imports):`
+**See [.gitlint](../.gitlint) for the complete list of 20 allowed scopes.**
 
-**Don't use scope for:**
+Scopes are organized by category:
 
-- Generic changes: `chore: update deps`
-- Multiple areas: Choose most relevant or omit
-- File paths: `fix(src/auth.py):` → `fix(auth):`
+- **Code/Feature Areas:** `auth`, `api`, `ui`, `cli`
+- **Documentation:** `readme`, `changelog`
+- **Infrastructure:** `workflow`, `github`, `deps`, `devcontainer`, `config`
+- **Languages/Tools:** `typst`, `python`, `markdown`, `yaml`
+- **Tooling:** `pre-commit`, `gitlint`, `linter`
+- **Other:** `security`, `release`
+
+**Scope rules:**
+- Always use lowercase
+- No spaces allowed
+- Use hyphens for multi-word scopes (e.g., `pre-commit`)
+- Choose the most specific scope for your change
+- Scopes avoid redundancy with types (no `docs`, `ci`, `build`, `test` scopes)
+- If the scope you need isn't in the list, discuss adding it to `.gitlint`
+
+**Sensible combinations:**
+- `feat(auth):` - New authentication feature
+- `fix(api):` - Fix API bug
+- `docs(readme):` - Update README (not `docs(docs):`)
+- `style(python):` - Format Python code
+- `chore(deps):` - Update dependencies
+- `ci(workflow):` - Modify CI workflow (not `ci(ci):`)
+- `test(auth):` - Add auth tests (not `test(test):`)
 
 ## Commit Message Examples
 
@@ -271,8 +290,8 @@ Split if you have:
 
 **Subject line:**
 - ✅ Imperative mood: "add", "fix", "update" (not "added", "fixed")
-- ✅ Capitalize first word? No
-- ✅ Period at end? No
+- ✅ Lowercase first word after colon: `feat(auth): add login`
+- ✅ No period at end
 - ✅ Under 50 characters
 
 **Body:**
@@ -298,6 +317,7 @@ s ghi9012 test(auth): add authentication tests
 ## Pre-commit Hooks
 
 **Hooks run automatically on commit:**
+- Gitlint (commit message validation)
 - Ruff (Python linting/formatting)
 - Shellcheck (shell script linting)
 - Pymarkdown (markdown linting)
@@ -354,9 +374,12 @@ uv run ruff check --fix .
 # Check shell scripts
 shellcheck script.sh
 
+# Commit rejected for missing/invalid scope?
+# Use a scope from the allowed list (see Scope Guidelines)
+
 # Then commit
 git add .
-git commit -m "fix: resolve linting issues"
+git commit -m "fix(linter): resolve linting issues"
 ```
 
 ### Wrong Branch
@@ -404,42 +427,34 @@ git commit -m "chore(config): add auth configuration"
 ### Commit Types Cheat Sheet
 
 ```text
-feat:     New feature
-fix:      Bug fix
-docs:     Documentation
-style:    Formatting
-refactor: Code restructure
-perf:     Performance
-test:     Tests
-chore:    Maintenance
-ci:       CI/CD
-build:    Build system
-revert:   Revert commit
+feat(scope):     New feature
+fix(scope):      Bug fix
+docs(scope):     Documentation
+style(scope):    Formatting
+refactor(scope): Code restructure
+perf(scope):     Performance
+test(scope):     Tests
+chore(scope):    Maintenance
+ci(scope):       CI/CD
+build(scope):    Build system
+revert(scope):   Revert commit
 ```
+
+**Note:** All commits REQUIRE a scope from the allowed list (see Scope Guidelines above).
 
 ### Fast Commit Commands
 
 **⚠️ Use with caution - only for 1-4 related files:**
 
 ```bash
-# Quick fix (single file)
-git add src/bug.py && git commit -m "fix: quick bug fix"
+# Quick fix
+git add . && git commit -m "fix(api): quick bug fix"
 
 # Feature commit (related files only)
 git add src/component.py && git commit -m "feat(ui): add new component"
 
-# Documentation (related docs)
-git add docs/api.md && git commit -m "docs: update API guide"
-```
-
-**Don't:**
-
-```bash
-# ❌ Blind commit all
-git add . && git commit -m "updates"
-
-# ❌ Large mixed batch
-git add . && git commit -m "feat: add feature"  # (if 10+ files)
+# Documentation
+git add docs/ && git commit -m "docs(readme): update API guide"
 ```
 
 ---

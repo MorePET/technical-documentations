@@ -7,6 +7,7 @@
 Follow the format: `<type>/<short-description>`
 
 Types:
+
 - `feature/` - New features
 - `fix/` - Bug fixes
 - `docs/` - Documentation changes
@@ -24,7 +25,7 @@ Examples:
 
 Use clear, descriptive titles:
 
-```
+```text
 <type>: Brief description of changes
 ```
 
@@ -34,6 +35,11 @@ Examples:
 - `docs: Update dev container setup guide`
 
 ### PR Description Template
+
+**Style Guidelines:**
+- Use standard markdown lists: `-` for bullets, `- [ ]` for unchecked, `- [x]` for checked
+- Never use emojis for lists (❌ ✅ 🎯 etc.)
+- Keep formatting clean and professional
 
 ```markdown
 ## Description
@@ -135,11 +141,11 @@ Before requesting review:
 
 ### When to Merge
 
-- ✅ At least one approval
-- ✅ All CI checks passing
-- ✅ All conversations resolved
-- ✅ Branch up to date with main
-- ✅ No merge conflicts
+- At least one approval
+- All CI checks passing
+- All conversations resolved
+- Branch up to date with main
+- No merge conflicts
 
 ### Merge Strategies
 
@@ -170,14 +176,14 @@ Before requesting review:
 
 ## Common PR Mistakes to Avoid
 
-❌ Committing directly to main
-❌ Pushing without running pre-commit
-❌ Including unrelated changes
-❌ Not updating documentation
-❌ Not updating CHANGELOG.md
-❌ Force pushing to shared branches
-❌ Merging your own PRs without review
-❌ Ignoring CI failures
+- Committing directly to main
+- Pushing without running pre-commit
+- Including unrelated changes
+- Not updating documentation
+- Not updating CHANGELOG.md
+- Force pushing to shared branches
+- Merging your own PRs without review
+- Ignoring CI failures
 
 ## CI/CD Integration
 

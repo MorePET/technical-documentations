@@ -89,6 +89,7 @@ gh repo view ORG/REPO --json nameWithOwner,description
 ```
 
 Example output:
+
 ```json
 {
   "description": "Repository description",
@@ -103,8 +104,6 @@ gh repo view ORG/REPO --json nameWithOwner,description,viewerPermission
 ```
 
 ---
-
-
 
 ## Examples
 

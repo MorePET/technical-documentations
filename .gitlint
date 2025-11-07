@@ -1,0 +1,94 @@
+# Gitlint configuration for conventional commits
+# See: https://jorisroovers.com/gitlint/latest/configuration/
+
+[general]
+# Enable all built-in rules by default
+ignore=
+# Enable community contributed rules
+contrib=contrib-title-conventional-commits
+
+# Set the verbosity level (1-3)
+verbosity=2
+
+# Ignore merge commits, revert commits, and fixup commits
+ignore-merge-commits=true
+ignore-revert-commits=true
+ignore-fixup-commits=true
+ignore-fixup-amend-commits=true
+ignore-squash-commits=true
+
+# Regex for lines to ignore in the body (e.g., commit trailers)
+ignore-body-lines=^Signed-off-by:,^Co-authored-by:,^Closes:,^Fixes:,^Related:,^Refs:,^BREAKING CHANGE:
+
+[title-max-length]
+line-length=72
+
+[title-min-length]
+min-length=10
+
+[body-max-line-length]
+line-length=72
+
+[body-min-length]
+min-length=0
+
+[body-is-missing]
+# Don't require body - simple commits can be just a title
+ignore-merge-commits=true
+
+# Conventional commits configuration
+[contrib-title-conventional-commits]
+# Supported types (matching your git-commit.md documentation)
+types=feat,fix,docs,style,refactor,perf,test,chore,ci,build,revert
+
+# Allowed scopes (ENFORCED - only these scopes are valid):
+#
+# Code/Feature Areas:
+# - auth: Authentication and authorization
+# - api: API endpoints and interfaces
+# - ui: User interface components
+# - cli: Command-line interface
+#
+# Documentation:
+# - readme: README files
+# - changelog: CHANGELOG updates
+#
+# Infrastructure:
+# - workflow: GitHub Actions workflows
+# - github: GitHub-specific features (issues, PRs)
+# - deps: Dependency updates
+# - devcontainer: Dev container configuration
+# - config: Configuration files
+#
+# Languages/Tools:
+# - typst: Typst documentation system
+# - python: Python code
+# - markdown: Markdown files and linting
+# - yaml: YAML configuration
+#
+# Tooling:
+# - pre-commit: Pre-commit hooks
+# - gitlint: Commit message linting
+# - linter: Generic linter configuration
+#
+# Other:
+# - security: Security-related changes
+# - release: Release preparation
+#
+# Scopes are REQUIRED for all commits.
+# Only scopes from the above list are allowed.
+#
+# Example sensible combinations:
+# - feat(auth): add OAuth support
+# - fix(api): resolve timeout issue
+# - docs(readme): update installation steps
+# - style(python): format with ruff
+# - chore(deps): update dependencies
+# - ci(workflow): add caching
+# - test(auth): add unit tests
+
+[title-match-regex]
+# Enforce scope is required and must be from the allowed list (20 scopes)
+# Allows: feat(auth): msg, fix(deps): msg, docs(readme): msg
+# Rejects: feat: msg (no scope), feat(other): msg (invalid scope)
+regex=^(feat|fix|docs|style|refactor|perf|test|chore|ci|build|revert)\((auth|api|ui|cli|readme|changelog|workflow|github|deps|devcontainer|config|typst|python|markdown|yaml|pre-commit|gitlint|linter|security|release)\):\s.+

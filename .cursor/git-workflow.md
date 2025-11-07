@@ -24,6 +24,7 @@ Follow naming convention: `<type>/<description>`
 - `release/` - Release preparation
 
 **Examples:**
+
 ```bash
 feature/github-auth
 fix/ssh-key-mismatch
@@ -37,6 +38,7 @@ release/v0.2.0
 ### Branch Lifecycle
 
 1. **Create branch from latest main**
+
    ```bash
    git checkout main
    git pull origin main
@@ -44,12 +46,14 @@ release/v0.2.0
    ```
 
 2. **Make changes and commit**
+
    ```bash
    git add .
-   git commit -m "feat: add new feature"
+   git commit -m "feat(api): add new feature"
    ```
 
 3. **Keep branch updated**
+
    ```bash
    git checkout main
    git pull origin main
@@ -58,12 +62,14 @@ release/v0.2.0
    ```
 
 4. **Push and create PR**
+
    ```bash
    git push origin feature/my-feature
    gh pr create
    ```
 
 5. **After PR merged, delete branch**
+
    ```bash
    git checkout main
    git pull origin main
@@ -90,28 +96,27 @@ Format: `<type>(<scope>): <description>`
 - `build` - Build system changes
 - `revert` - Revert previous commit
 
-**Scope (optional):**
-- `devcontainer`
-- `auth`
-- `docs`
-- `ci`
-- `build`
+**Scope (required):**
+- Must be from the allowed list defined in `.gitlint` (20 scopes)
+- Common: `auth`, `api`, `readme`, `deps`, `workflow`, `python`, `typst`
+- Scopes avoid redundancy with types (use `ci(workflow):` not `ci(ci):`)
+- See `.gitlint` for complete list and sensible combinations
 
 **Examples:**
 
-```
+```text
 feat(auth): add automatic GitHub CLI authentication
 fix(devcontainer): resolve SSH key path mismatch
 docs(readme): update installation instructions
-refactor(scripts): extract common auth logic to shared function
+refactor(python): extract common auth logic to shared function
 test(auth): add unit tests for token extraction
 chore(deps): update pre-commit hooks to latest versions
-ci: add shellcheck to CI pipeline
+ci(workflow): add shellcheck to CI pipeline
 ```
 
 ### Commit Message Structure
 
-```
+```text
 <type>(<scope>): <subject>
 
 <body>
@@ -136,7 +141,7 @@ ci: add shellcheck to CI pipeline
 
 **Example:**
 
-```
+```text
 feat(auth): add automatic token extraction from host
 
 Previously, users had to manually authenticate gh CLI in the
@@ -159,6 +164,7 @@ Closes #45
 - Makes git bisect more useful
 
 ✅ Good:
+
 ```bash
 git commit -m "feat(auth): add token extraction"
 git commit -m "feat(auth): add token file cleanup"
@@ -166,6 +172,7 @@ git commit -m "docs(auth): document token security"
 ```
 
 ❌ Bad:
+
 ```bash
 git commit -m "add auth and fix docs and update deps"
 ```
@@ -206,6 +213,7 @@ s ghi9012 add tests
 ### When to Rebase
 
 **Rebase your feature branch** onto main:
+
 ```bash
 git checkout feature/my-feature
 git rebase main
@@ -232,6 +240,7 @@ Use when:
 ### Resolving Merge Conflicts
 
 1. **Update your branch**
+
    ```bash
    git checkout main
    git pull
@@ -240,12 +249,14 @@ Use when:
    ```
 
 2. **Git will show conflicts**
-   ```
+
+   ```text
    CONFLICT (content): Merge conflict in file.txt
    ```
 
 3. **Open conflicted files**
-   ```
+
+   ```text
    <<<<<<< HEAD
    your changes
    =======
@@ -259,12 +270,14 @@ Use when:
    - Test the result
 
 5. **Continue rebase**
+
    ```bash
    git add .
    git rebase --continue
    ```
 
 6. **Force push** (if already pushed)
+
    ```bash
    git push --force-with-lease origin feature/my-feature
    ```
@@ -274,6 +287,7 @@ Use when:
 ### Pre-commit Hook
 
 Automatically runs on `git commit`:
+- Gitlint (commit message validation - enforces scopes)
 - Ruff (Python linting/formatting)
 - Shellcheck (shell script linting)
 - Pymarkdown (markdown linting)
@@ -281,6 +295,7 @@ Automatically runs on `git commit`:
 - End of file fix
 
 **Skip hooks** (only when absolutely necessary):
+
 ```bash
 git commit --no-verify -m "message"
 ```
@@ -290,6 +305,7 @@ git commit --no-verify -m "message"
 Hooks are automatically installed in dev container.
 
 Manual installation:
+
 ```bash
 pre-commit install
 ```
@@ -337,7 +353,7 @@ git gc                       # Garbage collection
 
 ## Branch Protection Rules
 
-### Required for `main` branch:
+### Required for main branch
 
 - ✅ Require pull request before merging
   - Require 1 approval
@@ -377,11 +393,13 @@ gh pr create
 - Fixing your own mistakes before PR review
 
 **Always use:**
+
 ```bash
 git push --force-with-lease origin branch-name
 ```
 
 **Never use:**
+
 ```bash
 git push --force  # DON'T USE THIS
 ```
