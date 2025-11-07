@@ -10,7 +10,7 @@ For complete documentation on commit conventions, workflow, and best practices, 
 
 **ALWAYS use conventional commits** with this format:
 
-```
+```text
 <type>(<scope>): <description>
 
 <body>
@@ -48,11 +48,13 @@ For complete documentation on commit conventions, workflow, and best practices, 
 ## Scope Guidelines
 
 **Use scope for:**
+
 - Component/module names: `feat(auth):`, `fix(db):`
 - File types: `docs(readme):`, `test(unit):`
 - Areas: `refactor(api):`, `style(imports):`
 
 **Don't use scope for:**
+
 - Generic changes: `chore: update deps`
 - Multiple areas: Choose most relevant or omit
 - File paths: `fix(src/auth.py):` → `fix(auth):`
@@ -103,16 +105,84 @@ Closes #123
 Related to #456"
 ```
 
+## ⚠️ Critical: Split Large Commits
+
+**ALWAYS review staged files before committing.**
+
+If you have **5+ files** or **multiple unrelated changes**, split into separate commits:
+
+### Signs You Need Multiple Commits
+
+❌ **Don't commit together:**
+- Feature + bug fix
+- Code + documentation
+- Implementation + tests (sometimes separate is better)
+- Multiple unrelated features
+- Config changes + code changes
+- Different scopes/areas
+
+✅ **Group by:**
+- Logical units of work
+- Single purpose/scope
+- Related files only
+- Same commit type
+
+### Example: Splitting a Large Change
+
+**Bad (10 files, mixed purposes):**
+
+```bash
+git add .  # ❌ Everything at once
+git commit -m "add feature and fix bugs and update docs"
+```
+
+**Good (split into logical commits):**
+
+```bash
+# Commit 1: Core feature
+git add src/auth.py src/models.py
+git commit -m "feat(auth): add password validation"
+
+# Commit 2: Tests
+git add tests/test_auth.py
+git commit -m "test(auth): add validation tests"
+
+# Commit 3: Documentation
+git add docs/auth.md README.md
+git commit -m "docs(auth): document password requirements"
+
+# Commit 4: Config
+git add config/settings.py
+git commit -m "chore(config): add auth settings"
+```
+
 ## Interactive Commit Workflow
 
 ### 1. Stage Your Changes
 
-```bash
-# Stage all changes
-git add .
+**⚠️ STOP before `git add .`**
 
-# Or stage specific files
+Review what changed first:
+
+```bash
+# See ALL changes
+git status
+
+# Count modified files
+git status --short | wc -l
+```
+
+**Decision tree:**
+- **1-4 files, same purpose** → Stage all together
+- **5+ files** → Review if they should be split
+- **Different types/scopes** → Definitely split
+
+```bash
+# Stage selectively
 git add src/auth.py tests/test_auth.py
+
+# Or stage all (only if related)
+git add .
 
 # Or interactively stage hunks
 git add -p
@@ -126,7 +196,14 @@ git diff --staged
 
 # See affected files
 git status
+
+# Count staged files
+git diff --staged --name-only | wc -l
 ```
+
+**If you see 5+ files:**
+- Ask yourself: "Do these all belong together?"
+- If no: Unstage and commit in batches
 
 ### 3. Create Commit
 
@@ -148,19 +225,33 @@ git push origin your-branch
 
 ### Atomic Commits
 
-**Each commit should be one logical change:**
+**Each commit should be ONE logical change.**
 
-✅ **Good:**
+**Atomic = Single-purpose, focused, reviewable**
+
+✅ **Good (separate commits):**
+
 ```bash
 git commit -m "feat(auth): add password validation"
 git commit -m "feat(auth): add password strength meter"
 git commit -m "test(auth): add validation tests"
 ```
 
-❌ **Bad:**
+❌ **Bad (mixed purposes):**
+
 ```bash
 git commit -m "add auth features and tests and fix docs"
 ```
+
+### When to Split Commits
+
+Split if you have:
+- ✂️ **5+ files** → Likely multiple logical changes
+- ✂️ **Different types** → feat + fix + docs = 3 commits
+- ✂️ **Different scopes** → auth + api + ui = 3 commits
+- ✂️ **Unrelated changes** → Even if same file
+
+**Rule of thumb:** If you use "and" in commit message, split it!
 
 ### Commit Frequency
 
@@ -202,6 +293,7 @@ git rebase -i HEAD~3
 pick abc1234 feat: add feature
 s def5678 fix typo
 s ghi9012 add tests
+s ghi9012 add tests
 ```
 
 ## Pre-commit Hooks
@@ -214,6 +306,7 @@ s ghi9012 add tests
 - End-of-file fixes
 
 **Skip hooks only when necessary:**
+
 ```bash
 git commit --no-verify -m "urgent fix"
 ```
@@ -280,26 +373,38 @@ git checkout correct-branch
 git cherry-pick commit-hash
 ```
 
-### Large Commit
+### Large Commit (Too Many Files)
 
-**Split into smaller commits:**
+**If you have 5+ staged files, split them:**
+
 ```bash
-# Unstage everything
-git reset HEAD~
+# See what's staged
+git status
 
-# Stage in parts
-git add file1.py
-git commit -m "feat: add user validation"
+# If too many files, unstage all
+git reset
 
-git add file2.py file3.py
-git commit -m "feat: add user model"
+# Commit in logical groups
+git add src/auth/*.py
+git commit -m "feat(auth): implement authentication"
+
+git add tests/test_auth*.py
+git commit -m "test(auth): add authentication tests"
+
+git add docs/auth.md
+git commit -m "docs(auth): document authentication flow"
+
+git add config/settings.py
+git commit -m "chore(config): add auth configuration"
 ```
+
+**Pro tip:** Use `git add -p` to stage specific hunks within files
 
 ## Quick Reference
 
 ### Commit Types Cheat Sheet
 
-```
+```text
 feat:     New feature
 fix:      Bug fix
 docs:     Documentation
@@ -315,15 +420,27 @@ revert:   Revert commit
 
 ### Fast Commit Commands
 
+**⚠️ Use with caution - only for 1-4 related files:**
+
 ```bash
-# Quick fix
-git add . && git commit -m "fix: quick bug fix"
+# Quick fix (single file)
+git add src/bug.py && git commit -m "fix: quick bug fix"
 
-# Feature commit
-git add src/ && git commit -m "feat(ui): add new component"
+# Feature commit (related files only)
+git add src/component.py && git commit -m "feat(ui): add new component"
 
-# Documentation
-git add docs/ && git commit -m "docs: update API guide"
+# Documentation (related docs)
+git add docs/api.md && git commit -m "docs: update API guide"
+```
+
+**Don't:**
+
+```bash
+# ❌ Blind commit all
+git add . && git commit -m "updates"
+
+# ❌ Large mixed batch
+git add . && git commit -m "feat: add feature"  # (if 10+ files)
 ```
 
 ---
