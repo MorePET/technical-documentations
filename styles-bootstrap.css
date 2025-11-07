@@ -180,6 +180,48 @@ h3::before {
   width: 29%;
 }
 
+/* Disable Bootstrap's default table-hover effect on header row */
+.table-hover thead tr:first-child:hover,
+.table-hover tbody tr:first-child:hover {
+  --bs-table-accent-bg: transparent !important;
+  --bs-table-hover-bg: transparent !important;
+  --bs-table-bg: transparent !important;
+}
+
+.table-hover thead tr:first-child:hover > *,
+.table-hover tbody tr:first-child:hover > * {
+  --bs-table-accent-bg: transparent !important;
+}
+
+/* Header row hover effect - ONLY first cell changes to match other cells */
+.table thead tr:first-child:hover th:first-child,
+.table thead tr:first-child:hover td:first-child,
+.table tbody tr:first-child:hover td:first-child {
+  background: #2563eb !important;
+  color: white !important;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+[data-bs-theme="dark"] .table thead tr:first-child:hover th:first-child,
+[data-bs-theme="dark"] .table thead tr:first-child:hover td:first-child,
+[data-bs-theme="dark"] .table tbody tr:first-child:hover td:first-child {
+  background: #3b82f6 !important;
+}
+
+/* Ensure other header cells stay the same during row hover */
+.table thead tr:first-child:hover th:not(:first-child),
+.table thead tr:first-child:hover td:not(:first-child),
+.table tbody tr:first-child:hover td:not(:first-child) {
+  background: #2563eb !important;
+  color: white !important;
+}
+
+[data-bs-theme="dark"] .table thead tr:first-child:hover th:not(:first-child),
+[data-bs-theme="dark"] .table thead tr:first-child:hover td:not(:first-child),
+[data-bs-theme="dark"] .table tbody tr:first-child:hover td:not(:first-child) {
+  background: #3b82f6 !important;
+}
+
 /* Row hover effect */
 .table tbody tr:not(:first-child):hover {
   background: rgba(37, 99, 235, 0.05);
