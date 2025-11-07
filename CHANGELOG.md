@@ -7,6 +7,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **Bootstrap Styling Support**
+  - Bootstrap 5.3.2 integration for HTML output
+  - New `build-html-bootstrap.py` script for complete Bootstrap workflow
+  - `add-styling-bootstrap.py` for adding Bootstrap CDN links and components
+  - `add-bootstrap-classes.py` for automatic class application to HTML elements
+  - Bootstrap-compatible theme toggle (light/dark/auto modes)
+  - Bootstrap Offcanvas TOC sidebar for navigation
+  - Responsive mobile-first design with Bootstrap grid
+  - Custom `styles-bootstrap.css` for Typst-specific enhancements
+  - Comprehensive Bootstrap styling documentation
+
+- **Makefile Targets**
+  - `make html-bootstrap` - Build HTML with Bootstrap styling
+  - `make example-bootstrap` - Build example with Bootstrap styling
+
+### Changed
+
+- Build scripts now support both custom CSS and Bootstrap workflows
+- Theme toggle adapted to work with Bootstrap's `data-bs-theme` attribute
+- TOC sidebar uses Bootstrap Offcanvas component for better mobile support
+
 ## [0.1.0] - 2025-01-06
 
 ### Added

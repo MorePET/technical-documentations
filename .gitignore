@@ -237,3 +237,4 @@ __marimo__/
 
 # Server process ID
 .server.pid
+.github_data/
