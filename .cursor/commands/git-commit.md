@@ -324,10 +324,40 @@ s ghi9012 test(auth): add authentication tests
 - Trailing whitespace removal
 - End-of-file fixes
 
-**Skip hooks only when necessary:**
+**⚠️ NEVER skip hooks without explicit permission:**
+
+**AI Assistants:** Do NOT use `--no-verify` unless:
+1. The user explicitly requests it, OR
+2. You ask the user first and get approval
+
+**When hooks fail:**
+1. **STOP** - Do not automatically retry with `--no-verify`
+2. **FIX** the issues reported by the hooks
+3. **EXPLAIN** what failed and what you're fixing
+4. **ASK** the user if they want to skip hooks (only if fixing isn't possible)
+5. **COMMIT** only after fixing or getting explicit approval to skip
+
+**Valid reasons to ask permission to skip:**
+- Pre-existing linting errors in files you didn't change
+- Build artifacts that don't exist yet but will be generated
+- Urgent hotfixes (user must explicitly request)
+
+**Example when asking:**
+
+```text
+The pre-commit hook failed because:
+- pymarkdown found formatting issues in README.md (pre-existing)
+- Typst files reference build artifacts that don't exist yet
+
+Would you like me to:
+1. Fix the markdown formatting issues first? (recommended)
+2. Skip hooks for this commit? (use --no-verify)
+```
+
+**Only after user approval:**
 
 ```bash
-git commit --no-verify -m "urgent fix"
+git commit --no-verify -m "fix(auth): urgent security patch"
 ```
 
 ## Common Scenarios
