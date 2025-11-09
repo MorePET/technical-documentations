@@ -141,6 +141,30 @@ def copy_css(output_html: Path):
         return False
 
 
+def remove_body_toc(input_html: Path, output_html: Path) -> bool:
+    """Run remove-body-toc.py to remove the TOC from the HTML body."""
+    print("\nRemoving Table of Contents from body (keeping sidebar)...")
+
+    script = Path(__file__).parent / "remove-body-toc.py"
+
+    try:
+        result = subprocess.run(
+            ["python3", str(script), str(input_html), str(output_html)],
+            capture_output=True,
+            text=True,
+            check=True,
+        )
+
+        if result.stdout:
+            print(result.stdout)
+
+        return True
+
+    except subprocess.CalledProcessError as e:
+        print(f"  ✗ Error removing body TOC: {e.stderr}")
+        return False
+
+
 def add_bootstrap_styling(
     output_html: Path, theme_toggle: bool = True, toc_sidebar: bool = True
 ) -> bool:
@@ -224,23 +248,28 @@ def main():
     if not add_bootstrap_classes(temp_html2, temp_html3):
         sys.exit(1)
 
-    # Step 4: Copy custom CSS
+    # Step 4: Remove body TOC (keep sidebar TOC only)
+    temp_html4 = html_file.parent / f"{html_file.stem}_temp4.html"
+    if not remove_body_toc(temp_html3, temp_html4):
+        sys.exit(1)
+
+    # Step 5: Copy custom CSS
     copy_css(html_file)
 
-    # Step 5: Add Bootstrap styling (CSS/JS, theme toggle, TOC)
+    # Step 6: Add Bootstrap styling (CSS/JS, theme toggle, TOC)
     # Copy temp file to final output first
-    shutil.copy(temp_html3, html_file)
+    shutil.copy(temp_html4, html_file)
 
     if not add_bootstrap_styling(
         html_file, theme_toggle=theme_toggle, toc_sidebar=toc_sidebar
     ):
         sys.exit(1)
 
-    # Step 6: Fix trailing whitespace
+    # Step 7: Fix trailing whitespace
     fix_trailing_whitespace(html_file)
 
     # Clean up temp files
-    for temp_file in [temp_html, temp_html2, temp_html3]:
+    for temp_file in [temp_html, temp_html2, temp_html3, temp_html4]:
         if temp_file.exists():
             temp_file.unlink()
 

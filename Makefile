@@ -14,8 +14,8 @@ THEME_TOGGLE ?= yes
 # Project configurations
 TECH_DOC_SRC = technical-documentation/technical-documentation.typ
 TECH_DOC_OUT = technical-documentation/build/technical-documentation
-EXAMPLE_SRC = example/technical-doc-example.typ
-EXAMPLE_OUT = example/build/technical-doc-example
+EXAMPLE_SRC = example/docs/main.typ
+EXAMPLE_OUT = example/build/example-documentation
 
 # Default target - builds the technical-documentation project
 all: technical-documentation
@@ -48,11 +48,14 @@ technical-documentation:
 	@$(MAKE) build-summary OUT=$(TECH_DOC_OUT)
 	@echo "🌓 Toggle dark mode with the button in top-right"
 
-# Build example project (the original demo)
+# Build example project (depends on python-project artifacts)
 example:
 	@echo "=================================================="
 	@echo "🎨 Building Example Project"
 	@echo "=================================================="
+	@$(MAKE) python-api
+	@$(MAKE) python-tests
+	@$(MAKE) python-diagrams
 	@$(MAKE) build-project SRC=$(EXAMPLE_SRC) OUT=$(EXAMPLE_OUT) PROJECT=example
 	@$(MAKE) server-start
 	@$(MAKE) build-summary OUT=$(EXAMPLE_OUT)
@@ -61,6 +64,29 @@ example:
 colors:
 	@echo "🎨 Generating color files..."
 	@python3 scripts/build-colors.py
+
+# Build python-project API documentation
+python-api:
+	@echo "📚 Generating Python API documentation..."
+	@cd example/python-project && python3 -m src.doc_generator.extract_api
+
+# Build python-project test reports
+python-tests:
+	@echo "🧪 Generating Python test reports..."
+	@cd example/python-project && python3 -m src.doc_generator.test_report
+
+# Build python-project diagrams (including v-model and build-pipeline)
+# Note: These diagrams are in example/docs/diagrams but need theme-aware compilation
+python-diagrams:
+	@echo "📊 Compiling additional diagrams..."
+	@mkdir -p example/build/diagrams
+	@typst compile --root . --input theme=light --format svg example/docs/diagrams/v-model.typ example/build/diagrams/v-model-light.svg
+	@typst compile --root . --input theme=dark --format svg example/docs/diagrams/v-model.typ example/build/diagrams/v-model-dark.svg
+	@cp example/build/diagrams/v-model-light.svg example/build/diagrams/v-model.svg
+	@typst compile --root . --input theme=light --format svg example/docs/diagrams/build-pipeline.typ example/build/diagrams/build-pipeline-light.svg
+	@typst compile --root . --input theme=dark --format svg example/docs/diagrams/build-pipeline.typ example/build/diagrams/build-pipeline-dark.svg
+	@cp example/build/diagrams/build-pipeline-light.svg example/build/diagrams/build-pipeline.svg
+	@echo "✓ Additional diagrams created"
 
 # Compile diagrams to SVG (with project parameter)
 diagrams: colors
@@ -108,8 +134,8 @@ check:
 check-outputs:
 	@test -f technical-documentation/build/technical-documentation.pdf && echo "✓ Technical doc PDF exists" || echo "❌ Technical doc PDF missing"
 	@test -f technical-documentation/build/technical-documentation.html && echo "✓ Technical doc HTML exists" || echo "❌ Technical doc HTML missing"
-	@test -f example/build/technical-doc-example.pdf && echo "✓ Example PDF exists" || echo "❌ Example PDF missing"
-	@test -f example/build/technical-doc-example.html && echo "✓ Example HTML exists" || echo "❌ Example HTML missing"
+	@test -f example/build/example-documentation.pdf && echo "✓ Example PDF exists" || echo "❌ Example PDF missing"
+	@test -f example/build/example-documentation.html && echo "✓ Example HTML exists" || echo "❌ Example HTML missing"
 	@test -f lib/generated/colors.css && echo "✓ Colors generated" || echo "❌ Colors missing"
 
 # Quick test - compile everything and check outputs exist

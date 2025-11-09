@@ -177,6 +177,50 @@ def generate_typst(colors: dict, output_file: Path):
 
     typ_lines.append("")
 
+    # Add theme helper functions
+    typ_lines.extend(
+        [
+            "// ============================================",
+            "// THEME HELPERS",
+            "// ============================================",
+            "",
+            "// Get current theme from sys.inputs (defaults to 'light')",
+            '#let get-theme() = sys.inputs.at("theme", default: "light")',
+            "",
+            "// Select color based on theme",
+            "#let theme-color(light, dark) = {",
+            '  if get-theme() == "dark" { dark } else { light }',
+            "}",
+            "",
+            "// ============================================",
+            "// SEMANTIC THEME-AWARE COLORS",
+            "// ============================================",
+            "// These automatically select the right color based on theme",
+            "",
+        ]
+    )
+
+    # Generate semantic color shortcuts
+    for name, config in colors["colors"].items():
+        base_name = name.replace("-", "_")
+
+        # Add _color suffix for names that conflict with Typst built-ins
+        if base_name in ["text", "stroke", "background", "link", "label"]:
+            base_name = base_name + "_color"
+
+        # Create short name for common use
+        short_name = base_name.replace("_color", "-c").replace("_", "-")
+
+        comment = (
+            f"// {config['description']}" if "description" in config else f"// {name}"
+        )
+        typ_lines.append(comment)
+        typ_lines.append(
+            f"#let {short_name} = theme-color({base_name}, {base_name}_dark)"
+        )
+
+    typ_lines.append("")
+
     output_file.write_text("\n".join(typ_lines))
     print(f"✓ Generated {output_file}")
 

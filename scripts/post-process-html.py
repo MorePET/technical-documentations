@@ -83,13 +83,13 @@ def inject_svgs_into_html(html_content: str, diagrams_dir: Path) -> str:
         "System Architecture Diagram": "architecture",
         "Data Flow Diagram": "data-flow",
         "State Machine Diagram": "state-machine",
+        "V-Model Overview": "v-model",
     }
 
     for header_text, base_name in diagram_mappings.items():
         # Find the paragraph after the header containing this text
-        pattern = (
-            rf"(<h3>[^<]*{re.escape(header_text)}[^<]*</h3>\s*</div>\s*<p>[^<]*</p>)"
-        )
+        # Support both h2 and h3 headers
+        pattern = rf"(<h[23]>[^<]*{re.escape(header_text)}[^<]*</h[23]>\s*</div>\s*<p>[^<]*</p>)"
 
         def inject_after_paragraph(match, base_name=base_name, header_text=header_text):
             svg_html = inject_dual_theme_svg(diagrams_dir, base_name)
