@@ -224,14 +224,8 @@ __marimo__/
 .pre-commit-cache/
 
 # ===== Technical Documentation Build System =====
-# Build outputs (root level) - but keep example/ outputs to show results
-/technical-documentation.pdf
-/technical-documentation.html
-/technical-doc-example.pdf
-/technical-doc-example.html
-/colors.css
-/styles.css
-/technical-documentation/diagrams/*.svg
+# Build outputs are ignored via build/ pattern above (line 16)
+# Intermediate generated files ignored via lib/generated/ above (line 22)
 
 # Server process ID
 .server.pid
