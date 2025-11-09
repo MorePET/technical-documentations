@@ -29,13 +29,16 @@ python-project/
 │   ├── main.typ                  # Main documentation file
 │   ├── narrative.typ             # V-Model narrative (570 lines)
 │   └── diagrams/
-│       └── v-model.typ           # V-Model diagram
-├── generated/                    # Auto-generated documentation
-│   ├── api-reference.typ         # API docs from source code
-│   ├── test-coverage.typ         # Coverage metrics
-│   └── test-results.typ          # Test results summary
-├── documentation.pdf             # Final PDF output (439KB)
-├── documentation.html            # Final HTML with dark mode (252KB)
+│       └── v-model.typ           # V-Model diagram (source)
+├── build/                        # All build outputs
+│   ├── generated/                # Auto-generated documentation
+│   │   ├── api-reference.typ    # API docs from source code
+│   │   ├── test-coverage.typ    # Coverage metrics
+│   │   └── test-results.typ     # Test results summary
+│   ├── diagrams/                 # Compiled diagrams
+│   │   └── v-model.svg
+│   ├── documentation.pdf         # Final PDF output (439KB)
+│   └── documentation.html        # Final HTML with dark mode (252KB)
 └── build_docs.sh                 # Build script
 ```
 
@@ -156,7 +159,7 @@ Total                  31%        ✅
 
 ## 📖 Documentation Features
 
-### PDF Output (`documentation.pdf` - 439KB)
+### PDF Output (`build/documentation.pdf` - 439KB)
 
 - Professional typography with Libertinus Serif
 - Complete V-Model lifecycle documentation
@@ -165,7 +168,7 @@ Total                  31%        ✅
 - Diagrams and figures
 - 40+ pages of comprehensive documentation
 
-### HTML Output (`documentation.html` - 252KB)
+### HTML Output (`build/documentation.html` - 252KB)
 
 - 🌓 **Dark mode support** with toggle button
 - 📑 **Collapsible TOC sidebar** for navigation
@@ -202,7 +205,7 @@ from pathlib import Path
 # Extract API docs
 generate_api_docs(
     modules=["src.hello", "src.main"],
-    output_file=Path("generated/api-reference.typ"),
+    output_file=Path("build/generated/api-reference.typ"),
     project_root=Path(".")
 )
 
@@ -222,7 +225,7 @@ Edit `build_docs.sh` or use the library:
 ```python
 generate_api_docs(
     modules=["src.hello", "src.main", "src.your_module"],
-    output_file=Path("generated/api-reference.typ"),
+    output_file=Path("build/generated/api-reference.typ"),
     project_root=Path(".")
 )
 ```

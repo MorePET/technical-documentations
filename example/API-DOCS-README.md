@@ -17,12 +17,12 @@ A complete automated documentation pipeline that extracts API documentation from
 - **`example/main-api-docs.typ`** - Main document combining narrative + auto-generated API docs
 
 ### Generated Outputs
-- **`example/generated/api-reference.typ`** - Auto-generated API documentation from Python docstrings
-- **`example/generated/test-coverage.typ`** - Test coverage report (30.4% currently)
-- **`example/generated/test-results.typ`** - Test results summary
-- **`example/diagrams/api-workflow.svg`** - Compiled workflow diagram
-- **`example/api-docs.pdf`** (184KB) - Beautiful PDF documentation
-- **`example/api-docs.html`** (162KB) - Interactive HTML with dark mode
+- **`example/build/generated/api-reference.typ`** - Auto-generated API documentation from Python docstrings
+- **`example/build/generated/test-coverage.typ`** - Test coverage report (30.4% currently)
+- **`example/build/generated/test-results.typ`** - Test results summary
+- **`example/build/diagrams/api-workflow.svg`** - Compiled workflow diagram
+- **`example/build/api-docs.pdf`** (184KB) - Beautiful PDF documentation
+- **`example/build/api-docs.html`** (162KB) - Interactive HTML with dark mode
 
 ## 🚀 Usage
 
@@ -46,7 +46,7 @@ This will:
 make watch-api-docs
 
 # Terminal 2: Watch Typst files and auto-compile
-typst watch example/main-api-docs.typ example/api-docs.html
+typst watch example/main-api-docs.typ example/build/api-docs.html
 
 # Terminal 3: Serve with live reload (VS Code Live Server)
 # Click "Go Live" in VS Code
@@ -89,7 +89,7 @@ The pipeline automatically extracts and documents:
 
 ## 🎨 Features
 
-### PDF Output (`example/api-docs.pdf`)
+### PDF Output (`example/build/api-docs.pdf`)
 - Professional typography with Libertinus Serif font
 - Proper section numbering
 - Table of contents
@@ -97,7 +97,7 @@ The pipeline automatically extracts and documents:
 - Code syntax highlighting
 - 184KB - compact and fast to load
 
-### HTML Output (`example/api-docs.html`)
+### HTML Output (`example/build/api-docs.html`)
 - **Dark mode support** with toggle button (🌓)
 - **Collapsible TOC sidebar** for navigation
 - **System theme detection** (auto mode)
@@ -115,7 +115,7 @@ Python Source Code (src/*.py)
     ↓
 formatter.py - Converts to Typst
     ↓
-generated/api-reference.typ (auto)
+build/generated/api-reference.typ (auto)
     +
 docs/narrative.typ (hand-written)
     ↓
@@ -198,7 +198,7 @@ Edit `example/docs/narrative.typ` - write your own tutorials, guides, examples.
 Edit `example/main-api-docs.typ` to customize fonts, colors, layout.
 
 ### Add More Diagrams
-Create `.typ` files in `example/diagrams/` and include them in the main document.
+Create `.typ` files in `example/diagrams/` and include them in the main document. They will compile to `build/diagrams/`.
 
 ## 📚 What's Missing vs Full Sphinx
 
@@ -228,8 +228,8 @@ Create `.typ` files in `example/diagrams/` and include them in the main document
 ## ✨ Next Steps
 
 1. **View the docs:**
-   - PDF: `example/api-docs.pdf`
-   - HTML: http://localhost:8000/example/api-docs.html
+   - PDF: `example/build/api-docs.pdf`
+   - HTML: http://localhost:8000/example/build/api-docs.html
 
 2. **Improve test coverage:**
    - Add tests for `main.py` CLI functions
