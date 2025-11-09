@@ -27,7 +27,7 @@
 
 /* Override Bootstrap's container for better document layout */
 body {
-  background: linear-gradient(to bottom, var(--bs-body-bg), var(--bs-secondary-bg));
+  background: var(--bs-body-bg);
   min-height: 100vh;
   color: var(--bs-body-color);
 }
