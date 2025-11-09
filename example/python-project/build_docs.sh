@@ -26,29 +26,31 @@ echo ""
 
 # Step 3: Compile V-model diagram
 echo "📊 Step 3/5: Compiling V-model diagram..."
-typst compile --root "$PROJECT_ROOT" docs/diagrams/v-model.typ docs/diagrams/v-model.svg
+mkdir -p build/diagrams
+typst compile --root "$PROJECT_ROOT" docs/diagrams/v-model.typ build/diagrams/v-model.svg
 echo "✓ V-model diagram compiled"
 echo ""
 
 # Step 4: Compile PDF documentation
 echo "📄 Step 4/5: Compiling PDF documentation..."
-typst compile --root "$PROJECT_ROOT" docs/main.typ documentation.pdf
-echo "✓ PDF generated: documentation.pdf"
+mkdir -p build
+typst compile --root "$PROJECT_ROOT" docs/main.typ build/documentation.pdf
+echo "✓ PDF generated: build/documentation.pdf"
 echo ""
 
 # Step 5: Compile HTML documentation
 echo "🌐 Step 5/5: Compiling HTML documentation..."
 # Use the workspace build script for HTML with dark mode
-python3 ../../scripts/build-html.py docs/main.typ documentation.html
-echo "✓ HTML generated: documentation.html"
+python3 ../../scripts/build-html.py docs/main.typ build/documentation.html
+echo "✓ HTML generated: build/documentation.html"
 echo ""
 
 echo "=================================================="
 echo "✅ Build Complete!"
 echo "=================================================="
 echo ""
-echo "📄 PDF:  $PROJECT_ROOT/documentation.pdf"
-echo "🌐 HTML: $PROJECT_ROOT/documentation.html"
+echo "📄 PDF:  $PROJECT_ROOT/build/documentation.pdf"
+echo "🌐 HTML: $PROJECT_ROOT/build/documentation.html"
 echo ""
 echo "💡 Open documentation.pdf to view the complete V-Model documentation"
 echo "🌓 Open documentation.html in a browser for interactive dark mode"

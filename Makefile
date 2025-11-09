@@ -13,9 +13,9 @@ THEME_TOGGLE ?= yes
 
 # Project configurations
 TECH_DOC_SRC = technical-documentation/technical-documentation.typ
-TECH_DOC_OUT = technical-documentation
+TECH_DOC_OUT = technical-documentation/build/technical-documentation
 EXAMPLE_SRC = example/technical-doc-example.typ
-EXAMPLE_OUT = technical-doc-example
+EXAMPLE_OUT = example/build/technical-doc-example
 
 # Default target - builds the technical-documentation project
 all: technical-documentation
@@ -77,12 +77,14 @@ diagrams: colors
 # Internal target: Compile PDF (called with SRC and OUT parameters)
 pdf-only:
 	@echo "📄 Compiling PDF: $(OUT).pdf..."
+	@mkdir -p $$(dirname $(OUT).pdf)
 	@typst compile --root . $(SRC) $(OUT).pdf
 	@echo "✓ PDF created: $(OUT).pdf"
 
 # Internal target: Compile HTML (called with SRC and OUT parameters)
 html-only:
 	@echo "🌐 Compiling HTML: $(OUT).html..."
+	@mkdir -p $$(dirname $(OUT).html)
 ifeq ($(THEME_TOGGLE),yes)
 	@python3 scripts/build-html.py $(SRC) $(OUT).html
 else
@@ -106,6 +108,7 @@ html-bootstrap:
 	@echo "🚀 Building HTML with Bootstrap styling..."
 	@$(MAKE) colors
 	@$(MAKE) diagrams PROJECT=$(PROJECT)
+	@mkdir -p $$(dirname $(TECH_DOC_OUT)-bootstrap.html)
 	@python3 scripts/build-html-bootstrap.py $(TECH_DOC_SRC) $(TECH_DOC_OUT)-bootstrap.html
 	@echo "✓ Bootstrap HTML created: $(TECH_DOC_OUT)-bootstrap.html"
 
@@ -113,6 +116,7 @@ example-bootstrap:
 	@echo "🚀 Building example with Bootstrap styling..."
 	@$(MAKE) colors
 	@$(MAKE) diagrams PROJECT=example
+	@mkdir -p $$(dirname $(EXAMPLE_OUT)-bootstrap.html)
 	@python3 scripts/build-html-bootstrap.py $(EXAMPLE_SRC) $(EXAMPLE_OUT)-bootstrap.html
 	@echo "✓ Bootstrap HTML created: $(EXAMPLE_OUT)-bootstrap.html"
 	@$(MAKE) server-start
@@ -128,10 +132,10 @@ check:
 
 # Internal: Check that build outputs exist
 check-outputs:
-	@test -f technical-documentation.pdf && echo "✓ Technical doc PDF exists" || echo "❌ Technical doc PDF missing"
-	@test -f technical-documentation.html && echo "✓ Technical doc HTML exists" || echo "❌ Technical doc HTML missing"
-	@test -f technical-doc-example.pdf && echo "✓ Example PDF exists" || echo "❌ Example PDF missing"
-	@test -f technical-doc-example.html && echo "✓ Example HTML exists" || echo "❌ Example HTML missing"
+	@test -f technical-documentation/build/technical-documentation.pdf && echo "✓ Technical doc PDF exists" || echo "❌ Technical doc PDF missing"
+	@test -f technical-documentation/build/technical-documentation.html && echo "✓ Technical doc HTML exists" || echo "❌ Technical doc HTML missing"
+	@test -f example/build/technical-doc-example.pdf && echo "✓ Example PDF exists" || echo "❌ Example PDF missing"
+	@test -f example/build/technical-doc-example.html && echo "✓ Example HTML exists" || echo "❌ Example HTML missing"
 	@test -f lib/generated/colors.css && echo "✓ Colors generated" || echo "❌ Colors missing"
 
 # Quick test - compile everything and check outputs exist
@@ -142,13 +146,9 @@ test: technical-documentation example
 
 # Internal: Remove PDF and HTML outputs
 clean-outputs:
-	@rm -f technical-documentation.pdf
-	@rm -f technical-documentation.html
-	@rm -f technical-documentation-bootstrap.html
-	@rm -f technical-doc-example.pdf
-	@rm -f technical-doc-example.html
-	@rm -f technical-doc-example-bootstrap.html
-	@rm -f technical-doc-example-with-classes.html
+	@rm -rf technical-documentation/build/
+	@rm -rf example/build/
+	@rm -rf example/python-project/build/
 	@rm -f *_temp*.html
 
 # Internal: Remove generated files
@@ -156,8 +156,6 @@ clean-generated:
 	@rm -f colors.css
 	@rm -f styles.css
 	@rm -f styles-bootstrap.css
-	@rm -f technical-documentation/diagrams/*.svg
-	@rm -f example/diagrams/*.svg
 	@rm -f lib/generated/colors.css
 	@rm -f lib/generated/colors.typ
 
