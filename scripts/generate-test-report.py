@@ -108,8 +108,8 @@ def generate_test_results_typst():
 def main():
     """Main entry point."""
 
-    output_dir = Path("example/generated")
-    output_dir.mkdir(exist_ok=True)
+    output_dir = Path("example/build/generated")
+    output_dir.mkdir(parents=True, exist_ok=True)
 
     # Run tests
     success = run_tests_with_coverage()

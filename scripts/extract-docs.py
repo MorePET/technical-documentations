@@ -213,8 +213,8 @@ def main():
     """Main entry point."""
 
     # Output directory
-    output_dir = Path("example/generated")
-    output_dir.mkdir(exist_ok=True)
+    output_dir = Path("example/build/generated")
+    output_dir.mkdir(parents=True, exist_ok=True)
 
     print("📖 Extracting API documentation...")
 

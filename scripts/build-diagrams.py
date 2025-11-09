@@ -106,7 +106,14 @@ def remove_white_background(svg_file: Path) -> bool:
 def compile_diagram_theme(typ_file: Path, theme: str) -> bool:
     """Compile a diagram for a specific theme using --input."""
     base_name = typ_file.stem
-    svg_file = typ_file.parent / f"{base_name}-{theme}.svg"
+    # Output to build/diagrams/ directory
+    project_root = Path(__file__).parent.parent
+    # Get relative project path (e.g., "example" or "technical-documentation")
+    relative_to_root = typ_file.parent.relative_to(project_root)
+    project_name = relative_to_root.parts[0]  # First part is project name
+    build_diagrams_dir = project_root / project_name / "build" / "diagrams"
+    build_diagrams_dir.mkdir(parents=True, exist_ok=True)
+    svg_file = build_diagrams_dir / f"{base_name}-{theme}.svg"
 
     print(f"  Compiling {theme} theme → {svg_file.name}...")
     start_time = time.time()
@@ -114,7 +121,6 @@ def compile_diagram_theme(typ_file: Path, theme: str) -> bool:
     try:
         # Compile with Typst, passing theme as input
         # Use --root to allow importing from lib/generated/
-        project_root = Path(__file__).parent.parent
         t0 = time.time()
         subprocess.run(
             [

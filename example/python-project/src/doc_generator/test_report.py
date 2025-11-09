@@ -125,5 +125,5 @@ def generate_test_report(output_dir: Path, project_root: Path) -> None:
 if __name__ == "__main__":
     # Example usage
     project_root = Path(__file__).parent.parent.parent
-    output_dir = project_root / "generated"
+    output_dir = project_root / "build" / "generated"
     generate_test_report(output_dir, project_root)

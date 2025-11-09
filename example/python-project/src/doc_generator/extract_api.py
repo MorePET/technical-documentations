@@ -203,5 +203,5 @@ def generate_api_docs(
 if __name__ == "__main__":
     # Example usage
     project_root = Path(__file__).parent.parent.parent
-    output = project_root / "generated" / "api-reference.typ"
+    output = project_root / "build" / "generated" / "api-reference.typ"
     generate_api_docs(["src.hello", "src.main"], output, project_root)
