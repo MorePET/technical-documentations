@@ -50,7 +50,7 @@
 The following diagram shows how this documentation is generated:
 
 #figure(
-  image("diagrams/api-workflow.svg", width: 100%),
+  image("build/diagrams/api-workflow.svg", width: 100%),
   caption: [Documentation generation workflow]
 )
 
@@ -72,7 +72,7 @@ This workflow ensures API documentation stays in sync with code!
 // AUTO-GENERATED API REFERENCE
 // ============================================
 
-#include "generated/api-reference.typ"
+#include "build/generated/api-reference.typ"
 
 #pagebreak()
 
@@ -80,7 +80,7 @@ This workflow ensures API documentation stays in sync with code!
 // TEST COVERAGE
 // ============================================
 
-#include "generated/test-coverage.typ"
+#include "build/generated/test-coverage.typ"
 
 #pagebreak()
 
@@ -88,4 +88,4 @@ This workflow ensures API documentation stays in sync with code!
 // TEST RESULTS
 // ============================================
 
-#include "generated/test-results.typ"
+#include "build/generated/test-results.typ"

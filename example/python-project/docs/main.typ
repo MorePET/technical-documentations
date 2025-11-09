@@ -81,7 +81,7 @@
 The V-Model is a software development methodology that emphasizes the relationship between each development phase and its corresponding testing phase. This document follows the V-Model structure:
 
 #figure(
-  image("diagrams/v-model.svg", width: 90%),
+  image("../build/diagrams/v-model.svg", width: 90%),
   caption: [V-Model Software Development Lifecycle]
 ) <fig-vmodel>
 
@@ -135,7 +135,7 @@ This ensures documentation stays synchronized with implementation.
 // AUTO-GENERATED API REFERENCE
 // ============================================
 
-#include "../generated/api-reference.typ"
+#include "../build/generated/api-reference.typ"
 
 #pagebreak()
 
@@ -147,7 +147,7 @@ This ensures documentation stays synchronized with implementation.
 
 This section provides detailed test coverage metrics, representing the quality verification at the implementation level.
 
-#include "../generated/test-coverage.typ"
+#include "../build/generated/test-coverage.typ"
 
 #pagebreak()
 
@@ -155,7 +155,7 @@ This section provides detailed test coverage metrics, representing the quality v
 // TEST RESULTS
 // ============================================
 
-#include "../generated/test-results.typ"
+#include "../build/generated/test-results.typ"
 
 #pagebreak()
 
