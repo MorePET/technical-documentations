@@ -4,6 +4,9 @@
 // Import Fletcher for diagram creation
 #import "@preview/fletcher:0.5.8" as fletcher: diagram, edge, node
 
+// Import Cheq for markdown-like checklists
+#import "@preview/cheq:0.3.0": checklist
+
 // Main template function that applies all formatting
 #let tech-doc(
   body,
@@ -11,10 +14,36 @@
   html-css: "styles-bootstrap.css", // Bootstrap custom CSS with dark mode support
   html-inline-css: none, // Or embed CSS directly with read("styles-bootstrap.css")
 ) = {
-  // Set page format
+  // Set page format (commented out for HTML compatibility)
   // set page(
   //   paper: "a4",
   //   margin: (left: 2.5cm, right: 2.5cm, top: 3cm, bottom: 3cm),
+  //   header: context {
+  //     // Skip header on first page and before any content headings (i.e., on TOC pages)
+  //     let page-num = counter(page).get().first()
+  //     if page-num > 1 {
+  //       // Query all headings up to and including current page
+  //       let all-headings = query(heading)
+  //       let headings-before = all-headings.filter(h => {
+  //         counter(page).at(h.location()).first() <= page-num
+  //       })
+  //
+  //       // Filter for only level 1 headings
+  //       let level1-headings = headings-before.filter(h => h.level == 1)
+  //
+  //       // Only show header if we have at least one level 1 heading (past TOC)
+  //       if level1-headings.len() > 0 {
+  //         let current-heading = level1-headings.last().body
+  //         align(left)[
+  //           _Technical Documentation Example: #current-heading _
+  //         ]
+  //         line(length: 100%, stroke: 0.5pt)
+  //       }
+  //     }
+  //   },
+  //   footer: context align(center)[
+  //     #counter(page).display() / #counter(page).final().first()
+  //   ]
   // )
 
   // Set text properties
@@ -223,96 +252,72 @@
   sys.inputs.at("use-svg", default: "false") == "true"
 }
 
-// System Architecture Diagram
-// Shows a typical system architecture with frontend, API gateway, backend, database, and cache
-#let architecture-diagram() = {
-  align(center)[
-    #if should-use-svg() {
-      // For HTML export: use pre-generated SVG
-      image("/example/build/diagrams/architecture.svg")
+// ============================================
+// UNIFIED FIGURE WRAPPER
+// ============================================
+
+// Unified figure wrapper for diagrams
+// Supports both direct inclusion (PDF vector quality) and pre-compiled SVGs (HTML dark mode)
+//
+// Parameters:
+//   - diagram-path: SOURCE path to .typ file (e.g., "diagrams/v-model.typ")
+//   - caption: Figure caption
+//   - label-ref: Label for cross-references
+//   - width: Width of the figure (default 90%)
+//   - mode: Rendering mode:
+//       * "auto" (default): Include directly for PDF, use SVG for HTML
+//       * "include": Always include the .typ file directly (best PDF quality)
+//       * "svg": Always use pre-compiled SVG (consistent across formats)
+#let fig(
+  diagram-path,
+  caption: none,
+  label-ref: none,
+  width: 90%,
+  mode: "auto",
+) = {
+  // Extract diagram name from path (e.g., "diagrams/v-model.typ" -> "v-model")
+  let parts = diagram-path.split("/")
+  let filename = parts.at(parts.len() - 1)
+  let diagram-name = filename.replace(".typ", "")
+
+  // Determine which rendering mode to use
+  let use-svg = if mode == "svg" {
+    true
+  } else if mode == "include" {
+    false
+  } else {
+    // Auto mode: always use SVG for consistent sizing and dark mode support
+    // SVGs are vector format anyway, so no quality loss
+    true
+  }
+
+  // Create the figure content
+  let content = if use-svg {
+    // SVG mode: use pre-compiled SVG
+    // Works for both PDF and HTML, ensures width control works correctly
+    let svg-path = "/example/build/diagrams/" + diagram-name + ".svg"
+    image(svg-path, width: width)
+  } else {
+    // Include mode: directly include .typ file
+    // NOTE: Width control doesn't work in this mode - diagram renders at natural size
+    // Convert relative path to absolute path from workspace root
+    let absolute-path = if diagram-path.starts-with("/") {
+      diagram-path
+    } else if diagram-path.starts-with("../") {
+      // "../diagrams/x.typ" -> "/example/diagrams/x.typ"
+      "/example/" + diagram-path.slice(3)
     } else {
-      // For PDF: render directly with Fletcher
-      diagram(
-        node-stroke: 1pt,
-        node-fill: blue.lighten(80%),
-        spacing: 5em,
-        edge-stroke: 1pt,
-        node-corner-radius: 5pt,
-        label-sep: 5pt,
-
-        node((0, 0), [Frontend]),
-        node((1, 0), [API Gateway]),
-        node((2, 0), [Backend]),
-        node((2, 1), [Database]),
-        node((1, 1), [Cache]),
-
-        edge((0, 0), (1, 0), [HTTPS], "->", label-pos: 0.5),
-        edge((1, 0), (2, 0), [REST], "->", label-pos: 0.5),
-        edge((2, 0), (2, 1), [SQL], "<->", label-pos: 0.5, label-side: right),
-        edge((1, 0), (1, 1), [Redis], "<->", label-pos: 0.5, label-side: right),
-      )
+      // Assume calling document is in example/docs/
+      "/example/docs/" + diagram-path
     }
-  ]
-}
 
-// Data Flow Diagram
-// Visualizes how data moves through a processing pipeline
-#let data-flow-diagram() = {
-  align(center)[
-    #if should-use-svg() {
-      // For HTML export: use pre-generated SVG
-      image("/example/build/diagrams/data-flow.svg")
-    } else {
-      // For PDF: render directly with Fletcher
-      diagram(
-        spacing: (6em, 3.5em),
-        node-stroke: 1pt,
-        edge-stroke: 1pt,
-        node-corner-radius: 5pt,
-        label-sep: 5pt,
+    include absolute-path
+  }
 
-        node((0, 0), [User Input], shape: fletcher.shapes.hexagon, fill: green.lighten(80%)),
-        node((1, 0), [Validation], fill: blue.lighten(80%)),
-        node((2, 0), [Processing], fill: blue.lighten(80%)),
-        node((3, 0), [Storage], shape: fletcher.shapes.pill, fill: orange.lighten(80%)),
-        node((2, 1), [External API], shape: fletcher.shapes.hexagon, fill: purple.lighten(80%)),
-
-        edge((0, 0), (1, 0), [raw data], "->", label-pos: 0.5),
-        edge((1, 0), (2, 0), [validated], "->", label-pos: 0.5),
-        edge((2, 0), (2, 1), [enrich], "<->", label-pos: 0.5, label-side: right),
-        edge((2, 0), (3, 0), [persist], "->", label-pos: 0.5),
-      )
-    }
-  ]
-}
-
-// State Machine Diagram
-// Shows workflow states and transitions (e.g., document approval workflow)
-#let state-diagram() = {
-  align(center)[
-    #if should-use-svg() {
-      // For HTML export: use pre-generated SVG
-      image("/example/build/diagrams/state-machine.svg")
-    } else {
-      // For PDF: render directly with Fletcher
-      diagram(
-        node-stroke: 1pt,
-        node-fill: blue.lighten(90%),
-        spacing: 6em,
-        edge-stroke: 1pt,
-        node-shape: fletcher.shapes.circle,
-        label-sep: 5pt,
-
-        node((0, 0), [Draft]),
-        node((1, 0), [Review]),
-        node((2, 0), [Approved], fill: green.lighten(80%)),
-        node((1, 1), [Rejected], fill: red.lighten(80%)),
-
-        edge((0, 0), (1, 0), [submit], "->", label-pos: 0.5),
-        edge((1, 0), (2, 0), [approve], "->", label-pos: 0.5),
-        edge((1, 0), (1, 1), [reject], "->", label-pos: 0.5, label-side: left),
-        edge((1, 1), (0, 0), [revise], "->", bend: -25deg, label-pos: 0.5, label-side: left),
-      )
-    }
-  ]
+  // Return figure with optional label
+  if label-ref != none {
+    [#figure(content, caption: caption) #label-ref]
+  } else {
+    figure(content, caption: caption)
+  }
 }
