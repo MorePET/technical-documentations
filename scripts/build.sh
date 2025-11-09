@@ -1,13 +1,22 @@
 #!/bin/bash
-# Build script: Export Typst to HTML and apply styling
+# DEPRECATED: This script is deprecated. Use build-html-bootstrap.py instead.
+# Build script: Export Typst to HTML and apply Bootstrap styling
 # Usage: ./build.sh [filename-without-extension]
+#
+# Recommended: Use build-html-bootstrap.py directly:
+#   python3 scripts/build-html-bootstrap.py input.typ output.html
 
 set -e  # Exit on error
+
+echo "⚠️  DEPRECATION WARNING"
+echo "This script (build.sh) is deprecated."
+echo "Use: python3 scripts/build-html-bootstrap.py input.typ output.html"
+echo ""
 
 # Default filename
 FILENAME="${1:-stakeholder-example}"
 
-echo "📝 Building ${FILENAME}..."
+echo "📝 Building ${FILENAME} with Bootstrap styling..."
 
 # Check if Typst file exists
 if [ ! -f "${FILENAME}.typ" ]; then
@@ -15,28 +24,12 @@ if [ ! -f "${FILENAME}.typ" ]; then
     exit 1
 fi
 
-# Compile Typst to HTML
-echo "🔨 Compiling Typst to HTML..."
-# Try with html feature flag first (for newer Typst versions)
-if typst compile --format html "${FILENAME}.typ" 2>&1 | grep -q "features html"; then
-    echo "⚠️  HTML export requires Typst to be compiled with --features html"
-    echo "💡 If you already have an HTML file, we can just style that"
-    if [ -f "${FILENAME}.html" ]; then
-        echo "✓ Found existing ${FILENAME}.html, using that"
-    else
-        echo "❌ No HTML file found. Please export HTML from Typst manually or use a Typst build with HTML support"
-        exit 1
-    fi
-else
-    echo "✓ Typst compilation successful"
-fi
-
-# Add styling
-echo "🎨 Adding CSS styling..."
-if ! python add-styling.py "${FILENAME}.html" --force; then
-    echo "❌ Styling failed"
+# Use the Bootstrap build workflow
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+if ! python3 "${SCRIPT_DIR}/build-html-bootstrap.py" "${FILENAME}.typ" "${FILENAME}.html"; then
+    echo "❌ Build failed"
     exit 1
 fi
 
 echo "✅ Done! Open ${FILENAME}.html in your browser"
-echo "📁 Files: ${FILENAME}.html + styles.css"
+echo "📁 Files: ${FILENAME}.html + styles-bootstrap.css + colors.css"

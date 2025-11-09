@@ -172,6 +172,24 @@ def compile_diagram_both_themes(typ_file: Path) -> bool:
     light_success = compile_diagram_theme(typ_file, "light")
     dark_success = compile_diagram_theme(typ_file, "dark")
 
+    # Create base .svg file (copy of light version) for Typst HTML compilation
+    if light_success:
+        project_root = Path(__file__).parent.parent
+        relative_to_root = typ_file.parent.relative_to(project_root)
+        project_name = relative_to_root.parts[0]
+        build_diagrams_dir = project_root / project_name / "build" / "diagrams"
+        base_name = typ_file.stem
+        light_file = build_diagrams_dir / f"{base_name}-light.svg"
+        base_file = build_diagrams_dir / f"{base_name}.svg"
+
+        try:
+            import shutil
+
+            shutil.copy(light_file, base_file)
+            print(f"    ✓ Created base file {base_file.name}")
+        except Exception as e:
+            print(f"    ⚠ Warning: Could not create base file: {e}")
+
     return light_success and dark_success
 
 

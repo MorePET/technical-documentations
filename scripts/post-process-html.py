@@ -277,11 +277,22 @@ def main():
         print(f"Error: Input file not found: {input_file}")
         sys.exit(1)
 
-    # Diagrams are in example/diagrams/
-    project_root = Path(__file__).parent.parent
-    diagrams_dir = project_root / "example" / "diagrams"
+    # Determine diagrams directory - check build/ first, then fall back to source
+    # If HTML is in build/, diagrams should be in build/diagrams/
+    # Otherwise, look in the project's diagrams/ directory
+    if "build" in input_file.parts:
+        # HTML is in build directory, use build/diagrams/
+        diagrams_dir = input_file.parent / "diagrams"
+        if not diagrams_dir.exists():
+            # Fall back to source diagrams directory
+            diagrams_dir = input_file.parent.parent / "diagrams"
+    else:
+        # HTML is in root, use project/diagrams/
+        diagrams_dir = input_file.parent / "diagrams"
 
     print(f"Processing {input_file}...")
+    print(f"Diagrams directory: {diagrams_dir}")
+    print(f"Diagrams exist: {diagrams_dir.exists()}")
     print("=" * 60)
 
     # Read HTML content

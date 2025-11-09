@@ -2,7 +2,7 @@
 # Builds diagrams, colors, PDF, and HTML with dark mode support
 # Supports multiple projects
 
-.PHONY: all clean colors diagrams pdf html html-bootstrap example-bootstrap help check test example technical-documentation rebuild all-projects install-hook build-project build-summary check-outputs clean-outputs clean-generated server-start server-stop server-status
+.PHONY: all clean colors diagrams pdf html help check test example technical-documentation rebuild install-hook build-project build-summary check-outputs clean-outputs clean-generated server-start server-stop server-status
 
 # Default project
 PROJECT ?= technical-documentation
@@ -57,13 +57,6 @@ example:
 	@$(MAKE) server-start
 	@$(MAKE) build-summary OUT=$(EXAMPLE_OUT)
 
-# Build all projects
-all-projects: technical-documentation example
-	@echo ""
-	@echo "=================================================="
-	@echo "✅ All Projects Built Successfully!"
-	@echo "=================================================="
-
 # Generate color files (CSS and Typst) from colors.json
 colors:
 	@echo "🎨 Generating color files..."
@@ -83,14 +76,14 @@ pdf-only:
 
 # Internal target: Compile HTML (called with SRC and OUT parameters)
 html-only:
-	@echo "🌐 Compiling HTML: $(OUT).html..."
+	@echo "🌐 Compiling HTML with Bootstrap: $(OUT).html..."
 	@mkdir -p $$(dirname $(OUT).html)
 ifeq ($(THEME_TOGGLE),yes)
-	@python3 scripts/build-html.py $(SRC) $(OUT).html
+	@python3 scripts/build-html-bootstrap.py $(SRC) $(OUT).html
 else
-	@python3 scripts/build-html.py $(SRC) $(OUT).html --no-theme-toggle
+	@python3 scripts/build-html-bootstrap.py $(SRC) $(OUT).html --no-theme-toggle
 endif
-	@echo "✓ HTML created: $(OUT).html"
+	@echo "✓ Bootstrap HTML created: $(OUT).html"
 
 # User-friendly targets for building just PDF or HTML
 pdf:
@@ -102,25 +95,6 @@ html:
 	@$(MAKE) colors
 	@$(MAKE) diagrams PROJECT=$(PROJECT)
 	@$(MAKE) html-only SRC=$(TECH_DOC_SRC) OUT=$(TECH_DOC_OUT)
-
-# Bootstrap HTML targets
-html-bootstrap:
-	@echo "🚀 Building HTML with Bootstrap styling..."
-	@$(MAKE) colors
-	@$(MAKE) diagrams PROJECT=$(PROJECT)
-	@mkdir -p $$(dirname $(TECH_DOC_OUT)-bootstrap.html)
-	@python3 scripts/build-html-bootstrap.py $(TECH_DOC_SRC) $(TECH_DOC_OUT)-bootstrap.html
-	@echo "✓ Bootstrap HTML created: $(TECH_DOC_OUT)-bootstrap.html"
-
-example-bootstrap:
-	@echo "🚀 Building example with Bootstrap styling..."
-	@$(MAKE) colors
-	@$(MAKE) diagrams PROJECT=example
-	@mkdir -p $$(dirname $(EXAMPLE_OUT)-bootstrap.html)
-	@python3 scripts/build-html-bootstrap.py $(EXAMPLE_SRC) $(EXAMPLE_OUT)-bootstrap.html
-	@echo "✓ Bootstrap HTML created: $(EXAMPLE_OUT)-bootstrap.html"
-	@$(MAKE) server-start
-	@$(MAKE) build-summary OUT=$(EXAMPLE_OUT)-bootstrap
 
 # Check for errors without building
 check:
@@ -154,7 +128,6 @@ clean-outputs:
 # Internal: Remove generated files
 clean-generated:
 	@rm -f colors.css
-	@rm -f styles.css
 	@rm -f styles-bootstrap.css
 	@rm -f lib/generated/colors.css
 	@rm -f lib/generated/colors.typ
@@ -177,18 +150,15 @@ help:
 	@echo "===================================="
 	@echo ""
 	@echo "Main targets:"
-	@echo "  make                    - Build technical-documentation project (default)"
-	@echo "  make technical-documentation - Build your technical documentation"
-	@echo "  make example            - Build the example/demo project"
-	@echo "  make all-projects       - Build all projects"
+	@echo "  make                    - Build technical-documentation (default)"
+	@echo "  make example            - Build the example project"
+	@echo "  make test               - Build and validate all projects"
 	@echo ""
 	@echo "Component targets:"
 	@echo "  make colors             - Generate color files from colors.json"
 	@echo "  make diagrams PROJECT=xxx - Compile diagrams for specific project"
 	@echo "  make pdf                - Compile PDF for default project"
-	@echo "  make html               - Compile HTML for default project"
-	@echo "  make html-bootstrap     - Compile HTML with Bootstrap styling"
-	@echo "  make example-bootstrap  - Compile example with Bootstrap styling"
+	@echo "  make html               - Compile HTML (Bootstrap styling)"
 	@echo ""
 	@echo "Configuration:"
 	@echo "  THEME_TOGGLE=yes|no     - Include theme toggle button (default: yes)"

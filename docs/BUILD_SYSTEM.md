@@ -59,9 +59,12 @@ diagrams/*.svg        │                     │
     ↓                 ↓                     ↓
 technical-doc-example.typ ──────────────────┤
     ↓                                       ↓
-[typst compile]              [build-html.py + add-styling.py]
-    ↓                                       ↓
-technical-doc-example.pdf   technical-doc-example.html
+[typst compile]         [build-html-bootstrap.py workflow]
+    ↓                   ├─ post-process-html.py
+technical-doc-example.pdf ├─ add-bootstrap-classes.py
+                        └─ add-styling-bootstrap.py
+                                            ↓
+                        technical-doc-example.html
 ```
 
 ## Pre-Commit Hook
@@ -123,9 +126,11 @@ git commit -m "Update architecture diagram"
 |--------|---------|
 | `build-colors.py` | Generates CSS and Typst files from colors.json |
 | `build-diagrams.py` | Compiles .typ diagrams to SVG, post-processes for dark mode |
-| `build-html.py` | Orchestrates HTML build: compile → post-process → style |
-| `post-process-html.py` | Injects SVGs and inlines colors.css |
-| `add-styling.py` | Adds theme toggle, TOC sidebar, and general styling |
+| `build-html-bootstrap.py` | Orchestrates Bootstrap HTML build workflow |
+| `post-process-html.py` | Injects SVG diagrams into HTML |
+| `add-bootstrap-classes.py` | Applies Bootstrap classes to HTML elements |
+| `add-styling-bootstrap.py` | Adds Bootstrap CDN, theme toggle, and TOC sidebar |
+| `build-html.py` | DEPRECATED: Now redirects to build-html-bootstrap.py |
 
 ### Build Orchestration
 
@@ -177,6 +182,7 @@ Edit these files to modify diagram content.
 - `generated/colors.typ` - Typst color definitions
 - `diagrams/*.svg` - Diagram SVGs with dark mode support
 - `colors.css` - Copy of colors.css for HTML
+- `styles-bootstrap.css` - Copy of Bootstrap custom styles for HTML
 
 ## Cleaning Up
 
@@ -361,27 +367,37 @@ make all V=1
 ```text
 /workspace/
 ├── Makefile                          # GNU Make build system
-├── build-all.sh                      # Shell script builder
-├── build-hooks/
-│   └── pre-commit                    # Git pre-commit hook
-├── build-colors.py                   # Color generator
-├── build-diagrams.py                 # Diagram compiler
-├── build-html.py                     # HTML orchestrator
-├── post-process-html.py              # SVG injector
-├── add-styling.py                    # Style enhancer
-├── colors.json                       # Master color config
-├── diagrams/
-│   ├── architecture.typ              # Diagram sources
-│   ├── data-flow.typ
-│   ├── state-machine.typ
-│   ├── *.svg                         # Generated SVGs
-├── generated/
-│   ├── colors.css                    # Generated colors
-│   └── colors.typ
-├── technical-doc-example.typ         # Main document
-├── technical-documentation-package.typ # Package
-├── technical-doc-example.pdf         # Output: PDF
-└── technical-doc-example.html        # Output: HTML
+├── scripts/
+│   ├── build-all.sh                  # Shell script builder
+│   ├── build-hooks/
+│   │   └── pre-commit                # Git pre-commit hook
+│   ├── build-colors.py               # Color generator
+│   ├── build-diagrams.py             # Diagram compiler
+│   ├── build-html-bootstrap.py       # Bootstrap HTML orchestrator
+│   ├── build-html.py                 # DEPRECATED: Redirects to Bootstrap
+│   ├── post-process-html.py          # SVG injector
+│   ├── add-bootstrap-classes.py      # Bootstrap class applicator
+│   └── add-styling-bootstrap.py      # Bootstrap style enhancer
+├── lib/
+│   ├── colors.json                   # Master color config
+│   ├── styles-bootstrap.css          # Bootstrap custom styles
+│   ├── generated/
+│   │   ├── colors.css                # Generated colors
+│   │   └── colors.typ
+│   └── technical-documentation-package.typ # Package
+├── example/
+│   ├── diagrams/                     # Diagram sources
+│   │   ├── architecture.typ
+│   │   ├── data-flow.typ
+│   │   └── state-machine.typ
+│   ├── build/                        # Generated outputs
+│   │   ├── diagrams/*.svg            # Generated SVGs
+│   │   ├── technical-doc-example.pdf # Output: PDF
+│   │   └── technical-doc-example.html # Output: HTML (Bootstrap)
+│   └── technical-doc-example.typ     # Main document
+└── technical-documentation/
+    ├── build/                        # Generated outputs
+    └── technical-documentation.typ   # Main document
 ```
 
 ## Support

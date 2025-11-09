@@ -7,9 +7,9 @@
 // Main template function that applies all formatting
 #let tech-doc(
   body,
-  // HTML export options
-  html-css: "styles.css", // CSS file with automatic dark mode support
-  html-inline-css: none, // Or embed CSS directly with read("styles.css")
+  // HTML export options (Bootstrap-based)
+  html-css: "styles-bootstrap.css", // Bootstrap custom CSS with dark mode support
+  html-inline-css: none, // Or embed CSS directly with read("styles-bootstrap.css")
 ) = {
   // Set page format
   // set page(
@@ -37,8 +37,8 @@
     block(above: 1.4em, below: 1em, it)
   }
 
-  // Note: HTML styling must be added after export using Python script:
-  // python add-styling.py your-file.html --force
+  // Note: HTML styling must be added after export using Bootstrap build script:
+  // python3 scripts/build-html-bootstrap.py your-file.typ your-file.html
   //
   // Your Typst build does not include the HTML module, so direct html.elem()
   // calls will cause errors. Use the post-processing approach instead.
@@ -229,7 +229,7 @@
   align(center)[
     #if should-use-svg() {
       // For HTML export: use pre-generated SVG
-      image("/example/diagrams/architecture.svg")
+      image("/example/build/diagrams/architecture.svg")
     } else {
       // For PDF: render directly with Fletcher
       diagram(
@@ -261,7 +261,7 @@
   align(center)[
     #if should-use-svg() {
       // For HTML export: use pre-generated SVG
-      image("/example/diagrams/data-flow.svg")
+      image("/example/build/diagrams/data-flow.svg")
     } else {
       // For PDF: render directly with Fletcher
       diagram(
@@ -292,7 +292,7 @@
   align(center)[
     #if should-use-svg() {
       // For HTML export: use pre-generated SVG
-      image("/example/diagrams/state-machine.svg")
+      image("/example/build/diagrams/state-machine.svg")
     } else {
       // For PDF: render directly with Fletcher
       diagram(

@@ -95,7 +95,7 @@ HTML output automatically supports dark mode:
 ## Tips
 
 1. **Colors**: Edit `lib/colors.json` to change the color palette for all projects
-2. **Styles**: Edit `lib/styles.css` for HTML styling
+2. **Styles**: Edit `lib/styles-bootstrap.css` for HTML styling (Bootstrap-based)
 3. **Package**: Edit `lib/technical-documentation-package.typ` to add new functions
 4. **Multiple Projects**: Create new folders at the workspace root and use `./scripts/build-all.sh <folder-name>`
 
