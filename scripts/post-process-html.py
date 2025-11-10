@@ -67,37 +67,43 @@ def inject_dual_theme_svg(diagrams_dir: Path, base_name: str) -> str:
 def inject_svgs_into_html(html_content: str, diagrams_dir: Path) -> str:
     """Inject dual-theme SVG content into HTML where diagrams should appear."""
 
-    # Find all img tags with diagram SVG sources
+    # Find all img tags with diagram SVG sources (file paths)
     img_pattern = r'<img[^>]*src="([^"]*diagrams/([^/"]+)\.svg)"[^>]*>'
 
     def replace_img_with_dual_svg(match):
         base_name = match.group(2)
-
         return inject_dual_theme_svg(diagrams_dir, base_name)
 
     html_content = re.sub(img_pattern, replace_img_with_dual_svg, html_content)
 
-    # Fallback: inject SVGs based on known section headers
-    # This handles the case where Typst HTML export doesn't create img tags
+    # Also handle data URI images (base64 encoded SVGs from Typst HTML export)
+    # Pattern matches figure elements with captions containing known diagram names
     diagram_mappings = {
-        "System Architecture Diagram": "architecture",
-        "Data Flow Diagram": "data-flow",
-        "State Machine Diagram": "state-machine",
-        "V-Model Overview": "v-model",
+        "V-Model Software Development Lifecycle": "v-model",
+        "System Architecture": "architecture",
+        "Data Flow Through System": "data-flow",
+        "Workflow State Machine": "state-machine",
+        "Documentation Build Pipeline": "build-pipeline",
     }
 
-    for header_text, base_name in diagram_mappings.items():
-        # Find the paragraph after the header containing this text
-        # Support both h2 and h3 headers
-        pattern = rf"(<h[23]>[^<]*{re.escape(header_text)}[^<]*</h[23]>\s*</div>\s*<p>[^<]*</p>)"
+    # Replace figure elements that contain data URI SVG images
+    for caption_text, base_name in diagram_mappings.items():
+        # Pattern: <figure>...<img src="data:image/svg+xml...>...<figcaption>Figure X: Caption</figcaption></figure>
+        # We want to replace the img tag with dual-theme SVG while keeping the figure wrapper
+        # The caption may include "Figure X: " prefix with regular or non-breaking space
+        # Use \s* to match any whitespace including non-breaking spaces
+        pattern = rf"(<figure[^>]*>).*?(<figcaption[^>]*>Figure[\s\xa0]+\d+:[\s\xa0]+{re.escape(caption_text)}.*?</figcaption>\s*</figure>)"
 
-        def inject_after_paragraph(match, base_name=base_name, header_text=header_text):
+        def replace_figure_img(match, base_name=base_name):
             svg_html = inject_dual_theme_svg(diagrams_dir, base_name)
             if svg_html:
-                return match.group(1) + "\n    " + svg_html
-            return match.group(1)
+                # Return figure opening tag + SVG + figcaption + figure closing tag
+                return match.group(1) + "\n    " + svg_html + "\n    " + match.group(2)
+            return match.group(0)  # Return original if SVG not found
 
-        html_content = re.sub(pattern, inject_after_paragraph, html_content)
+        html_content = re.sub(
+            pattern, replace_figure_img, html_content, flags=re.DOTALL
+        )
 
     return html_content
 
