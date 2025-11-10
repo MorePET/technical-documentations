@@ -2,7 +2,7 @@
 # Builds diagrams, colors, PDF, and HTML with dark mode support
 # Supports multiple projects
 
-.PHONY: all clean colors diagrams pdf html help check test example technical-documentation rebuild all-projects install-hook build-project build-summary check-outputs clean-outputs clean-generated server-start server-stop server-status
+.PHONY: all clean colors diagrams pdf html help check test example technical-documentation rebuild install-hook build-project build-summary check-outputs clean-outputs clean-generated server-start server-stop server-status
 
 # Default project
 PROJECT ?= technical-documentation
@@ -12,10 +12,10 @@ PROJECT ?= technical-documentation
 THEME_TOGGLE ?= yes
 
 # Project configurations
-TECH_DOC_SRC = technical-documentation/technical-documentation.typ
-TECH_DOC_OUT = technical-documentation
-EXAMPLE_SRC = example/technical-doc-example.typ
-EXAMPLE_OUT = technical-doc-example
+TECH_DOC_SRC = docs/main.typ
+TECH_DOC_OUT = build/technical-documentation
+EXAMPLE_SRC = example/docs/main.typ
+EXAMPLE_OUT = example/build/example-documentation
 
 # Default target - builds the technical-documentation project
 all: technical-documentation
@@ -48,26 +48,45 @@ technical-documentation:
 	@$(MAKE) build-summary OUT=$(TECH_DOC_OUT)
 	@echo "🌓 Toggle dark mode with the button in top-right"
 
-# Build example project (the original demo)
+# Build example project (depends on python-project artifacts)
 example:
 	@echo "=================================================="
 	@echo "🎨 Building Example Project"
 	@echo "=================================================="
+	@$(MAKE) python-api
+	@$(MAKE) python-tests
+	@$(MAKE) python-diagrams
 	@$(MAKE) build-project SRC=$(EXAMPLE_SRC) OUT=$(EXAMPLE_OUT) PROJECT=example
 	@$(MAKE) server-start
 	@$(MAKE) build-summary OUT=$(EXAMPLE_OUT)
-
-# Build all projects
-all-projects: technical-documentation example
-	@echo ""
-	@echo "=================================================="
-	@echo "✅ All Projects Built Successfully!"
-	@echo "=================================================="
 
 # Generate color files (CSS and Typst) from colors.json
 colors:
 	@echo "🎨 Generating color files..."
 	@python3 scripts/build-colors.py
+
+# Build python-project API documentation
+python-api:
+	@echo "📚 Generating Python API documentation..."
+	@cd example/python-project && python3 -m src.doc_generator.extract_api
+
+# Build python-project test reports
+python-tests:
+	@echo "🧪 Generating Python test reports..."
+	@cd example/python-project && python3 -m src.doc_generator.test_report
+
+# Build python-project diagrams (including v-model and build-pipeline)
+# Note: These diagrams are in example/docs/diagrams but need theme-aware compilation
+python-diagrams:
+	@echo "📊 Compiling additional diagrams..."
+	@mkdir -p example/build/diagrams
+	@typst compile --root . --input theme=light --format svg example/docs/diagrams/v-model.typ example/build/diagrams/v-model-light.svg
+	@typst compile --root . --input theme=dark --format svg example/docs/diagrams/v-model.typ example/build/diagrams/v-model-dark.svg
+	@cp example/build/diagrams/v-model-light.svg example/build/diagrams/v-model.svg
+	@typst compile --root . --input theme=light --format svg example/docs/diagrams/build-pipeline.typ example/build/diagrams/build-pipeline-light.svg
+	@typst compile --root . --input theme=dark --format svg example/docs/diagrams/build-pipeline.typ example/build/diagrams/build-pipeline-dark.svg
+	@cp example/build/diagrams/build-pipeline-light.svg example/build/diagrams/build-pipeline.svg
+	@echo "✓ Additional diagrams created"
 
 # Compile diagrams to SVG (with project parameter)
 diagrams: colors
@@ -77,18 +96,20 @@ diagrams: colors
 # Internal target: Compile PDF (called with SRC and OUT parameters)
 pdf-only:
 	@echo "📄 Compiling PDF: $(OUT).pdf..."
+	@mkdir -p $$(dirname $(OUT).pdf)
 	@typst compile --root . $(SRC) $(OUT).pdf
 	@echo "✓ PDF created: $(OUT).pdf"
 
 # Internal target: Compile HTML (called with SRC and OUT parameters)
 html-only:
-	@echo "🌐 Compiling HTML: $(OUT).html..."
+	@echo "🌐 Compiling HTML with Bootstrap: $(OUT).html..."
+	@mkdir -p $$(dirname $(OUT).html)
 ifeq ($(THEME_TOGGLE),yes)
-	@python3 scripts/build-html.py $(SRC) $(OUT).html
+	@python3 scripts/build-html-bootstrap.py $(SRC) $(OUT).html
 else
-	@python3 scripts/build-html.py $(SRC) $(OUT).html --no-theme-toggle
+	@python3 scripts/build-html-bootstrap.py $(SRC) $(OUT).html --no-theme-toggle
 endif
-	@echo "✓ HTML created: $(OUT).html"
+	@echo "✓ Bootstrap HTML created: $(OUT).html"
 
 # User-friendly targets for building just PDF or HTML
 pdf:
@@ -111,10 +132,10 @@ check:
 
 # Internal: Check that build outputs exist
 check-outputs:
-	@test -f technical-documentation.pdf && echo "✓ Technical doc PDF exists" || echo "❌ Technical doc PDF missing"
-	@test -f technical-documentation.html && echo "✓ Technical doc HTML exists" || echo "❌ Technical doc HTML missing"
-	@test -f technical-doc-example.pdf && echo "✓ Example PDF exists" || echo "❌ Example PDF missing"
-	@test -f technical-doc-example.html && echo "✓ Example HTML exists" || echo "❌ Example HTML missing"
+	@test -f technical-documentation/build/technical-documentation.pdf && echo "✓ Technical doc PDF exists" || echo "❌ Technical doc PDF missing"
+	@test -f technical-documentation/build/technical-documentation.html && echo "✓ Technical doc HTML exists" || echo "❌ Technical doc HTML missing"
+	@test -f example/build/example-documentation.pdf && echo "✓ Example PDF exists" || echo "❌ Example PDF missing"
+	@test -f example/build/example-documentation.html && echo "✓ Example HTML exists" || echo "❌ Example HTML missing"
 	@test -f lib/generated/colors.css && echo "✓ Colors generated" || echo "❌ Colors missing"
 
 # Quick test - compile everything and check outputs exist
@@ -125,18 +146,15 @@ test: technical-documentation example
 
 # Internal: Remove PDF and HTML outputs
 clean-outputs:
-	@rm -f technical-documentation.pdf
-	@rm -f technical-documentation.html
-	@rm -f technical-doc-example.pdf
-	@rm -f technical-doc-example.html
-	@rm -f technical-doc-example_temp.html
+	@rm -rf technical-documentation/build/
+	@rm -rf example/build/
+	@rm -rf example/python-project/build/
+	@rm -f *_temp*.html
 
 # Internal: Remove generated files
 clean-generated:
 	@rm -f colors.css
-	@rm -f styles.css
-	@rm -f technical-documentation/diagrams/*.svg
-	@rm -f example/diagrams/*.svg
+	@rm -f styles-bootstrap.css
 	@rm -f lib/generated/colors.css
 	@rm -f lib/generated/colors.typ
 
@@ -158,16 +176,15 @@ help:
 	@echo "===================================="
 	@echo ""
 	@echo "Main targets:"
-	@echo "  make                    - Build technical-documentation project (default)"
-	@echo "  make technical-documentation - Build your technical documentation"
-	@echo "  make example            - Build the example/demo project"
-	@echo "  make all-projects       - Build all projects"
+	@echo "  make                    - Build technical-documentation (default)"
+	@echo "  make example            - Build the example project"
+	@echo "  make test               - Build and validate all projects"
 	@echo ""
 	@echo "Component targets:"
 	@echo "  make colors             - Generate color files from colors.json"
 	@echo "  make diagrams PROJECT=xxx - Compile diagrams for specific project"
 	@echo "  make pdf                - Compile PDF for default project"
-	@echo "  make html               - Compile HTML for default project"
+	@echo "  make html               - Compile HTML (Bootstrap styling)"
 	@echo ""
 	@echo "Configuration:"
 	@echo "  THEME_TOGGLE=yes|no     - Include theme toggle button (default: yes)"

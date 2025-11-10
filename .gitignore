@@ -19,7 +19,7 @@ dist/
 downloads/
 eggs/
 .eggs/
-lib/
+lib/generated/
 lib64/
 parts/
 sdist/
@@ -50,6 +50,7 @@ htmlcov/
 .cache
 nosetests.xml
 coverage.xml
+coverage.json
 *.cover
 *.py.cover
 .hypothesis/
@@ -222,3 +223,15 @@ __marimo__/
 
 # Pre-commit cache
 .pre-commit-cache/
+
+# ===== Technical Documentation Build System =====
+# Build outputs are ignored via build/ pattern above (line 16)
+# Intermediate generated files ignored via lib/generated/ above (line 22)
+
+# Server process ID
+.server.pid
+.github_data/
+
+# Large documentation attachments (regulatory docs, reference materials)
+# These should be stored externally (e.g., Git LFS, cloud storage, or documentation server)
+docs/attachments/

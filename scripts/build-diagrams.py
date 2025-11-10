@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 """
-Build script for compiling diagrams to SVG format.
+Build script for compiling diagrams to SVG format with dual theme support.
 
 This script:
 1. Compiles all .typ files in the diagrams/ folder to SVG
-2. Post-processes SVGs to use CSS variables for dark mode support
-3. Removes white backgrounds and injects CSS imports
+2. Generates both light and dark theme versions (-light.svg and -dark.svg)
+3. Uses native Typst colors from colors.json (no post-processing needed)
 
 Usage:
     python build-diagrams.py [project]
@@ -19,106 +19,186 @@ import json
 import re
 import subprocess
 import sys
+import time
+from concurrent.futures import ProcessPoolExecutor, as_completed
 from pathlib import Path
 
 
-def load_color_mappings(colors_file: Path) -> dict:
-    """Load color configuration and create RGB to CSS variable mappings."""
+def load_colors(colors_file: Path) -> dict:
+    """Load color configuration from colors.json."""
     if not colors_file.exists():
-        print(f"Warning: {colors_file} not found, skipping color mapping")
-        return {}
+        print(f"Warning: {colors_file} not found")
+        return {"colors": {}}
 
     with colors_file.open() as f:
-        config = json.load(f)
-
-    mappings = {}
-    for name, color_config in config["colors"].items():
-        light_color = color_config["light"].lower()
-        if light_color != "transparent":
-            mappings[light_color] = f"var(--color-{name})"
-
-    return mappings
+        return json.load(f)
 
 
-def post_process_svg(svg_file: Path, color_mappings: dict) -> bool:
-    """Post-process SVG to use CSS variables and remove white background."""
+def generate_color_definitions(colors: dict, theme: str) -> str:
+    """Generate Typst color definitions for a specific theme."""
+    lines = [
+        f"// Auto-generated {theme} theme colors",
+        "",
+    ]
+
+    for name, config in colors["colors"].items():
+        color_value = config[theme]
+        # Convert kebab-case to snake_case and add _color suffix to avoid conflicts
+        typst_name = name.replace("-", "_")
+
+        # Add _color suffix for common names that might conflict with Typst functions
+        if typst_name in ["text", "stroke", "background", "link", "label"]:
+            typst_name = typst_name + "_color"
+
+        if color_value.lower() == "transparent":
+            typst_value = "none"
+        else:
+            typst_value = f'rgb("{color_value}")'
+
+        lines.append(f"#let {typst_name} = {typst_value}")
+
+    return "\n".join(lines)
+
+
+def inject_colors_into_diagram(typ_content: str, color_definitions: str) -> str:
+    """Inject color definitions into diagram .typ file."""
+    # Find where to inject (after imports, before page settings)
+    # Look for the fletcher import line
+    import_pattern = r"(#import\s+[^\n]+\n)"
+
+    match = re.search(import_pattern, typ_content)
+    if match:
+        # Insert after the last import
+        insert_pos = match.end()
+        return (
+            typ_content[:insert_pos]
+            + "\n"
+            + color_definitions
+            + "\n"
+            + typ_content[insert_pos:]
+        )
+    else:
+        # No imports found, insert at the beginning
+        return color_definitions + "\n\n" + typ_content
+
+
+def remove_white_background(svg_file: Path) -> bool:
+    """Remove white background from SVG."""
     try:
         content = svg_file.read_text()
-        original_content = content
 
         # Remove white page backgrounds
         # Replace fill="#ffffff" or fill="#FFFFFF" in <path> tags (page background)
-        content = re.sub(
+        new_content = re.sub(
             r'<path[^>]*fill="#[fF]{6}"[^>]*fill-rule="nonzero"[^>]*>', "", content
         )
 
-        # Replace hard-coded colors with CSS variables
-        for hex_color, css_var in color_mappings.items():
-            # Handle both lowercase and uppercase hex
-            patterns = [
-                (hex_color, css_var),
-                (hex_color.upper(), css_var),
-            ]
+        if new_content != content:
+            svg_file.write_text(new_content)
+            return True
 
-            for color, var in patterns:
-                # Replace fill="color"
-                content = content.replace(f'fill="{color}"', f'fill="{var}"')
-                # Replace stroke="color"
-                content = content.replace(f'stroke="{color}"', f'stroke="{var}"')
-
-        # Note: CSS is not embedded in SVGs anymore - it's inlined in the HTML head
-        # This allows data-theme attribute to properly affect the SVG variables
-        # SVG elements use var(--color-*) which inherit from the parent document
-
-        # Only write if content changed
-        if content != original_content:
-            svg_file.write_text(content)
-            print(f"  ✓ Post-processed {svg_file.name}")
-
-        return True
-
+        return False
     except Exception as e:
-        print(f"  ✗ Error post-processing {svg_file.name}: {e}")
+        print(f"  ⚠ Warning: Could not remove background from {svg_file.name}: {e}")
         return False
 
 
-def compile_diagram(typ_file: Path, color_mappings: dict) -> bool:
-    """Compile a single diagram file to SVG and post-process it."""
-    svg_file = typ_file.with_suffix(".svg")
+def compile_diagram_theme(typ_file: Path, theme: str) -> bool:
+    """Compile a diagram for a specific theme using --input."""
+    base_name = typ_file.stem
+    # Output to build/diagrams/ directory
+    project_root = Path(__file__).parent.parent
+    # Get relative project path (e.g., "example" or "technical-documentation")
+    relative_to_root = typ_file.parent.relative_to(project_root)
+    project_name = relative_to_root.parts[0]  # First part is project name
+    build_diagrams_dir = project_root / project_name / "build" / "diagrams"
+    build_diagrams_dir.mkdir(parents=True, exist_ok=True)
+    svg_file = build_diagrams_dir / f"{base_name}-{theme}.svg"
 
-    print(f"Compiling {typ_file.name} → {svg_file.name}...")
+    print(f"  Compiling {theme} theme → {svg_file.name}...")
+    start_time = time.time()
 
     try:
-        result = subprocess.run(
-            ["typst", "compile", str(typ_file), str(svg_file)],
+        # Compile with Typst, passing theme as input
+        # Use --root to allow importing from lib/generated/
+        t0 = time.time()
+        subprocess.run(
+            [
+                "typst",
+                "compile",
+                "--root",
+                str(project_root),
+                "--input",
+                f"theme={theme}",
+                str(typ_file),
+                str(svg_file),
+            ],
             capture_output=True,
             text=True,
             check=True,
         )
+        compile_time = time.time() - t0
 
-        if result.stdout:
-            print(f"  Output: {result.stdout.strip()}")
+        # Remove white background
+        t0 = time.time()
+        remove_white_background(svg_file)
+        bg_remove_time = time.time() - t0
 
-        print(f"  ✓ Successfully created {svg_file.name}")
+        total_time = time.time() - start_time
 
-        # Post-process the SVG
-        post_process_svg(svg_file, color_mappings)
-
+        print(f"    ✓ Successfully created {svg_file.name} ({total_time * 1000:.1f}ms)")
+        print(
+            f"      [typst: {compile_time * 1000:.1f}ms | bg-remove: {bg_remove_time * 1000:.1f}ms]"
+        )
         return True
 
     except subprocess.CalledProcessError as e:
-        print(f"  ✗ Error compiling {typ_file.name}:")
-        print(f"    {e.stderr}")
+        print(f"    ✗ Error compiling {theme} theme:")
+        print(f"      {e.stderr}")
         return False
     except FileNotFoundError:
-        print("  ✗ Error: 'typst' command not found. Please install Typst.")
+        print("    ✗ Error: 'typst' command not found. Please install Typst.")
         return False
+    except Exception as e:
+        print(f"    ✗ Unexpected error: {e}")
+        return False
+
+
+def compile_diagram_both_themes(typ_file: Path) -> bool:
+    """Compile a diagram for both light and dark themes."""
+    print(f"Compiling {typ_file.name}...")
+
+    # Compile both themes (theme is passed via --input to typst)
+    light_success = compile_diagram_theme(typ_file, "light")
+    dark_success = compile_diagram_theme(typ_file, "dark")
+
+    # Create base .svg file (copy of light version) for Typst HTML compilation
+    if light_success:
+        project_root = Path(__file__).parent.parent
+        relative_to_root = typ_file.parent.relative_to(project_root)
+        project_name = relative_to_root.parts[0]
+        build_diagrams_dir = project_root / project_name / "build" / "diagrams"
+        base_name = typ_file.stem
+        light_file = build_diagrams_dir / f"{base_name}-light.svg"
+        base_file = build_diagrams_dir / f"{base_name}.svg"
+
+        try:
+            import shutil
+
+            shutil.copy(light_file, base_file)
+            print(f"    ✓ Created base file {base_file.name}")
+        except Exception as e:
+            print(f"    ⚠ Warning: Could not create base file: {e}")
+
+    return light_success and dark_success
 
 
 def main():
-    """Compile all diagram files to SVG and post-process them."""
+    """Compile all diagram files to SVG with dual theme support."""
     # Parse command-line arguments
-    parser = argparse.ArgumentParser(description="Compile diagrams to SVG")
+    parser = argparse.ArgumentParser(
+        description="Compile diagrams to SVG (light + dark themes)"
+    )
     parser.add_argument(
         "project",
         nargs="?",
@@ -133,6 +213,7 @@ def main():
     colors_file = project_root / "lib" / "colors.json"
 
     print(f"Building diagrams for project: {args.project}")
+    print("=" * 60)
 
     if not project_dir.exists():
         print(f"Error: project directory not found at {project_dir}")
@@ -143,10 +224,10 @@ def main():
         print("Creating empty diagrams directory...")
         diagrams_dir.mkdir(parents=True, exist_ok=True)
 
-    # Load color mappings
-    print("Loading color mappings...")
-    color_mappings = load_color_mappings(colors_file)
-    print(f"Loaded {len(color_mappings)} color mapping(s)\n")
+    # Load colors configuration
+    print("Loading color configuration from colors.json...")
+    colors = load_colors(colors_file)
+    print(f"Loaded {len(colors['colors'])} color definition(s)\n")
 
     # Find all .typ files in the diagrams directory
     typ_files = sorted(diagrams_dir.glob("*.typ"))
@@ -156,21 +237,50 @@ def main():
         print("Nothing to compile.")
         return 0
 
-    print(f"Found {len(typ_files)} diagram(s) to compile\n")
+    print(f"Found {len(typ_files)} diagram(s) to compile")
 
-    # Compile each diagram
+    # Compile diagrams in parallel for faster build times
+    overall_start = time.time()
     success_count = 0
-    for typ_file in typ_files:
-        if compile_diagram(typ_file, color_mappings):
-            success_count += 1
-        print()  # Empty line between files
+
+    # Use ProcessPoolExecutor for true parallelism (not limited by GIL)
+    max_workers = min(len(typ_files), 8)  # Use up to 8 workers
+    print(f"⚡ Using parallel compilation with {max_workers} worker(s)\n")
+
+    with ProcessPoolExecutor(max_workers=max_workers) as executor:
+        # Submit all compilation tasks
+        future_to_file = {
+            executor.submit(compile_diagram_both_themes, typ_file): typ_file
+            for typ_file in typ_files
+        }
+
+        # Process results as they complete
+        for future in as_completed(future_to_file):
+            typ_file = future_to_file[future]
+            try:
+                if future.result():
+                    success_count += 1
+                print()  # Empty line between files
+            except Exception as e:
+                print(f"✗ Error compiling {typ_file.name}: {e}")
+                print()
+
+    overall_time = time.time() - overall_start
 
     # Summary
-    print("=" * 50)
+    print("=" * 60)
     print(f"Compilation complete: {success_count}/{len(typ_files)} successful")
+    print(f"Generated {success_count * 2} SVG files (light + dark themes)")
+    print(f"Total time: {overall_time:.3f}s ({overall_time * 1000:.1f}ms)")
+    print(
+        f"Average per diagram: {(overall_time / len(typ_files)):.3f}s ({(overall_time / len(typ_files)) * 1000:.1f}ms)"
+    )
 
     if success_count == len(typ_files):
-        print("\n✓ All diagrams compiled and post-processed successfully!")
+        print("\n✓ All diagrams compiled successfully!")
+        print("\nNext steps:")
+        print("  - Use post-process-html.py to inject SVGs into HTML")
+        print("  - Both light and dark theme SVGs are now available")
         return 0
     else:
         print(f"\n✗ {len(typ_files) - success_count} diagram(s) failed to compile")

@@ -4,6 +4,10 @@
       "enabled": true,
       "line_length": 210
     },
+    "md024": {
+      "enabled": true,
+      "allow_different_nesting": true
+    },
     "md036": {
       "enabled": false
     }

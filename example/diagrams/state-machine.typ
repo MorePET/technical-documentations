@@ -1,20 +1,21 @@
 #import "@preview/fletcher:0.5.8" as fletcher: diagram, edge, node
-#set page(width: auto, height: auto, margin: 5mm, fill: none)
-#set text(font: "Libertinus Serif", size: 10pt)
+#import "/lib/generated/colors.typ": text-c, stroke-c, background-c, node-bg-blue-light, node-bg-green, node-bg-red
+
+// State Machine Diagram
+#set page(width: auto, height: auto, margin: 5mm)
+#set text(font: "Libertinus Serif", size: 10pt, fill: text-c)
 
 #align(center)[
   #diagram(
-    node-stroke: 1pt,
-    node-fill: blue.lighten(90%),
-    spacing: 6em,
-    edge-stroke: 1pt,
-    node-shape: fletcher.shapes.circle,
-    label-sep: 5pt,
+    node-stroke: (paint: stroke-c, thickness: 1pt),
+    edge-stroke: (paint: stroke-c, thickness: 1pt),
+    spacing: 5em,
+    node-corner-radius: 5pt,
 
-    node((0, 0), [Draft]),
-    node((1, 0), [Review]),
-    node((2, 0), [Approved], fill: green.lighten(80%)),
-    node((1, 1), [Rejected], fill: red.lighten(80%)),
+    node((0, 0), [Draft], fill: node-bg-blue-light),
+    node((1, 0), [Review], fill: node-bg-blue-light),
+    node((2, 0), [Approved], fill: node-bg-green),
+    node((1, 1), [Rejected], fill: node-bg-red),
 
     edge((0, 0), (1, 0), [submit], "->", label-pos: 0.5),
     edge((1, 0), (2, 0), [approve], "->", label-pos: 0.5),

@@ -82,9 +82,9 @@ if [ "$REBUILD_DOCS" = true ]; then
     git add technical-doc-example.pdf
     echo -e "${GREEN}  ✓ PDF updated${NC}"
 
-    echo -e "${YELLOW}  → Recompiling HTML...${NC}"
-    python3 scripts/build-html.py example/technical-doc-example.typ technical-doc-example.html > /dev/null 2>&1
-    git add technical-doc-example.html colors.css styles.css
+    echo -e "${YELLOW}  → Recompiling HTML with Bootstrap...${NC}"
+    python3 scripts/build-html-bootstrap.py example/technical-doc-example.typ example/build/technical-doc-example.html > /dev/null 2>&1
+    git add example/build/technical-doc-example.html example/build/colors.css example/build/styles-bootstrap.css
     echo -e "${GREEN}  ✓ HTML updated${NC}"
 fi
 

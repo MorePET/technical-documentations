@@ -1,0 +1,385 @@
+/* Bootstrap-enhanced styling for Typst HTML exports */
+/* This file provides custom styling on top of Bootstrap 5 */
+/* Bootstrap CSS should be loaded before this file */
+
+/* Custom color palette (overrides Bootstrap defaults for better readability) */
+:root, [data-bs-theme="light"] {
+  --bs-body-bg: #ffffff;
+  --bs-body-color: #1f2937;
+  --bs-secondary-bg: #f9fafb;
+  --bs-tertiary-bg: #f3f4f6;
+  --bs-primary: #2563eb;
+  --bs-primary-dark: #1d4ed8;
+  --bs-border-color: #e5e7eb;
+  --bs-text-muted: #6b7280;
+}
+
+[data-bs-theme="dark"] {
+  --bs-body-bg: #0f172a;
+  --bs-body-color: #e2e8f0;
+  --bs-secondary-bg: #1e293b;
+  --bs-tertiary-bg: #334155;
+  --bs-primary: #3b82f6;
+  --bs-primary-dark: #2563eb;
+  --bs-border-color: #334155;
+  --bs-text-muted: #94a3b8;
+}
+
+/* Override Bootstrap's container for better document layout */
+body {
+  background: var(--bs-body-bg);
+  min-height: 100vh;
+  color: var(--bs-body-color);
+}
+
+.container {
+  max-width: 1400px;
+}
+
+/* Typography enhancements beyond Bootstrap defaults */
+h2 {
+  margin-top: 3rem;
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 3px solid var(--bs-primary);
+  font-weight: 700;
+}
+
+h3 {
+  margin-top: 2.5rem;
+  margin-bottom: 1rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+h3::before {
+  content: '';
+  width: 4px;
+  height: 1.5rem;
+  background: var(--bs-primary);
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+/* Enhanced table styling - matching custom design */
+.table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  margin: 2rem 0;
+  background: var(--bs-secondary-bg);
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+  border: 1px solid var(--bs-border-color);
+}
+
+[data-bs-theme="dark"] .table {
+  box-shadow: 0 10px 15px rgba(0, 0, 0, 0.5);
+}
+
+/* Table header styling - first row with solid blue background for cells */
+.table thead tr:first-child,
+.table tbody tr:first-child {
+  background: transparent;
+  color: white;
+  position: relative;
+  border-bottom: none !important;
+}
+
+/* Header cells (except first column) get solid blue */
+.table thead tr:first-child th:not(:first-child),
+.table thead tr:first-child td:not(:first-child),
+.table tbody tr:first-child td:not(:first-child) {
+  background: #2563eb;
+  color: white;
+}
+
+[data-bs-theme="dark"] .table thead tr:first-child th:not(:first-child),
+[data-bs-theme="dark"] .table thead tr:first-child td:not(:first-child),
+[data-bs-theme="dark"] .table tbody tr:first-child td:not(:first-child) {
+  background: #3b82f6;
+}
+
+/* Decorative gradient line under header */
+.table thead tr:first-child::after,
+.table tbody tr:first-child::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #2563eb, transparent);
+}
+
+[data-bs-theme="dark"] .table thead tr:first-child::after,
+[data-bs-theme="dark"] .table tbody tr:first-child::after {
+  background: linear-gradient(90deg, transparent, #3b82f6, transparent);
+}
+
+/* Header cells */
+.table thead tr:first-child th,
+.table thead tr:first-child td,
+.table tbody tr:first-child td {
+  font-weight: 700;
+  font-size: 0.95rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 1.25rem 1rem;
+  border: none;
+  color: white !important;
+}
+
+.table thead tr:first-child th strong,
+.table tbody tr:first-child td strong {
+  font-weight: 700;
+}
+
+/* Regular table cells */
+.table td {
+  padding: 1.25rem 1rem;
+  vertical-align: top;
+  border-bottom: 1px solid var(--bs-border-color);
+}
+
+/* First column styling - stakeholder names */
+.table td:first-child,
+.table th:first-child {
+  background: var(--bs-tertiary-bg);
+  font-weight: 600;
+  color: var(--bs-body-color);
+  width: 15%;
+  min-width: 150px;
+  border-right: 1px solid var(--bs-border-color);
+}
+
+/* Header row first column keeps the tertiary bg (not blue gradient) */
+.table thead tr:first-child th:first-child,
+.table tbody tr:first-child td:first-child {
+  background: var(--bs-tertiary-bg) !important;
+  color: var(--bs-body-color) !important;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-right: 1px solid var(--bs-border-color);
+}
+
+/* Column widths */
+.table td:nth-child(2) {
+  width: 28%;
+}
+
+.table td:nth-child(3) {
+  width: 28%;
+}
+
+.table td:nth-child(4) {
+  width: 29%;
+}
+
+/* Disable Bootstrap's default table-hover effect on header row */
+.table-hover thead tr:first-child:hover,
+.table-hover tbody tr:first-child:hover {
+  --bs-table-accent-bg: transparent !important;
+  --bs-table-hover-bg: transparent !important;
+  --bs-table-bg: transparent !important;
+}
+
+.table-hover thead tr:first-child:hover > *,
+.table-hover tbody tr:first-child:hover > * {
+  --bs-table-accent-bg: transparent !important;
+}
+
+/* Header row hover effect - ONLY first cell changes to match other cells */
+.table thead tr:first-child:hover th:first-child,
+.table thead tr:first-child:hover td:first-child,
+.table tbody tr:first-child:hover td:first-child {
+  background: #2563eb !important;
+  color: white !important;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+[data-bs-theme="dark"] .table thead tr:first-child:hover th:first-child,
+[data-bs-theme="dark"] .table thead tr:first-child:hover td:first-child,
+[data-bs-theme="dark"] .table tbody tr:first-child:hover td:first-child {
+  background: #3b82f6 !important;
+}
+
+/* Ensure other header cells stay the same during row hover */
+.table thead tr:first-child:hover th:not(:first-child),
+.table thead tr:first-child:hover td:not(:first-child),
+.table tbody tr:first-child:hover td:not(:first-child) {
+  background: #2563eb !important;
+  color: white !important;
+}
+
+[data-bs-theme="dark"] .table thead tr:first-child:hover th:not(:first-child),
+[data-bs-theme="dark"] .table thead tr:first-child:hover td:not(:first-child),
+[data-bs-theme="dark"] .table tbody tr:first-child:hover td:not(:first-child) {
+  background: #3b82f6 !important;
+}
+
+/* Row hover effect */
+.table tbody tr:not(:first-child):hover {
+  background: rgba(37, 99, 235, 0.05);
+  transition: background 0.2s ease;
+}
+
+[data-bs-theme="dark"] .table tbody tr:not(:first-child):hover {
+  background: rgba(59, 130, 246, 0.1);
+}
+
+.table tbody tr:not(:first-child):hover td:first-child {
+  background: rgba(37, 99, 235, 0.1);
+}
+
+[data-bs-theme="dark"] .table tbody tr:not(:first-child):hover td:first-child {
+  background: rgba(59, 130, 246, 0.15);
+}
+
+/* Remove bottom border from last row */
+.table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* Lists inside table cells */
+.table td ul {
+  margin: 0;
+  padding-left: 1.25rem;
+  list-style-type: none;
+}
+
+.table td li {
+  position: relative;
+  padding-left: 0.5rem;
+  margin: 0.5rem 0;
+  line-height: 1.5;
+}
+
+.table td li::before {
+  content: '→';
+  position: absolute;
+  left: -1rem;
+  color: var(--bs-primary);
+  font-size: 0.85rem;
+}
+
+/* Strong text in cells (excluding first row) */
+.table tbody tr:not(:first-child) td strong {
+  color: var(--bs-body-color);
+}
+
+/* Diagram container styling */
+.diagram-container {
+  text-align: center;
+  padding: 1rem 0;
+  margin: 2rem 0;
+}
+
+/* Diagram theme switching - show/hide based on theme */
+.diagram-light,
+.diagram-dark {
+  display: none;
+}
+
+/* Show light diagram in light mode */
+[data-bs-theme="light"] .diagram-light {
+  display: block !important;
+}
+
+/* Show dark diagram in dark mode */
+[data-bs-theme="dark"] .diagram-dark {
+  display: block !important;
+}
+
+/* Default: show light theme when no theme attribute is set */
+html:not([data-bs-theme]) .diagram-light {
+  display: block;
+}
+
+/* System preference dark mode - when no explicit theme is set */
+@media (prefers-color-scheme: dark) {
+  html:not([data-bs-theme]) .diagram-light {
+    display: none;
+  }
+
+  html:not([data-bs-theme]) .diagram-dark {
+    display: block;
+  }
+}
+
+/* Diagram SVG styling - no background or shadows */
+.diagram-container svg {
+  max-width: 100%;
+  height: auto;
+  box-shadow: none !important;
+  background: transparent !important;
+  border-radius: 0 !important;
+}
+
+/* Content lists (not in tables) */
+body > div > ul {
+  background: var(--bs-secondary-bg);
+  border-left: 4px solid var(--bs-primary);
+  border-radius: var(--bs-border-radius);
+  padding: 1.5rem 1.5rem 1.5rem 2.5rem;
+  margin: 1.5rem 0;
+  box-shadow: var(--bs-box-shadow-sm);
+}
+
+[data-bs-theme="dark"] body > div > ul {
+  box-shadow: var(--bs-box-shadow);
+}
+
+/* Responsive design - mobile tables */
+@media (max-width: 768px) {
+  /* Make tables scrollable on mobile instead of stacking */
+  .table-responsive {
+    display: block;
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Keep table structure intact on mobile */
+  .table {
+    min-width: 600px; /* Prevent too narrow tables */
+  }
+
+  /* Slightly smaller text on mobile for better fit */
+  .table {
+    font-size: 0.875rem;
+  }
+
+  .table th,
+  .table td {
+    padding: 0.75rem 0.5rem;
+  }
+}
+
+/* Print styles */
+@media print {
+  body {
+    background: white !important;
+  }
+
+  .table {
+    box-shadow: none !important;
+    page-break-inside: avoid;
+  }
+
+  h2, h3 {
+    page-break-after: avoid;
+  }
+
+  /* Hide interactive elements */
+  .theme-toggle,
+  .toc-sidebar,
+  .toc-mobile-toggle,
+  .toc-expand-btn {
+    display: none !important;
+  }
+}
