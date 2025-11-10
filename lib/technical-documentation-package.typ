@@ -7,6 +7,9 @@
 // Import Cheq for markdown-like checklists
 #import "@preview/cheq:0.3.0": checklist
 
+// Import and re-export notations for isotopes and radiopharmaceuticals
+#import "notations.typ": *
+
 // Main template function that applies all formatting
 #let tech-doc(
   body,
