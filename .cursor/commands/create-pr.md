@@ -19,153 +19,265 @@ For complete documentation on pull request guidelines, templates, and review pro
 
 When creating a pull request, follow these steps:
 
-### 0. Intelligent Version Bump Analysis (Automatic)
+### 0. Intelligent Version Bump Analysis (AI-Powered)
 
-**The command automatically analyzes changes and suggests version bumps:**
+**The AI analyzes your changes and intelligently suggests version bumps:**
+
+#### Step 1: Gather Information
 
 ```bash
-# 1. Get current version
+# Get current version
 CURRENT_VERSION=$(make version | grep -oP '\d+\.\d+\.\d+')
 
-# 2. Get latest tag
+# Get latest tag
 LATEST_TAG=$(git tag -l | grep -E '^[0-9]+\.[0-9]+\.[0-9]+$' | sort -V | tail -1)
 
-# 3. Analyze commits in branch
+# Get base branch
 BASE_BRANCH=$(git symbolic-ref refs/remotes/origin/HEAD | sed 's@^refs/remotes/origin/@@')
+
+# Get commits in this branch
 COMMITS=$(git log --oneline origin/$BASE_BRANCH..HEAD)
 
-# 4. Determine bump type based on Semantic Versioning
-HAS_BREAKING=false
-HAS_FEAT=false
-HAS_FIX=false
+# Get full diff
+DIFF=$(git diff origin/$BASE_BRANCH...HEAD)
 
-# Check for breaking changes
-if echo "$COMMITS" | grep -qE "BREAKING CHANGE|!:"; then
-  HAS_BREAKING=true
-fi
+# Get files changed
+FILES_CHANGED=$(git diff --name-only origin/$BASE_BRANCH...HEAD)
+```
 
-# Check for features
-if echo "$COMMITS" | grep -qE "^[a-f0-9]+ feat"; then
-  HAS_FEAT=true
-fi
+#### Step 2: AI Analysis (Intelligent)
 
-# Check for fixes
-if echo "$COMMITS" | grep -qE "^[a-f0-9]+ fix"; then
-  HAS_FIX=true
-fi
+**The AI examines:**
 
-# Suggest bump type (Semantic Versioning)
-if [ "$HAS_BREAKING" = "true" ]; then
-  SUGGESTED_BUMP="major"
-  EXPLANATION="Breaking changes detected (MAJOR bump required)"
-elif [ "$HAS_FEAT" = "true" ]; then
-  SUGGESTED_BUMP="minor"
-  EXPLANATION="New features detected (MINOR bump recommended)"
-elif [ "$HAS_FIX" = "true" ]; then
-  SUGGESTED_BUMP="patch"
-  EXPLANATION="Bug fixes only (PATCH bump recommended)"
-else
-  SUGGESTED_BUMP="patch"
-  EXPLANATION="Other changes (PATCH bump default)"
-fi
+1. **Commit Messages** (mechanical check):
+   - Breaking changes: `BREAKING CHANGE` or `!:` in commits
+   - Features: `feat:` commits
+   - Fixes: `fix:` commits
 
-# Calculate suggested version
-IFS='.' read -r -a PARTS <<< "$CURRENT_VERSION"
-case "$SUGGESTED_BUMP" in
-  major)
-    SUGGESTED_VERSION="$((PARTS[0] + 1)).0.0"
-    ;;
-  minor)
-    SUGGESTED_VERSION="${PARTS[0]}.$((PARTS[1] + 1)).0"
-    ;;
-  patch)
-    SUGGESTED_VERSION="${PARTS[0]}.${PARTS[1]}.$((PARTS[2] + 1))"
-    ;;
-esac
+2. **Code Changes** (intelligent analysis):
+   - API signature changes (breaking)
+   - New public functions/classes (feature)
+   - Internal refactoring (patch)
+   - Documentation only (no bump needed)
+   - Configuration changes
+   - Test additions
 
-# Present to user
-echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-echo "📊 Version Bump Analysis"
-echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-echo ""
-echo "Current version: $CURRENT_VERSION"
-echo "Latest tag: $LATEST_TAG"
-echo ""
-echo "Analysis:"
-BREAKING_STATUS=$([ "$HAS_BREAKING" = "true" ] && echo "✓ Found" || echo "✗ None")
-echo "  Breaking changes: $BREAKING_STATUS"
-echo "  New features: $([ "$HAS_FEAT" = "true" ] && echo "✓ Found" || echo "✗ None")"
-echo "  Bug fixes: $([ "$HAS_FIX" = "true" ] && echo "✓ Found" || echo "✗ None")"
-echo ""
-echo "📈 Suggested: $SUGGESTED_BUMP bump"
-echo "   $CURRENT_VERSION → $SUGGESTED_VERSION"
-echo ""
-echo "Explanation: $EXPLANATION"
-echo ""
-echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-echo ""
-echo "Apply version bump?"
-echo "  1) patch - $CURRENT_VERSION → ${PARTS[0]}.${PARTS[1]}.$((PARTS[2] + 1))"
-echo "  2) minor - $CURRENT_VERSION → ${PARTS[0]}.$((PARTS[1] + 1)).0"
-echo "  3) major - $CURRENT_VERSION → $((PARTS[0] + 1)).0.0"
-echo "  4) skip - No version bump"
-echo ""
-read -p "Choice [1-4, default=$SUGGESTED_BUMP]: " CHOICE
+3. **File Impact** (scope analysis):
+   - Core library changes vs. examples
+   - Public API vs. internal implementation
+   - Documentation vs. code
 
+**AI presents analysis:**
+
+```text
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🤖 AI Version Bump Analysis
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Current version: 0.3.3
+Latest tag: 0.3.3
+
+📊 Mechanical Analysis (Commit Messages):
+  Breaking changes: ✗ None
+  New features (feat:): ✓ Found (2 commits)
+  Bug fixes (fix:): ✗ None
+
+🧠 AI Analysis (Code Changes):
+  - Added new public commands: /tag-and-release
+  - Enhanced existing command: /create-pr
+  - New documentation: VERSION_MANAGEMENT.md
+  - No API breaking changes
+  - All changes backward compatible
+
+📁 Impact:
+  - Files changed: 4
+  - Core changes: ✓ (new workflow commands)
+  - Public API: ✓ (new user-facing features)
+  - Breaking changes: ✗
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📈 Recommendation: MINOR bump (0.3.3 → 0.4.0)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Rationale:
+- New user-facing features added (workflow commands)
+- Backward compatible (no breaking changes)
+- More than just bug fixes
+- Follows Semantic Versioning: MINOR for new features
+
+Semantic Versioning Rules:
+  MAJOR (X.0.0) - Breaking changes (incompatible API)
+  MINOR (0.X.0) - New features (backward compatible) ← Suggested
+  PATCH (0.0.X) - Bug fixes only
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Apply version bump?
+  1) patch  - 0.3.3 → 0.3.4 (bug fixes only)
+  2) minor  - 0.3.3 → 0.4.0 (new features) ← AI Recommendation
+  3) major  - 0.3.3 → 1.0.0 (breaking changes)
+  4) skip   - No version bump
+
+Choice [1-4, default=2]:
+```
+
+#### Step 3: Apply Version Bump
+
+```bash
+# User selects or accepts AI recommendation
 case "$CHOICE" in
   1|patch)
-    echo "Bumping patch version..."
-    make bump-patch
+    BUMP_TYPE="patch"
     ;;
-  2|minor)
-    echo "Bumping minor version..."
-    make bump-minor
+  2|minor|"")  # Default to AI suggestion
+    BUMP_TYPE="minor"
     ;;
   3|major)
-    echo "Bumping major version..."
-    make bump-major
+    BUMP_TYPE="major"
     ;;
-  4|skip|"")
+  4|skip)
     echo "Skipping version bump"
-    ;;
-  *)
-    echo "Applying suggested: $SUGGESTED_BUMP"
-    make bump-$SUGGESTED_BUMP
+    BUMP_TYPE=""
     ;;
 esac
 
-# Prompt to update CHANGELOG
-if [ "$CHOICE" != "skip" ] && [ "$CHOICE" != "4" ]; then
-  NEW_VERSION=$(make version | grep -oP '\d+\.\d+\.\d+')
-  echo ""
-  echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-  echo "📝 CHANGELOG Update Required"
-  echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-  echo ""
-  echo "Version bumped to: $NEW_VERSION"
-  echo ""
-  echo "Please update CHANGELOG.md with actual changes:"
-  echo "  1. Open CHANGELOG.md"
-  echo "  2. Find: ## [$NEW_VERSION] - $(date +%Y-%m-%d)"
-  echo "  3. Replace placeholder with actual changes"
-  echo "  4. Use categories: Added, Changed, Fixed, etc."
-  echo ""
-  read -p "Press Enter when CHANGELOG is updated..."
+if [ -n "$BUMP_TYPE" ]; then
+  echo "Applying $BUMP_TYPE bump..."
+  make bump-$BUMP_TYPE
+fi
+```
 
-  # Commit version bump
+#### Step 4: AI-Generated CHANGELOG Update
+
+**AI automatically generates CHANGELOG entry based on analysis:**
+
+```bash
+if [ -n "$BUMP_TYPE" ]; then
+  NEW_VERSION=$(make version | grep -oP '\d+\.\d+\.\d+')
+
+  echo ""
+  echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+  echo "📝 Generating CHANGELOG Entry"
+  echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+  echo ""
+  echo "AI is analyzing changes and generating CHANGELOG entry..."
+  echo ""
+
+  # AI analyzes the diff and generates appropriate CHANGELOG entry
+  # Based on:
+  # - Files changed
+  # - Code changes (new features, fixes, refactoring)
+  # - Commit messages
+  # - Scope of changes
+
+  # AI generates entry following Keep a Changelog format
+  # Categories used based on actual changes:
+  # - Added: New features, new files, new capabilities
+  # - Changed: Modifications to existing functionality
+  # - Deprecated: Features marked for removal
+  # - Removed: Deleted features
+  # - Fixed: Bug fixes
+  # - Security: Security-related changes
+
+  # Example AI-generated entry:
+  # ## [0.4.0] - 2025-11-10
+  #
+  # ### Added
+  #
+  # - **Automated Release Workflow**
+  #   - New `/tag-and-release` command for complete release automation
+  #   - Validates CHANGELOG format and version continuity
+  #   - Creates git tags and GitHub releases
+  #
+  # ### Changed
+  #
+  # - **PR Creation Workflow**
+  #   - Enhanced `/create-pr` with AI-powered version bump analysis
+  #   - Automatic CHANGELOG generation
+
+  echo "Generated CHANGELOG entry for version $NEW_VERSION"
+  echo ""
+  echo "Preview of generated entry:"
+  echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+
+  # Show generated entry to user
+  sed -n "/^## \[$NEW_VERSION\]/,/^## \[/p" CHANGELOG.md | head -n -1
+
+  echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+  echo ""
+  echo "✨ AI has generated the CHANGELOG entry based on your changes"
+  echo "📝 You can refine it in the PR if needed"
+  echo ""
+  read -p "Press Enter to commit version bump and CHANGELOG..."
+
+  # Commit version bump with AI-generated CHANGELOG
   echo ""
   echo "Committing version bump..."
   git add pyproject.toml CHANGELOG.md
   git commit -m "chore(release): bump version to $NEW_VERSION
 
-Updated version and CHANGELOG for upcoming release."
+AI-generated CHANGELOG entry based on branch changes.
+Version bump: $CURRENT_VERSION → $NEW_VERSION ($BUMP_TYPE)
+
+Can be refined during PR review."
+
+  echo "✅ Version bumped and CHANGELOG updated"
 fi
 ```
 
-**Semantic Versioning Summary:**
-- **MAJOR (X.0.0)**: Breaking changes (incompatible API changes)
-- **MINOR (0.X.0)**: New features (backward compatible)
-- **PATCH (0.0.X)**: Bug fixes (backward compatible)
+**How AI Analyzes Changes:**
+
+1. **Commit Message Analysis** (baseline):
+   - Scans for `BREAKING CHANGE`, `feat:`, `fix:`, etc.
+   - Identifies conventional commit types
+
+2. **Code Diff Analysis** (intelligent):
+   - Examines actual code changes
+   - Identifies new public APIs (functions, classes, commands)
+   - Detects signature changes (breaking)
+   - Recognizes refactoring vs. new features
+   - Distinguishes user-facing vs. internal changes
+
+3. **File Impact Analysis**:
+   - New files added (often features)
+   - Modified files (fixes or enhancements)
+   - Documentation-only changes
+   - Test additions
+
+4. **Contextual Understanding**:
+   - Relates changes to project structure
+   - Understands user-facing impact
+   - Considers backward compatibility
+
+**AI CHANGELOG Generation:**
+
+The AI automatically generates appropriate CHANGELOG entries:
+
+- **Categorizes changes** into Added/Changed/Fixed/etc.
+- **Summarizes features** from code analysis
+- **Groups related changes** logically
+- **Uses clear, user-focused language**
+- **Follows Keep a Changelog format** exactly
+
+**You can refine in PR** - Everything gets reviewed anyway!
+
+**Semantic Versioning AI Logic:**
+
+```text
+IF breaking changes detected (API changes, removed features):
+  → MAJOR bump (X.0.0)
+
+ELSE IF new features added (new public APIs, new commands, new capabilities):
+  → MINOR bump (0.X.0)
+
+ELSE IF only fixes, refactoring, or docs:
+  → PATCH bump (0.0.X)
+
+SPECIAL CASES:
+- Documentation only → Skip bump
+- Internal refactoring only → PATCH bump
+- New internal tools (not user-facing) → PATCH or MINOR
+```
 
 **Reference:** [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 
