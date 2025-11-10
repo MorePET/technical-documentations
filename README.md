@@ -70,7 +70,7 @@ podman machine list
 Once inside the devcontainer:
 
 ```bash
-# Build the default project
+# Build the default project (docs/)
 make
 
 # Or build the example project
@@ -81,8 +81,8 @@ make example
 
 Open your browser to <http://localhost:8000> to see:
 
-- PDF version: `technical-documentation.pdf`
-- HTML version: `technical-documentation.html`
+- PDF version: `build/technical-documentation.pdf`
+- HTML version: `build/technical-documentation.html`
 
 That's it! The build system handles everything automatically.
 
@@ -171,18 +171,23 @@ make diagrams PROJECT=example
 
 ```text
 workspace/
-├── technical-documentation/       # Default project
-│   ├── technical-documentation.typ    # Main document
-│   ├── diagrams/                      # Diagram source files
-│   └── build/                         # Build outputs
-│       ├── diagrams/                  # Compiled diagram SVGs
-│       ├── technical-documentation.pdf
-│       └── technical-documentation.html
+├── docs/                          # Default project
+│   ├── main.typ                       # Main document
+│   └── diagrams/                      # Diagram source files
+│
+├── build/                         # Build outputs (default project)
+│   ├── diagrams/                      # Compiled diagram SVGs
+│   ├── technical-documentation.pdf
+│   └── technical-documentation.html
 │
 ├── example/                       # Example project
-│   ├── technical-documentation.typ
-│   ├── diagrams/
-│   └── build/
+│   ├── docs/
+│   │   ├── main.typ
+│   │   └── diagrams/
+│   └── build/                         # Example build outputs
+│       ├── diagrams/
+│       ├── technical-documentation.pdf
+│       └── technical-documentation.html
 │
 ├── lib/                          # Shared library
 │   ├── technical-documentation-package.typ  # Typst functions
@@ -201,7 +206,7 @@ workspace/
 
 ### 1. Create Your Document
 
-Edit `technical-documentation/technical-documentation.typ`:
+Edit `docs/main.typ`:
 
 ```typst
 #import "../lib/technical-documentation-package.typ": *
@@ -219,7 +224,7 @@ Your content here...
 
 ### 2. Add Diagrams
 
-Create diagrams in `technical-documentation/diagrams/`:
+Create diagrams in `docs/diagrams/`:
 
 ```typst
 // diagrams/architecture.typ
@@ -388,7 +393,7 @@ make example
 
 ## Tips
 
-1. **Multiple Projects**: Create new folders at workspace root, each with their own `technical-documentation.typ` and `diagrams/` folder
+1. **Multiple Projects**: Create new folders at workspace root, each with `docs/main.typ` and `docs/diagrams/` subdirectories
 2. **Live Reload**: Use `live-server` for best development experience with auto-reload
 3. **Diagram Organization**: Group related diagrams in subdirectories under `diagrams/`
 4. **Color Consistency**: Use generated color variables from `lib/generated/colors.typ` in diagrams
