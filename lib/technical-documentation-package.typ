@@ -69,6 +69,27 @@
     block(above: 1.4em, below: 1em, it)
   }
 
+  // Configure math equations for isotope notation
+  // - PDF: Use proper math font for best typography
+  // - HTML: Use system fonts to match Bootstrap's default font stack
+  // - Box inline equations to keep them inline in paragraphs
+  set math.equation(numbering: none)
+  show math.equation: it => context {
+    let is-html = sys.inputs.at("html-export", default: "false") == "true"
+
+    if is-html {
+      // HTML export: match Bootstrap's system font stack (sans-serif)
+      // Bootstrap 5.3.2 uses: system-ui, -apple-system, "Segoe UI", Roboto, etc.
+      set text(font: ("system-ui", "Arial", "sans-serif"))
+      // Wrap inline equations in box so they don't interrupt paragraphs
+      show: if it.block { it => it } else { box }
+      html.frame(it)
+    } else {
+      // PDF export: use default math font for proper math typography
+      it
+    }
+  }
+
   // Note: HTML styling must be added after export using Bootstrap build script:
   // python3 scripts/build-html-bootstrap.py your-file.typ your-file.html
   //

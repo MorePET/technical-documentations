@@ -181,10 +181,48 @@ The composable design allows maximum flexibility:
 
 ## Technical Notes
 
-- All isotope notations use proper mathematical superscripts/subscripts
+### HTML Export with `html.frame`
+
+The notation system uses the `physica` package for all isotope notation and enables HTML export via a show rule:
+
+**How it works:**
+- All isotopes use the `physica` package's `isotope()` function
+- A show rule in `technical-documentation-package.typ` wraps math equations in `html.frame` for HTML export
+- Inline equations are wrapped in `box` to keep them inline within paragraphs
+- **PDF export:** Uses proper math font for beautiful typography
+- **HTML export:** Uses system fonts (system-ui, Arial) in SVGs to match Bootstrap's body text
+
+**Implementation:**
+
+```typst
+show math.equation: it => context {
+  let is-html = sys.inputs.at("html-export", default: "false") == "true"
+
+  if is-html {
+    // HTML: use Bootstrap's system font stack
+    set text(font: ("system-ui", "Arial", "sans-serif"))
+    show: if it.block { it => it } else { box }
+    html.frame(it)
+  } else {
+    // PDF: use proper math font
+    it
+  }
+}
+```
+
+**Benefits:**
+- Single source of truth: `physica` package everywhere
+- Clean, simple implementation (no Unicode mapping needed)
+- Perfect math typography in PDF, system fonts in HTML
+- Inline isotopes stay inline in paragraphs
+- Font automatically matches Bootstrap body text (system-ui stack)
+
+### Implementation Details
+
 - Hyphens in tracer names are escaped to prevent interpretation as subtraction
-- The system is fully compatible with both PDF and HTML export
-- Based on the `physica` package's `isotope()` function
+- Supports full range of mass numbers (0-9) and special characters (m for metastable states)
+- The build script (`build-html-bootstrap.py`) automatically sets the `html-export=true` flag
+- Show rule detects export mode via `sys.inputs.at("html-export", default: "false")`
 
 ## Design Principles (DRY & SOLID)
 

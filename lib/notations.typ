@@ -1,5 +1,7 @@
 // Nuclear and radiopharmaceutical notation package
-// Using physica package for proper isotope notation
+// Uses physica package with html.frame for HTML export compatibility
+//
+// Note: HTML export is enabled via show rule in technical-documentation-package.typ
 
 #import "@preview/physica:0.9.4": isotope
 
@@ -8,6 +10,9 @@
 // ========================================
 // A = mass number (superscript)
 // Z = atomic number (subscript, optional)
+//
+// Uses physica package for both PDF and HTML
+// HTML export enabled via html.frame show rule above
 #let nuclide(element, A: none, Z: none) = {
   if Z != none {
     isotope(element, a: str(A), z: str(Z))
