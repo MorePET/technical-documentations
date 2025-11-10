@@ -24,59 +24,95 @@ declare -a ERROR_MESSAGES
 declare -a WARNING_MESSAGES
 declare -a SETUP_INSTRUCTIONS
 
+# Helper function: Check container runtime authentication
+# Single Responsibility: Each function does one thing
+check_container_auth() {
+	local runtime="$1"
+	local auth_file="$2"
+	local display_name="$3"
+
+	if ! grep -q "ghcr.io" "$auth_file" 2>/dev/null; then
+		echo "   ⚠️  $display_name not authenticated to ghcr.io"
+		WARNING_MESSAGES+=("$display_name not authenticated to ghcr.io")
+		return 1
+	fi
+
+	echo "   ✅ $display_name authenticated to ghcr.io"
+	return 0
+}
+
+# Generate setup instructions for a runtime
+# Single Responsibility: Only generates instructions
+generate_ghcr_instructions() {
+	local runtime="$1"
+	local login_cmd="$2"
+	local pull_cmd="$3"
+
+	SETUP_INSTRUCTIONS+=("$(cat <<-EOF
+		GHCR Authentication ($runtime):
+		  1. Create GitHub Personal Access Token:
+		     https://github.com/settings/tokens/new
+		     - Name: "GHCR Dev Container Access"
+		     - Scope: read:packages ✅
+		  2. Login to GHCR:
+		     $login_cmd
+		  3. Verify:
+		     $pull_cmd
+	EOF
+	)")
+}
+
 # 1. Check GHCR Authentication
 echo "🔍 [1/5] Checking GitHub Container Registry (GHCR) authentication..."
-echo "in the following explanation docker or podman are interchangeable"
+echo "   In the following explanation, docker or podman are interchangeable"
+
+# Track if at least one runtime is available
+DOCKER_AVAILABLE=false
+PODMAN_AVAILABLE=false
+
+# Check Docker (independently)
 if command -v docker >/dev/null 2>&1; then
+	echo "   Checking for Docker authentication..."
+	DOCKER_AVAILABLE=true
+
 	if docker info >/dev/null 2>&1; then
-		# Try to check docker auth for ghcr.io
-		if grep -q "ghcr.io" "$HOME/.docker/config.json" 2>/dev/null; then
-			echo "   ✅ Docker authenticated to ghcr.io"
-		else
-			echo "   ⚠️  Docker not authenticated to ghcr.io"
-			WARNING_MESSAGES+=("Docker not authenticated to ghcr.io")
-			SETUP_INSTRUCTIONS+=("$(cat <<-'EOF'
-				GHCR Authentication (Docker):
-				  1. Create GitHub Personal Access Token:
-				     https://github.com/settings/tokens/new
-				     - Name: "GHCR Dev Container Access"
-				     - Scope: read:packages ✅
-				  2. Login to GHCR:
-				     echo "YOUR_TOKEN" | docker login ghcr.io -u YOUR_GITHUB_USERNAME --password-stdin
-				  3. Verify:
-				     docker pull ghcr.io/morepet/containers/dev/typst:1.3-dev
-			EOF
-			)")
+		if ! check_container_auth "docker" "$HOME/.docker/config.json" "Docker"; then
+			generate_ghcr_instructions \
+				"Docker" \
+				'echo "YOUR_TOKEN" | docker login ghcr.io -u YOUR_GITHUB_USERNAME --password-stdin' \
+				'docker pull ghcr.io/morepet/containers/dev/typst:1.3-dev'
 			SETUP_WARNINGS=true
 		fi
-	fi
-elif command -v podman >/dev/null 2>&1; then
-	AUTH_FILE="${XDG_RUNTIME_DIR:-/run/user/$(id -u)}/containers/auth.json"
-	if [ -f "$AUTH_FILE" ] && grep -q "ghcr.io" "$AUTH_FILE" 2>/dev/null; then
-		echo "   ✅ Podman authenticated to ghcr.io"
 	else
-		echo "   ⚠️  Podman not authenticated to ghcr.io"
-		WARNING_MESSAGES+=("Podman not authenticated to ghcr.io")
-		SETUP_INSTRUCTIONS+=("$(cat <<-'EOF'
-			GHCR Authentication (Podman):
-			  1. Create GitHub Personal Access Token:
-			     https://github.com/settings/tokens/new
-			     - Name: "GHCR Dev Container Access"
-			     - Scope: read:packages ✅
-			  2. Login to GHCR:
-			     echo "YOUR_TOKEN" | podman login ghcr.io -u YOUR_GITHUB_USERNAME --password-stdin
-			  3. Verify:
-			     podman pull ghcr.io/morepet/containers/dev/typst:1.3-dev
-		EOF
-		)")
+		echo "   ⚠️  Docker daemon not running"
+		WARNING_MESSAGES+=("Docker daemon not running")
 		SETUP_WARNINGS=true
 	fi
-else
+fi
+
+# Check Podman (independently)
+if command -v podman >/dev/null 2>&1; then
+	echo "   Checking for Podman authentication..."
+	PODMAN_AVAILABLE=true
+
+	AUTH_FILE="${XDG_RUNTIME_DIR:-/run/user/$(id -u)}/containers/auth.json"
+	if ! check_container_auth "podman" "$AUTH_FILE" "Podman"; then
+		generate_ghcr_instructions \
+			"Podman" \
+			'echo "YOUR_TOKEN" | podman login ghcr.io -u YOUR_GITHUB_USERNAME --password-stdin' \
+			'podman pull ghcr.io/morepet/containers/dev/typst:1.3-dev'
+		SETUP_WARNINGS=true
+	fi
+fi
+
+# Check if neither runtime is available
+if ! $DOCKER_AVAILABLE && ! $PODMAN_AVAILABLE; then
 	echo "   ❌ Neither Docker nor Podman found"
 	ERROR_MESSAGES+=("Container runtime not found")
 	SETUP_INSTRUCTIONS+=("Install Docker Desktop or Podman")
 	SETUP_FAILED=true
 fi
+
 echo ""
 
 # 2. Check SSH public key
