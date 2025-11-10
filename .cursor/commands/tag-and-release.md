@@ -24,7 +24,55 @@ Before running this command, ensure:
 
 The command performs these steps automatically:
 
-### 1. Validate Prerequisites
+### 1. Check for Version Bump Instruction (Optional)
+
+**Read bump type from recent commits:**
+
+```bash
+# Check if recent commits indicate a version bump
+# Look for [patch], [minor], or [major] in commit messages
+RECENT_COMMIT=$(git log -1 --pretty=%B)
+BUMP_TYPE=""
+
+if echo "$RECENT_COMMIT" | grep -q "\[patch\]"; then
+  BUMP_TYPE="patch"
+elif echo "$RECENT_COMMIT" | grep -q "\[minor\]"; then
+  BUMP_TYPE="minor"
+elif echo "$RECENT_COMMIT" | grep -q "\[major\]"; then
+  BUMP_TYPE="major"
+fi
+
+# If bump type found, apply it automatically
+if [ -n "$BUMP_TYPE" ]; then
+  CURRENT=$(make version | grep -oP '\d+\.\d+\.\d+')
+  echo "🔄 Auto-applying $BUMP_TYPE bump from commit instruction"
+  echo "   Current: $CURRENT"
+
+  make bump-$BUMP_TYPE
+
+  NEW=$(make version | grep -oP '\d+\.\d+\.\d+')
+  echo "   New: $NEW"
+  echo ""
+
+  # Commit the bump
+  git add pyproject.toml CHANGELOG.md
+  git commit -m "chore(release): apply $BUMP_TYPE bump to $NEW
+
+Auto-bumped based on PR merge commit instruction."
+
+  echo "✅ Version auto-bumped: $CURRENT → $NEW"
+fi
+```
+
+**How it works:**
+
+When `/create-pr` commits a version bump, it includes `[patch]`, `[minor]`,
+or `[major]` in the commit message. After PR merge, `/tag-and-release`
+reads this and automatically applies the bump before creating the release.
+
+This eliminates manual version bumping after merging PRs!
+
+### 2. Validate Prerequisites
 
 **Branch Check:**
 

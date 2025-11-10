@@ -11,25 +11,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - **Automated Release Workflow Commands**
   - `/tag-and-release`: Complete tag and release automation
-    - Validates prerequisites (main branch, clean working directory)
-    - Checks version consecutiveness against git tags
-    - Validates CHANGELOG.md format (Keep a Changelog standard)
+    - Auto-applies version bump from PR commit tags `[patch]`, `[minor]`, `[major]`
+    - Validates prerequisites (main branch, clean directory)
+    - Checks version consecutiveness (no gaps allowed)
+    - Validates CHANGELOG.md format (Keep a Changelog compliance)
     - Creates annotated git tag with release notes
     - Pushes tag to remote
     - Creates GitHub release with comparison link
-    - Comprehensive error messages
-  - `/create-pr` enhancement: Intelligent version bump analysis
-    - Analyzes commit history for breaking changes/features/fixes
-    - Suggests Semantic Versioning-compliant version bump
-    - Executes `make bump-patch/minor/major`
-    - Prompts for CHANGELOG.md update
-    - Commits version bump automatically
+  - `/create-pr` enhancement: AI-powered version bump
+    - Analyzes commits (BREAKING CHANGE, feat:, fix:)
+    - Examines actual code changes intelligently
+    - Suggests Semantic Versioning-compliant bump with rationale
+    - Executes `make bump-patch/minor/major` based on user choice
+    - AI auto-generates CHANGELOG entry
+    - Tags commit with `[patch]`/`[minor]`/`[major]` for tag-and-release
+    - Refinable in PR review
 
 ### Changed
 
 - **Cursor Commands**
-  - Enhanced `/create-pr` with version management integration
-  - Added version bump workflow before PR creation
+  - `/create-pr`: Concise AI analysis, automatic CHANGELOG generation
+  - `/tag-and-release`: Reads bump type from commits, auto-applies version bump
+  - Integrated workflow: create-pr tags bump type → tag-and-release applies it
 
 ## [0.3.3] - 2025-11-10
 
