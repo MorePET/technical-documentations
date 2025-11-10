@@ -50,6 +50,7 @@ htmlcov/
 .cache
 nosetests.xml
 coverage.xml
+coverage.json
 *.cover
 *.py.cover
 .hypothesis/
@@ -230,3 +231,7 @@ __marimo__/
 # Server process ID
 .server.pid
 .github_data/
+
+# Large documentation attachments (regulatory docs, reference materials)
+# These should be stored externally (e.g., Git LFS, cloud storage, or documentation server)
+docs/attachments/
