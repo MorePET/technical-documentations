@@ -5,6 +5,37 @@ All notable changes to this template will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.4.0] - 2025-11-10
+
+### Added
+
+- **Automated Release Workflow Commands**
+  - `/create-pr` enhancement: AI-powered version bump and CHANGELOG generation
+    - Analyzes commits (BREAKING CHANGE, feat:, fix:) and actual code changes
+    - Examines code diffs intelligently (APIs, signatures, user-facing changes)
+    - Suggests Semantic Versioning-compliant bump with rationale
+    - Executes `make bump-patch/minor/major` based on user choice
+    - AI auto-generates CHANGELOG entry in proper Keep a Changelog format
+    - Creates versioned section directly (no [Unreleased] needed)
+    - Version bump committed to PR branch before merge
+    - Refinable during PR review
+  - `/tag-and-release`: Streamlined tag and release creation
+    - Validates prerequisites (main branch, clean directory)
+    - Checks version consecutiveness (no gaps allowed)
+    - Validates CHANGELOG.md format (Keep a Changelog compliance)
+    - Creates annotated git tag with release notes from CHANGELOG
+    - Pushes tag to remote
+    - Creates GitHub release with comparison link
+
+### Changed
+
+- **Release Workflow**
+  - Version bumping moved to PR creation stage (in `/create-pr`)
+  - CHANGELOG entries created during PR with AI assistance
+  - No [Unreleased] section - versions determined at PR time
+  - Cleaner git history - no post-merge version bump commits
+  - Integrated workflow: create-pr bumps version → merge PR → tag-and-release creates release
+
 ## [0.3.3] - 2025-11-10
 
 ### Added

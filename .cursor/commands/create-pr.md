@@ -8,6 +8,7 @@ For complete documentation on pull request guidelines, templates, and review pro
 
 - **[Pull Request Guidelines](./../pr-template.md)**
 - **[Git Workflow](./../git-workflow.md)**
+- **[Version Management](./../../docs/VERSION_MANAGEMENT.md)**
 
 ## Workflow
 
@@ -17,6 +18,122 @@ For complete documentation on pull request guidelines, templates, and review pro
 - Keep PR descriptions clean and professional
 
 When creating a pull request, follow these steps:
+
+### 0. AI-Powered Version Bump & CHANGELOG (Before PR Creation)
+
+**IMPORTANT:** Version bump and CHANGELOG update happen **during PR creation**, not after merge.
+After PR is merged to main, run `/tag-and-release` directly to create the git tag and GitHub release.
+
+**AI analyzes your changes, suggests version bump, and generates CHANGELOG:**
+
+```bash
+# Gather data
+CURRENT_VERSION=$(make version | grep -oP '\d+\.\d+\.\d+')
+COMMITS=$(git log --oneline origin/main..HEAD)
+FILES=$(git diff --name-only origin/main...HEAD)
+
+# AI Analysis: Check commits AND examine actual code changes
+# Mechanical: BREAKING CHANGE, feat:, fix: in commits
+# Intelligent: New APIs, signature changes, file impact, user-facing changes
+
+# AI presents recommendation
+echo "🤖 AI Analysis: Current $CURRENT_VERSION"
+echo ""
+echo "Changes detected:"
+echo "  - [AI summary of actual changes]"
+echo ""
+echo "📈 Recommended: MINOR bump → 0.4.0"
+echo "    Rationale: [AI explanation]"
+echo ""
+echo "Apply version bump?"
+echo "  1) patch  - Bug fixes only"
+echo "  2) minor  - New features ← AI suggests"
+echo "  3) major  - Breaking changes"
+echo "  4) skip"
+read -p "Choice [default=2]: " CHOICE
+
+# Apply bump
+case "${CHOICE:-2}" in
+  1) make bump-patch; BUMP_TYPE="patch" ;;
+  2) make bump-minor; BUMP_TYPE="minor" ;;
+  3) make bump-major; BUMP_TYPE="major" ;;
+  4) BUMP_TYPE="" ;;
+esac
+
+# AI generates CHANGELOG entry automatically
+if [ -n "$BUMP_TYPE" ]; then
+  NEW_VERSION=$(make version | grep -oP '\d+\.\d+\.\d+')
+
+  # AI analyzes diff and generates Keep a Changelog formatted entry
+  # Creates ## [X.Y.Z] - YYYY-MM-DD section with proper categories
+  # Categorizes: Added/Changed/Fixed based on actual changes
+  # Uses clear, user-focused language
+  # NO [Unreleased] section - version is final
+
+  echo "✨ AI generated CHANGELOG for $NEW_VERSION"
+  echo "   - Created ## [$NEW_VERSION] - $(date +%Y-%m-%d) section"
+  echo "   - Categorized changes: Added/Changed/Fixed"
+  echo "   - User-focused descriptions"
+  echo ""
+  echo "📝 Review and refine CHANGELOG in PR if needed"
+
+  # Commit version bump with changelog
+  git add pyproject.toml CHANGELOG.md
+  git commit -m "chore(release): bump version to $NEW_VERSION
+
+Version bump: $CURRENT_VERSION → $NEW_VERSION
+Type: $BUMP_TYPE
+
+AI-generated CHANGELOG entry. Refinable in PR review."
+
+  echo ""
+  echo "✅ Version bumped and CHANGELOG updated"
+  echo "   Ready to create PR and merge"
+  echo "   After merge: run /tag-and-release on main"
+fi
+```
+
+**AI Analysis Factors:**
+
+- **Commits:** `BREAKING CHANGE`, `feat:`, `fix:` patterns
+- **Code:** New APIs, signature changes, refactoring detection
+- **Files:** New vs. modified, public vs. internal
+- **Impact:** User-facing vs. internal changes
+
+**Semantic Versioning:**
+
+- **MAJOR (X.0.0):** Breaking changes, API removals
+- **MINOR (0.X.0):** New features (backward compatible)
+- **PATCH (0.0.X):** Bug fixes, docs, internal refactoring
+
+**CHANGELOG Format:**
+
+The AI generates a properly formatted CHANGELOG entry following Keep a Changelog:
+
+```markdown
+## [0.4.0] - 2025-11-10
+
+### Added
+
+- **Feature Name**: Description of new feature
+  - Sub-feature details
+  - User-facing benefits
+
+### Changed
+
+- **Component Name**: Description of changes
+  - What changed and why
+  - Impact on users
+
+### Fixed
+
+- Bug description and resolution
+```
+
+**No [Unreleased] Section:**
+
+Version is determined during PR creation, so CHANGELOG entries go directly
+under versioned sections (`## [X.Y.Z] - YYYY-MM-DD`). No `[Unreleased]` header needed.
 
 1. **Ensure your branch follows naming conventions:**
    - `feature/`, `fix/`, `docs/`, `refactor/`, `test/`, `chore/`, or `release/`
