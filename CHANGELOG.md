@@ -52,7 +52,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     - `make bump-patch`: Bump patch version (0.3.2 → 0.3.3)
     - `make bump-minor`: Bump minor version (0.3.2 → 0.4.0)
     - `make bump-major`: Bump major version (0.3.2 → 1.0.0)
-  - `docs/VERSION_MANAGEMENT.md`: Comprehensive documentation
+  - `VERSION_MANAGEMENT.md`: Comprehensive documentation
     - Single source of truth approach with pyproject.toml
     - Release workflow guidelines
     - Best practices for version management

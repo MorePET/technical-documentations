@@ -654,7 +654,7 @@ gh release delete 0.3.3 --yes
 
 - **[git-commit.md](./git-commit.md)**: Commit changes before release
 - **[create-pr.md](./create-pr.md)**: Create PR with version bumping
-- **[Version Management](./../../docs/VERSION_MANAGEMENT.md)**: Version management system docs
+- **[Version Management](./../VERSION_MANAGEMENT.md)**: Version management system docs
 
 ## Quick Reference
 
@@ -700,4 +700,4 @@ make bump-major  # 0.3.3 → 1.0.0
 
 ---
 
-**For version management details, see [docs/VERSION_MANAGEMENT.md](./../../docs/VERSION_MANAGEMENT.md)**
+**For version management details, see [VERSION_MANAGEMENT.md](./../VERSION_MANAGEMENT.md)**

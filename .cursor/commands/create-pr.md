@@ -8,7 +8,7 @@ For complete documentation on pull request guidelines, templates, and review pro
 
 - **[Pull Request Guidelines](./../pr-template.md)**
 - **[Git Workflow](./../git-workflow.md)**
-- **[Version Management](./../../docs/VERSION_MANAGEMENT.md)**
+- **[Version Management](./../VERSION_MANAGEMENT.md)**
 
 ## Workflow
 
