@@ -237,6 +237,191 @@ Open your browser to <http://localhost:8000> to see:
 
 That's it! The build system handles everything automatically.
 
+## Using Podman Without VS Code Devcontainer
+
+If you prefer to use Podman directly instead of VS Code's built-in devcontainer support, you have three options.
+All options assume you've completed the [Host Machine Prerequisites](#host-machine-prerequisites) (especially GHCR authentication).
+
+### Option 1: Direct Podman CLI Usage
+
+Use Podman command-line directly for maximum control and minimal dependencies.
+
+**Start the container:**
+
+```bash
+# Linux (with SELinux context)
+podman run -it --rm \
+  -v "${PWD}:/workspace:Z" \
+  -w /workspace \
+  ghcr.io/morepet/containers/dev/typst:1.3-dev \
+  /bin/bash
+
+# macOS/Windows (no SELinux)
+podman run -it --rm \
+  -v "${PWD}:/workspace" \
+  -w /workspace \
+  ghcr.io/morepet/containers/dev/typst:1.3-dev \
+  /bin/bash
+```
+
+**Important: SELinux Context (Linux only)**
+
+The `:Z` flag is required on Linux systems with SELinux to allow the container to access the mounted volume. Without it, you'll get permission denied errors.
+
+- `:Z` - Private unshared label (recommended for single container access)
+- `:z` - Shared label (use if multiple containers need access)
+
+**Inside the container, run initialization scripts in order:**
+
+```bash
+# 1. Post-create (one-time setup)
+/workspace/.devcontainer/post-create.sh
+
+# 2. Post-attach (session setup)
+/workspace/.devcontainer/post-attach.sh
+
+# 3. Build documentation
+make
+```
+
+**Script execution order matters:**
+1. `post-create.sh` - Sets up git, GitHub CLI, pre-commit hooks, Node.js
+2. `post-attach.sh` - Configures git and verifies GitHub CLI for current session
+
+**Pros:**
+- No additional tools required beyond Podman
+- Full control over container lifecycle
+- Easy to customize and script
+
+**Cons:**
+- Manual script execution required
+- Need to remember the correct command and flags
+- No automatic devcontainer.json integration
+
+### Option 2: Podman Compose
+
+Use `podman-compose` for a more declarative approach with persistent configuration.
+
+**Install podman-compose:**
+
+```bash
+# Using pip
+pip install podman-compose
+
+# Or using system package manager (Fedora/RHEL)
+sudo dnf install podman-compose
+
+# Or using system package manager (Debian/Ubuntu)
+sudo apt install podman-compose
+```
+
+**Start the container:**
+
+```bash
+# Start in detached mode
+podman-compose up -d
+
+# Attach to the running container
+podman-compose exec dev /bin/bash
+```
+
+**Inside the container, run initialization scripts:**
+
+```bash
+# Run setup scripts in order
+/workspace/.devcontainer/post-create.sh
+/workspace/.devcontainer/post-attach.sh
+
+# Build documentation
+make
+```
+
+**Stop the container:**
+
+```bash
+podman-compose down
+```
+
+**Configuration file:** The repository includes `podman-compose.yml` with proper settings:
+- Volume mount with cached consistency
+- Working directory set to `/workspace`
+- Interactive terminal support
+- Matches devcontainer.json configuration
+
+**Pros:**
+- Declarative configuration in `podman-compose.yml`
+- Easy to start/stop with simple commands
+- Persistent container state (optional)
+- Familiar Docker Compose syntax
+
+**Cons:**
+- Requires installing podman-compose
+- Still need to manually run initialization scripts
+- Limited devcontainer.json feature support
+
+### Option 3: Dev Container CLI
+
+Use the official Dev Container CLI for full `devcontainer.json` compatibility with Podman.
+
+**Install Dev Container CLI:**
+
+```bash
+npm install -g @devcontainers/cli
+```
+
+**Start the devcontainer with Podman:**
+
+```bash
+# Build and start the devcontainer
+devcontainer up --workspace-folder . --docker-path podman
+
+# Execute commands inside
+devcontainer exec --workspace-folder . make
+
+# Open a shell
+devcontainer exec --workspace-folder . /bin/bash
+```
+
+**Full integration:**
+
+The Dev Container CLI automatically:
+- ✅ Reads and applies `.devcontainer/devcontainer.json` settings
+- ✅ Runs `initializeCommand` on the host
+- ✅ Executes `postCreateCommand` and `postAttachCommand` in container
+- ✅ Mounts volumes correctly
+- ✅ Installs VS Code extensions (when used with VS Code)
+
+**Pros:**
+- **Best option for full compatibility** with devcontainer.json
+- Automatic script execution in correct order
+- Supports all devcontainer features (extensions, settings, lifecycle scripts)
+- Works with Podman via `--docker-path` flag
+- Can be used in CI/CD pipelines
+
+**Cons:**
+- Requires Node.js and npm
+- More complex installation
+- Slight learning curve for CLI commands
+
+### Comparison Table
+
+| Feature | Direct CLI | Podman Compose | Dev Container CLI |
+|---------|------------|----------------|-------------------|
+| **Setup Complexity** | Low | Medium | Medium |
+| **Dependencies** | Podman only | Podman + podman-compose | Podman + Node.js + npm |
+| **Script Automation** | Manual | Manual | Automatic ✅ |
+| **devcontainer.json Support** | None | None | Full ✅ |
+| **Flexibility** | Highest | High | Medium |
+| **Best For** | Quick tests, scripting | Persistent dev environments | Full devcontainer compatibility |
+
+### Recommendation
+
+- **Use Option 1 (Direct CLI)** for quick testing or one-off builds
+- **Use Option 2 (Podman Compose)** if you prefer docker-compose workflow
+- **Use Option 3 (Dev Container CLI)** for the most complete devcontainer experience
+
+**Still prefer VS Code integration?** See [Quick Start](#quick-start) for using VS Code's built-in Dev Containers extension, which provides the best IDE integration.
+
 ## Features
 
 ### Documentation Generation

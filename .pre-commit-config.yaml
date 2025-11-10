@@ -67,7 +67,7 @@ repos:
       - id: pymarkdown
         name: pymarkdown
         args: ["scan"]
-        exclude: ^\.github_data/
+        exclude: ^(\.github_data/|\.cursor/commands/)
         additional_dependencies: ["pyjson5"]
 
   # Dockerfile Linting (using Podman instead of Docker)

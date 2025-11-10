@@ -5,6 +5,25 @@ All notable changes to this template will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.5.0] - 2025-11-10
+
+### Added
+
+- **Podman Support**: Full container management support using Podman as Docker alternative (#24)
+  - `podman-compose.yml` configuration file for declarative container management
+  - Comprehensive usage documentation with three approaches: Direct CLI, Podman Compose, and Dev Container CLI
+  - Detailed comparison table of all Podman usage options with pros/cons analysis
+  - SELinux context handling guide for Linux users (`:Z` flag)
+  - Installation instructions for multiple platforms
+  - Proper initialization script execution order documentation
+
+### Changed
+
+- **Command Optimizations**: Refactored all 6 Cursor command files for improved AI execution efficiency
+  - Reduced command file size by ~2000 lines while maintaining functionality
+  - Improved clarity and execution flow in create-pr, git-commit, solve-issue, tag-and-release, yolo-issue, and create-issue commands
+  - Enhanced command structure for better AI parsing and execution
+
 ## [0.4.1] - 2025-11-10
 
 ### Fixed

@@ -1,151 +1,171 @@
 # Create Issue Command
 
-This command helps you create issues in GitHub repositories using the GitHub CLI.
+**CREATES GITHUB ISSUES - REQUIRES USER CONFIRMATION**
 
-## ⚠️ CRITICAL WORKFLOW - MUST FOLLOW
+Execute `/create-issue` to create issues following project standards.
 
-When creating an issue, **ALWAYS** follow these steps in order:
+## EXECUTION PROTOCOL
 
-### 1. Determine the target repository
-
-- If user specifies a repo (e.g., "ORG/REPO"), use that
-- Otherwise, detect current repo with: `gh repo view --json nameWithOwner --jq .nameWithOwner`
-
-### 2. Verify the repository exists
+### STEP 1: DETERMINE TARGET REPOSITORY
 
 ```bash
-gh repo view ORG/REPO --json nameWithOwner,description
-```
-
-- If successful, show repo name and description
-- If failed, inform user the repo doesn't exist or isn't accessible
-
-### 3. **⚠️ CONFIRM WITH USER FIRST** (MANDATORY)
-
-**DO NOT create the issue yet!** Show the user:
-- ✓ Target repository: `ORG/REPO`
-- ✓ Issue type: `Bug` / `Feature` / `Task`
-- ✓ Issue title: `"Your title here"`
-- ✓ Preview of issue body (first 20 lines)
-- ❓ **Ask:** "Create this issue? (yes/no)"
-
-### 4. Create the issue ONLY after user confirms "yes"
-
-GitHub will automatically assign the next available issue number. **DO NOT** specify the issue number yourself!
-
-## Quick Reference
-
-### Create a Bug Issue
-
-```bash
-gh api \
-  --method POST \
-  /repos/ORG/REPO/issues \
-  --field title="Brief description of the problem" \
-  --field body="<your issue body>" \
-  --field type="Bug"
-```
-
-### Create a Feature Issue
-
-```bash
-gh api \
-  --method POST \
-  /repos/ORG/REPO/issues \
-  --field title="Feature title" \
-  --field body="<your issue body>" \
-  --field type="Feature"
-```
-
-### Create a Task Issue
-
-```bash
-gh api \
-  --method POST \
-  /repos/ORG/REPO/issues \
-  --field title="Task: Brief description" \
-  --field body="<your issue body>" \
-  --field type="Task" \
-  --field assignees[]="username"
-```
-
-**Important Notes:**
-- GitHub automatically assigns the next available issue number
-- **DO NOT add labels** unless explicitly requested by user
-- Only use: `title`, `body`, `type`, and optionally `assignees[]`
-
-## Utility Commands
-
-### Get Current Repo
-
-```bash
-gh repo view --json nameWithOwner --jq .nameWithOwner
-```
-
-### Verify Repo Exists
-
-```bash
-gh repo view ORG/REPO --json nameWithOwner,description
-```
-
-Example output:
-
-```json
-{
-  "description": "Repository description",
-  "nameWithOwner": "ORG/REPO"
-}
-```
-
-### Check Repo Access
-
-```bash
-gh repo view ORG/REPO --json nameWithOwner,description,viewerPermission
-```
-
----
-
-## Examples
-
-### Example 1: Bug Report
-
-```bash
-# 1. Get repo
+# If user specifies repo: use "ORG/REPO"
+# Otherwise detect current:
 REPO=$(gh repo view --json nameWithOwner --jq .nameWithOwner)
-
-# 2. Show user what will be created
-echo "Creating bug report in $REPO"
-echo "Type: Bug"
-echo "Title: Login button doesn't work on mobile"
-echo ""
-echo "Create this issue? (yes/no)"
-read -r confirm
-
-# 3. Create only if confirmed
-if [ "$confirm" = "yes" ]; then
-  gh api --method POST /repos/$REPO/issues \
-    --field title="Login button doesn't work on mobile" \
-    --field body="## Description
-Login button is not responsive on mobile devices..." \
-    --field type="Bug"
-fi
 ```
 
-### Example 2: Feature Request
+### STEP 2: VERIFY REPOSITORY ACCESS
 
 ```bash
-gh api --method POST /repos/ORG/REPO/issues \
-  --field title="Add dark mode support" \
-  --field body="## Feature Request\n\nWe should add dark mode..." \
-  --field type="Feature"
+gh repo view $REPO --json nameWithOwner,description
 ```
 
----
+**IF fails:**
+→ Display: "❌ Repository not found or not accessible: $REPO"
+→ ABORT
 
-## Common Mistakes
+**IF succeeds:**
+→ Display repo name and description
+→ PROCEED to STEP 3
 
-❌ **Specifying issue number** - GitHub assigns this automatically
-❌ **Adding labels** - DO NOT add `labels[]` unless user explicitly asks
-❌ **Creating without confirmation** - Always ask user first
-❌ **Wrong type values** - Must be exactly: `Bug`, `Feature`, or `Task`
-❌ **Assuming what user wants** - Only add fields user explicitly requests
+### STEP 3: GATHER ISSUE DETAILS
+
+**Determine from user input:**
+- Issue type: Bug / Feature / Task
+- Title (clear, descriptive)
+- Body (structured with headings)
+- Assignees (optional)
+
+**Format body based on type:**
+
+**Bug:**
+```markdown
+## Description
+[What's wrong]
+
+## Steps to Reproduce
+1. [Step 1]
+2. [Step 2]
+
+## Expected Behavior
+[What should happen]
+
+## Actual Behavior
+[What actually happens]
+
+## Environment
+- OS:
+- Version:
+```
+
+**Feature:**
+```markdown
+## Feature Request
+[What feature is needed]
+
+## Use Case
+[Why it's needed]
+
+## Proposed Solution
+[How it could work]
+
+## Alternatives Considered
+[Other approaches]
+```
+
+**Task:**
+```markdown
+## Task Description
+[What needs to be done]
+
+## Acceptance Criteria
+- [ ] [Criterion 1]
+- [ ] [Criterion 2]
+
+## Related Issues
+- Related to #X
+```
+
+### STEP 4: CONFIRM WITH USER (MANDATORY)
+
+**MUST display preview and wait for confirmation:**
+
+```text
+📋 Issue Preview
+
+Target: ORG/REPO
+Type: Bug/Feature/Task
+Title: "Your title here"
+
+Body:
+[First 20 lines of body...]
+
+❓ Create this issue? (yes/no)
+```
+
+**WAIT for user response.**
+
+**IF user says "no" or anything other than "yes":**
+→ Display: "Issue creation cancelled"
+→ ABORT
+
+**IF user says "yes":**
+→ PROCEED to STEP 5
+
+### STEP 5: CREATE ISSUE
+
+**GitHub auto-assigns issue number - DO NOT specify it yourself:**
+
+```bash
+gh api --method POST /repos/$REPO/issues \
+  --field title="$TITLE" \
+  --field body="$BODY"
+```
+
+**IF assignees requested:**
+```bash
+gh api --method POST /repos/$REPO/issues \
+  --field title="$TITLE" \
+  --field body="$BODY" \
+  --field assignees[]="$USERNAME"
+```
+
+**DO NOT add labels unless user explicitly requests them.**
+
+### STEP 6: CONFIRM CREATION
+
+```text
+✅ Issue created successfully
+
+Issue: #<number>
+Title: <title>
+URL: https://github.com/ORG/REPO/issues/<number>
+```
+
+## ERROR HANDLING
+
+**Repository not found:**
+→ "❌ Repository not accessible: ORG/REPO"
+→ Verify repo exists and you have access
+
+**Authentication failure:**
+→ Run `gh auth status`
+→ Run `gh auth login` if not authenticated
+
+**API error:**
+→ Check error message from gh CLI
+→ Verify user has write access to repo
+
+## CRITICAL RULES
+
+**NEVER:**
+- ❌ Specify issue number (GitHub auto-assigns)
+- ❌ Add labels without explicit user request
+- ❌ Create without user confirmation
+- ❌ Use fields other than: title, body, assignees
+
+**ALWAYS:**
+- ✅ Show preview before creating
+- ✅ Wait for explicit "yes" confirmation
+- ✅ Let GitHub assign issue number
+- ✅ Use structured body format
