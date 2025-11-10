@@ -1,231 +1,198 @@
-# Dual-Theme Diagram Workflow
+# Documentation Example
 
-This example demonstrates a complete workflow for generating beautiful diagrams with full light/dark theme support.
+This example demonstrates professional documentation practices using Typst, combining V-Model development lifecycle, stakeholder analysis, technical diagrams, and auto-generated API documentation.
 
-## Features
+## Structure
 
-✨ **Dual-Theme Support**: Diagrams automatically render in both light and dark themes
-🎨 **Beautiful Color Scheme**: Uses colors from `colors.json` with semantic meaning
-🔄 **Automatic Theme Detection**: Respects system preferences
-💾 **Theme Persistence**: Remembers user's theme choice
-📱 **Fully Offline**: Single HTML file works without internet
-🎯 **Bootstrap Compatible**: Works with both Bootstrap and standalone HTML
+```text
+example/
+├── docs/
+│   └── main.typ                    # High-level product documentation
+├── python-project/                 # Implementation package example
+│   ├── docs/
+│   │   ├── main.typ               # V-Model phases for this package
+│   │   └── diagrams/
+│   │       ├── v-model.typ        # V-Model diagram source
+│   │       └── v-model.svg        # Compiled diagram
+│   ├── src/                       # Python source code
+│   │   ├── hello.py               # Core functionality
+│   │   ├── main.py                # CLI entry point
+│   │   └── doc_generator/         # Documentation generation tools
+│   │       ├── extract_api.py     # API documentation extraction
+│   │       └── test_report.py     # Test report generation
+│   ├── tests/                     # Test suite
+│   │   ├── test_hello.py
+│   │   └── test_main.py
+│   └── build/                     # Build outputs
+│       ├── generated/             # Auto-generated docs
+│       │   ├── api-reference.typ
+│       │   ├── test-coverage.typ
+│       │   └── test-results.typ
+│       └── diagrams/              # Compiled diagrams
+│           └── v-model.svg
+├── diagrams/                       # Technical diagram sources
+│   ├── architecture.typ
+│   ├── data-flow.typ
+│   └── state-machine.typ
+├── build/                          # Example documentation build outputs
+│   ├── example-documentation.pdf   # Final PDF
+│   ├── example-documentation.html  # Final HTML with dark mode
+│   └── diagrams/                   # Compiled technical diagrams
+│       ├── architecture.svg
+│       ├── architecture-light.svg
+│       ├── architecture-dark.svg
+│       ├── data-flow.svg
+│       ├── data-flow-light.svg
+│       ├── data-flow-dark.svg
+│       ├── state-machine.svg
+│       ├── state-machine-light.svg
+│       └── state-machine-dark.svg
+└── stakeholders.{csv,json,yaml}    # Example data files
+```
 
-## Workflow
+## Building
 
-### Quick Start
-
-Use the Makefile to build everything automatically:
+### Build Complete Example Documentation
 
 ```bash
 make example
 ```
 
-or look into the individual steps
-
-### 1. Build Diagrams (Both Themes)
-
-```bash
-# Generate both light and dark theme SVGs from .typ files
-python3 ../scripts/build-diagrams.py example
-```
-
-This will create:
-
-- `architecture-light.svg` and `architecture-dark.svg`
-- `data-flow-light.svg` and `data-flow-dark.svg`
-- `state-machine-light.svg` and `state-machine-dark.svg`
-
-### 2. Process HTML
-
-```bash
-# Inject SVGs and add theme switching
-python3 ../scripts/post-process-html.py demo-diagrams.html demo-diagrams-processed.html
-```
-
 This will:
-- Inject both light and dark SVG versions
-- Add CSS for theme-based visibility
-- Add JavaScript for theme toggling
-- Add a floating theme toggle button
 
-### 3. View Result
+1. Generate Python API documentation from source code
+2. Run tests and generate coverage reports
+3. Compile all diagrams (both light and dark themes)
+4. Build the complete documentation (PDF + HTML)
+5. Start a local web server on port 8000
 
-Open `demo-diagrams-processed.html` in any browser. The diagrams will automatically match your system theme, and you can toggle between themes using the 🌓 button.
+Output files:
+- `example/build/example-documentation.pdf` (~500KB)
+- `example/build/example-documentation.html` (~300KB)
 
-## How It Works
+### Clean Build
 
-### Diagram Files (`.typ`)
-
-Diagrams use color variables that get injected during build:
-
-```typst
-#import "@preview/fletcher:0.5.8" as fletcher: diagram, edge, node
-#set page(width: auto, height: auto, margin: 5mm, fill: background_color)
-#set text(font: "Libertinus Serif", size: 10pt, fill: text_color)
-
-#align(center)[
-  #diagram(
-    node-stroke: (paint: stroke_color, thickness: 1pt),
-    node-fill: node_bg_blue,
-    // ... rest of diagram
-  )
-]
+```bash
+make clean
+make example
 ```
 
-### Build Process
+## What's Included
 
-1. **Read `colors.json`**: Loads light and dark color definitions
-2. **Inject Colors**: Creates temporary `.typ` files with theme-specific colors
-3. **Compile**: Runs `typst compile` to generate SVGs
-4. **Clean up**: Removes temporary files
+### High-Level Documentation (`example/docs/main.typ`)
 
-### HTML Structure
+The main documentation combines:
 
-The processed HTML contains both SVG versions:
+1. **V-Model Overview**: Software development lifecycle methodology
+2. **Stakeholder Analysis**: Multiple table formats (manual, CSV, JSON, YAML)
+3. **Technical Diagrams**: Architecture, data flow, and state machines with Fletcher
+4. **Implementation Example**: Complete Python CLI package with V-Model phases
+5. **Auto-Generated Content**: API docs, test coverage, and test results
 
-```html
-<div class="diagram-container">
-  <div class="diagram-light" data-theme="light">
-    <!-- Light theme SVG -->
-  </div>
-  <div class="diagram-dark" data-theme="dark">
-    <!-- Dark theme SVG -->
-  </div>
-</div>
-```
+### Python Project (`example/python-project/`)
 
-### Theme Switching
+A complete Python CLI application demonstrating:
 
-CSS controls visibility based on the `data-bs-theme` or `data-theme` attribute:
+- ✅ V-Model development phases (Requirements → Acceptance Testing)
+- ✅ Comprehensive test coverage (80%+)
+- ✅ Auto-generated API documentation from docstrings
+- ✅ Test reports with coverage metrics
+- ✅ Professional CLI with argparse
+- ✅ Type hints throughout
+- ✅ PEP 8 compliant
 
-```css
-[data-bs-theme="light"] .diagram-dark { display: none; }
-[data-bs-theme="dark"] .diagram-light { display: none; }
-```
+## Features
 
-JavaScript handles:
-- System preference detection
-- User toggle
-- LocalStorage persistence
-- System preference changes
-
-## Color Configuration
-
-Colors are defined in `/workspace/lib/colors.json`:
-
-```json
-{
-  "colors": {
-    "text": { "light": "#000000", "dark": "#ffffff" },
-    "stroke": { "light": "#000000", "dark": "#ffffff" },
-    "node-bg-blue": { "light": "#cfe2ff", "dark": "#084298" },
-    "node-bg-green": { "light": "#d1e7dd", "dark": "#0f5132" },
-    // ... more colors
-  }
-}
-```
-
-These colors are:
-- **Semantic**: Named by purpose (e.g., `node-bg-blue`, `stroke`)
-- **Accessible**: Provide good contrast in both themes
-- **Bootstrap-aligned**: Match Bootstrap 5 color system
-
-## File Structure
-
-```text
-example/
-├── diagrams/
-│   ├── architecture.typ          # Source diagram
-│   ├── architecture-light.svg    # Generated light theme
-│   ├── architecture-dark.svg     # Generated dark theme
-│   ├── data-flow.typ
-│   ├── data-flow-light.svg
-│   ├── data-flow-dark.svg
-│   ├── state-machine.typ
-│   ├── state-machine-light.svg
-│   └── state-machine-dark.svg
-├── demo-diagrams.html            # Source HTML
-├── demo-diagrams-processed.html  # Processed with dual themes
-└── README.md                     # This file
-```
-
-## Advantages
-
-### vs. CSS Variables (Old Approach)
-
-- ✅ **No post-processing**: Colors are native Typst, not regex-replaced
-- ✅ **Perfect accuracy**: No risk of missing colors or false matches
-- ✅ **Instant switching**: No CSS calculation needed
-- ✅ **Better compatibility**: Works in all browsers
-
-### vs. WASM Approach
-
-- ✅ **Works offline**: No 5MB WASM bundle needed
-- ✅ **Instant load**: Pre-rendered, no compilation
-- ✅ **Smaller file**: ~350KB vs 5MB+
-- ✅ **Better compatibility**: No ES6 modules required
-
-### Trade-offs
-
-- ❌ **2x SVG size**: Both themes embedded
-- ❌ **No dynamic filtering**: Would need WASM for that
-- ❌ **Build step required**: Can't generate on-the-fly
-
-## For Production
-
-This workflow is ideal for:
-- 📄 **Documentation sites**: Beautiful diagrams that match site theme
-- 📊 **Technical reports**: Professional PDFs with embedded diagrams
-- 📱 **Offline viewing**: Single HTML file, no dependencies
-- 🔗 **Sharing**: Email or file share, works immediately
+✨ **Dual-Theme Support**: HTML output with automatic light/dark mode switching
+📊 **Technical Diagrams**: Fletcher-based diagrams with semantic colors
+🔄 **Auto-Generated**: API docs extracted from Python source code using griffe
+🧪 **Test Integration**: Coverage reports and test results embedded in docs
+📖 **V-Model Methodology**: Complete software lifecycle documentation
+🎨 **Stakeholder Analysis**: Multiple formats for stakeholder documentation
+💾 **Theme Persistence**: HTML remembers user's theme choice
+📱 **Fully Offline**: Single HTML file works without internet
 
 ## Customization
 
 ### Add New Diagrams
 
-1. Create `diagrams/my-diagram.typ` using color variables
-2. Run `python3 ../scripts/build-diagrams.py example`
-3. Add to HTML: `<img src="diagrams/my-diagram.svg">`
-4. Run `python3 ../scripts/post-process-html.py ...`
+1. Create `diagrams/my-diagram.typ` using color variables from `lib/colors.json`
+2. Run `make example` to compile with both themes
+3. Reference in Typst: `#architecture-diagram()` (or create similar function)
 
 ### Customize Colors
 
 Edit `/workspace/lib/colors.json` and rebuild:
 
 ```bash
-python3 ../scripts/build-diagrams.py example
+make colors
+make example
 ```
 
-### Customize Theme Toggle
+### Extend Python Project
 
-Edit `scripts/post-process-html.py`, function `add_theme_toggle_script()` to change:
-- Button position
-- Button style
-- Keyboard shortcuts
-- Animation effects
+1. Add new modules to `python-project/src/`
+2. Add tests to `python-project/tests/`
+3. Update `python-project/src/doc_generator/extract_api.py` module list
+4. Run `make example` to regenerate docs
 
-## Browser Support
+## Documentation Pipeline
 
-- ✅ Chrome/Edge 88+
-- ✅ Firefox 85+
-- ✅ Safari 14+
-- ✅ Mobile browsers
-- ⚠️ IE11: Needs polyfills for localStorage and CSS variables
+```text
+Python Source Code
+    ↓
+[griffe] AST Analysis
+    ↓
+API Documentation (Typst)
+    +
+V-Model Narrative (Typst)
+    +
+Test Reports (pytest + coverage)
+    +
+Stakeholder Analysis
+    +
+Technical Diagrams (Fletcher)
+    ↓
+typst compile
+    ↓
+PDF + HTML outputs with dark mode
+```
 
-## Performance
+## Technologies
 
-| Metric | Value |
-|--------|-------|
-| File size (3 diagrams) | ~350KB |
-| Load time | < 100ms |
-| Theme switch | Instant (CSS) |
-| Memory usage | Minimal |
+**Documentation:**
+- Typst: Modern document compilation
+- griffe: Python API extraction (AST-based)
+- docstring-parser: Docstring parsing
+- pytest + pytest-cov: Test and coverage
+- Fletcher: Typst diagramming library
+
+**Implementation:**
+- Python 3.12+
+- Type hints throughout
+- Google-style docstrings
+- PEP 8 compliant (Ruff enforced)
+
+## Benefits
+
+1. **Single Source of Truth**: API docs extracted directly from code
+2. **Always Up-to-Date**: Auto-generated on every build
+3. **Professional Output**: Publication-quality PDF with Libertinus Serif
+4. **Modern HTML**: Dark mode support with theme persistence
+5. **Complete Lifecycle**: V-Model from requirements to acceptance
+6. **Reusable**: Python package structure can be copied to other projects
 
 ## Next Steps
 
-1. **Explore** the generated `demo-diagrams-processed.html`
-2. **Try** the theme toggle button
-3. **Customize** the colors in `colors.json`
-4. **Create** your own diagrams in the `diagrams/` folder
-5. **Build** and process to see them with dual themes
+1. **Explore** the generated `example/build/example-documentation.html`
+2. **Try** the theme toggle button (🌓) in top-right
+3. **Review** the V-Model phases in the documentation
+4. **Examine** the auto-generated API reference
+5. **Study** the test coverage report
+6. **Customize** for your own projects
+
+## Learn More
+
+- See `python-project/README.md` for package-specific details
+- See `/workspace/docs/BUILD_SYSTEM.md` for build system documentation
+- See `/workspace/docs/DARK_MODE_COLOR_STANDARDS.md` for color system details
