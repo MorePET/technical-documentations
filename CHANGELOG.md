@@ -5,6 +5,42 @@ All notable changes to this template will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.3] - 2025-11-10
+
+### Added
+
+- **Version Management System**
+  - `scripts/get_version.py`: Extract version from pyproject.toml
+  - `scripts/bump_version.py`: Automated semantic version bumping
+    - Supports major, minor, patch version bumps
+    - Auto-updates CHANGELOG.md with version and date
+    - Dry-run mode for previewing changes
+    - Comprehensive error handling and validation
+  - Makefile targets for version management:
+    - `make version`: Display current version
+    - `make bump-patch`: Bump patch version (0.3.2 → 0.3.3)
+    - `make bump-minor`: Bump minor version (0.3.2 → 0.4.0)
+    - `make bump-major`: Bump major version (0.3.2 → 1.0.0)
+  - `docs/VERSION_MANAGEMENT.md`: Comprehensive documentation
+    - Single source of truth approach with pyproject.toml
+    - Release workflow guidelines
+    - Best practices for version management
+    - Troubleshooting guide
+
+### Changed
+
+- **pyproject.toml**: Now serves as single source of truth for version numbers
+- **Makefile**: Added version management section to help output
+
+### Benefits
+
+- Eliminates version number duplication across files
+- Prevents version mismatches between files
+- Automates CHANGELOG.md updates
+- Streamlines release workflow
+- Follows semantic versioning standards
+- Provides both CLI and Make interfaces for version management
+
 ## [0.3.2] - 2025-11-10
 
 ### Added

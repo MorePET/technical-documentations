@@ -31,32 +31,43 @@ When creating a pull request, follow these steps:
    git rebase main
    ```
 
-3. **Run pre-commit hooks and tests:**
+3. **Ensure all changes are committed:**
 
    ```bash
-   # Ensure all checks pass
-   git status  # Should show clean working directory
+   git status  # Must show "nothing to commit, working tree clean"
    ```
 
-4. **Self-review your changes:**
+   - **All work must be committed before creating PR**
+   - No uncommitted changes allowed
+   - No untracked files that should be included
+   - See [git-commit.md](./git-commit.md) for commit guidelines
+
+4. **Run pre-commit hooks and tests:**
+
+   ```bash
+   # All pre-commit hooks should have passed during commits
+   # Verify tests pass if applicable
+   ```
+
+5. **Self-review your changes:**
    - Read through the diff
    - Check for console.logs, TODOs, or debug code
    - Verify all tests pass
-   - Run pre-commit hooks
+   - Confirm pre-commit hooks passed
 
-5. **Push your branch:**
+6. **Push your branch:**
 
    ```bash
    git push origin your-branch
    ```
 
-6. **Create the pull request:**
+7. **Create the pull request:**
 
    ```bash
    gh pr create
    ```
 
-7. **Fill out the PR template** with:
+8. **Fill out the PR template** with:
    - Clear, descriptive title
    - Detailed description of changes
    - Related issues (if applicable)
@@ -176,6 +187,7 @@ Examples:
 
 Before creating PR, ensure:
 
+- **All changes are committed** (clean working directory)
 - Branch follows naming convention
 - Commits follow conventional format
 - All pre-commit hooks pass
