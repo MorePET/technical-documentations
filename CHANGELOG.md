@@ -64,6 +64,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Consolidated diagram outputs to project-specific build directories
   - Simplified gitignore patterns for build artifacts
   - Updated all include paths to reference build directories
+  - Unified example and main build processes to use same pipeline (colors → diagrams → pdf → html)
+  - Example project outputs now in dedicated `example/build/` folder
 
 - **Documentation Migration**
   - Migrated all documentation from Markdown to Typst format
@@ -75,6 +77,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Theme toggle adapted to work with Bootstrap's `data-bs-theme` attribute
   - TOC sidebar uses Bootstrap Offcanvas component for better mobile support
   - Improved regex patterns for SVG injection to prevent content deletion
+
+- **Typst Library Enhancements**
+  - Isotope and beta particle notation now uses Unicode superscripts/subscripts in HTML export
+  - Better accessibility with native Unicode text instead of SVG fragments
+  - Smaller HTML file sizes with improved text selection and copy/paste support
+  - PDF export unchanged (still uses physica package for proper typesetting)
 
 ### Fixed
 
