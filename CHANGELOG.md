@@ -9,6 +9,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Development Server**
+  - Node.js and live-server integration for better development experience
+  - Automatic setup in devcontainer via `setup-node-liveserver.sh`
+  - Smart fallback to Python server if live-server unavailable
+  - Auto-reload on file changes with live-server
+  - Better concurrent request handling and no Content-Length mismatch issues
+
+- **Cache-Busting**
+  - Automatic timestamp-based cache-busting for CSS files
+  - Uses file modification time for efficient browser cache invalidation
+  - Applies to both `colors.css` and `styles-bootstrap.css`
+
 - **Python Documentation Generation**
   - Self-contained documentation generator using griffe for API extraction
   - Automatic API reference generation from Python source code
@@ -65,6 +77,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Improved regex patterns for SVG injection to prevent content deletion
 
 ### Fixed
+
+- **Table Column Widths**
+  - Fixed 2-column tables not expanding Description column to full width
+  - Changed System Components table from `columns: (auto, auto)` to `columns: (auto, 1fr)`
+  - Added CSS override for 2-column tables to allow second column expansion
+
+- **HTTP Server Issues**
+  - Resolved Content-Length mismatch errors with Python's http.server
+  - Replaced basic http.server with ThreadingHTTPServer for better stability
+  - Added proper CORS and Cache-Control headers for development
 
 - **Dark Mode Support**
   - Fixed dark mode text color in Fletcher diagrams (text now uses theme-aware colors)
