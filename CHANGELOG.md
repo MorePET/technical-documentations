@@ -5,6 +5,32 @@ All notable changes to this template will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+
+- **Automated Release Workflow Commands**
+  - `/tag-and-release`: Complete tag and release automation
+    - Validates prerequisites (main branch, clean working directory)
+    - Checks version consecutiveness against git tags
+    - Validates CHANGELOG.md format (Keep a Changelog standard)
+    - Creates annotated git tag with release notes
+    - Pushes tag to remote
+    - Creates GitHub release with comparison link
+    - Comprehensive error messages
+  - `/create-pr` enhancement: Intelligent version bump analysis
+    - Analyzes commit history for breaking changes/features/fixes
+    - Suggests Semantic Versioning-compliant version bump
+    - Executes `make bump-patch/minor/major`
+    - Prompts for CHANGELOG.md update
+    - Commits version bump automatically
+
+### Changed
+
+- **Cursor Commands**
+  - Enhanced `/create-pr` with version management integration
+  - Added version bump workflow before PR creation
+
 ## [0.3.3] - 2025-11-10
 
 ### Added
