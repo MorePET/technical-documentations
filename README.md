@@ -5,6 +5,87 @@ technical documentation with Typst, featuring automated diagram compilation,
 dual PDF/HTML output with dark mode support, and comprehensive Python API
 documentation generation.
 
+## Requirements
+
+### Container Runtime
+
+You need **one** of the following:
+
+- **Docker Desktop** (recommended for macOS/Windows)
+  - [Download Docker Desktop](https://www.docker.com/products/docker-desktop/)
+  - Ensure Docker Desktop is running before opening the devcontainer
+
+- **Podman Desktop** (alternative, works on Linux/macOS/Windows)
+  - [Download Podman Desktop](https://podman-desktop.io/)
+  - Ensure podman machine is initialized and running:
+
+    ```bash
+    podman machine init
+    podman machine start
+    ```
+
+### Development Environment
+
+- **VS Code** with **Dev Containers extension**
+  - Install VS Code: <https://code.visualstudio.com/>
+  - Install extension: [Dev Containers](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers)
+
+### Optional (for SSH signing)
+
+- SSH key configured for Git signing
+- SSH agent running with your key loaded (automatically forwarded to container)
+
+## Quick Start
+
+### 1. Start Your Container Runtime
+
+**Docker Desktop users:**
+
+- Launch Docker Desktop application
+- Wait for it to fully start (Docker icon in system tray)
+
+**Podman users:**
+
+```bash
+# Initialize podman machine (first time only)
+podman machine init
+
+# Start podman machine
+podman machine start
+
+# Verify it's running
+podman machine list
+```
+
+### 2. Open in Devcontainer
+
+1. Clone this repository
+2. Open the folder in VS Code
+3. When prompted, click **"Reopen in Container"**
+   - Or use Command Palette (F1): "Dev Containers: Reopen in Container"
+4. Wait for container to build (first time takes 2-3 minutes)
+
+### 3. Build Documentation
+
+Once inside the devcontainer:
+
+```bash
+# Build the default project
+make
+
+# Or build the example project
+make example
+```
+
+### 4. View Your Documentation
+
+Open your browser to <http://localhost:8000> to see:
+
+- PDF version: `technical-documentation.pdf`
+- HTML version: `technical-documentation.html`
+
+That's it! The build system handles everything automatically.
+
 ## Features
 
 ### Documentation Generation
@@ -36,41 +117,15 @@ documentation generation.
 - **Pre-commit Hooks**: Automatic linting and formatting (Ruff, shellcheck, pymarkdown, yamllint)
 - **Protected Configs**: Linting configuration files protected from accidental modification
 
-## Quick Start
-
-### 1. Open in Devcontainer
-
-Open this repository in VS Code and select "Reopen in Container" when prompted.
-
-### 2. Build Your Documentation
-
-```bash
-# Build the default project (technical-documentation/)
-make
-
-# Build the example project
-make example
-
-# Build a specific project
-make PROJECT=my-project
-```
-
-The build automatically:
-
-- Generates color palettes from `lib/colors.json`
-- Compiles all diagrams in `diagrams/` folder
-- Builds PDF output
-- Builds HTML with Bootstrap styling
-- Starts development server on <http://localhost:8000>
-
-### 3. View Your Documentation
-
-Open your browser to <http://localhost:8000> to see:
-
-- PDF version: `technical-documentation.pdf`
-- HTML version: `technical-documentation.html`
-
 ## Build System
+
+The build automatically handles:
+
+- Generating color palettes from `lib/colors.json`
+- Compiling all diagrams in `diagrams/` folder
+- Building PDF output
+- Building HTML with Bootstrap styling
+- Starting development server on <http://localhost:8000>
 
 ### Main Targets
 
@@ -146,7 +201,7 @@ workspace/
 
 ### 1. Create Your Document
 
-Edit `docs/main.typ`:
+Edit `technical-documentation/technical-documentation.typ`:
 
 ```typst
 #import "../lib/technical-documentation-package.typ": *
@@ -374,14 +429,14 @@ chmod 444 .pre-commit-config.yaml
 
 The protection is local-only and doesn't affect CI/CD workflows.
 
-## Requirements
+## Manual Setup (Without Devcontainer)
 
-- **Devcontainer**: VS Code with Dev Containers extension
-- **Or Manual Setup**:
-  - Typst 0.12+
-  - Python 3.12+
-  - Node.js (optional, for live-server)
-  - Make
+If you prefer not to use the devcontainer:
+
+- Typst 0.12+
+- Python 3.12+
+- Node.js (optional, for live-server)
+- Make
 
 ## License
 
