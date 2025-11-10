@@ -181,48 +181,47 @@ The composable design allows maximum flexibility:
 
 ## Technical Notes
 
-### HTML Export with `html.frame`
+### HTML Export with Unicode Superscripts
 
-The notation system uses the `physica` package for all isotope notation and enables HTML export via a show rule:
+The notation system uses different rendering approaches for PDF and HTML:
 
 **How it works:**
-- All isotopes use the `physica` package's `isotope()` function
-- A show rule in `technical-documentation-package.typ` wraps math equations in `html.frame` for HTML export
-- Inline equations are wrapped in `box` to keep them inline within paragraphs
-- **PDF export:** Uses proper math font for beautiful typography
-- **HTML export:** Uses system fonts (system-ui, Arial) in SVGs to match Bootstrap's body text
+- **PDF export:** Uses the `physica` package's `isotope()` function for proper mathematical typography
+- **HTML export:** Uses Unicode superscript characters (e.g., ⁴⁴, ⁶⁸, ¹⁸) for clean text output
+- Automatic mode detection via `sys.inputs.at("html-export", default: "false")`
+- Inline isotopes stay inline within paragraphs in both formats
 
 **Implementation:**
 
 ```typst
-show math.equation: it => context {
+#let nuclide(element, A: none, Z: none) = context {
   let is-html = sys.inputs.at("html-export", default: "false") == "true"
 
   if is-html {
-    // HTML: use Bootstrap's system font stack
-    set text(font: ("system-ui", "Arial", "sans-serif"))
-    show: if it.block { it => it } else { box }
-    html.frame(it)
+    // HTML: use Unicode superscripts/subscripts
+    [#to-superscript(str(A))#element]
   } else {
-    // PDF: use proper math font
-    it
+    // PDF: use physica package for proper typography
+    isotope(element, a: str(A))
   }
 }
 ```
 
 **Benefits:**
-- Single source of truth: `physica` package everywhere
-- Clean, simple implementation (no Unicode mapping needed)
-- Perfect math typography in PDF, system fonts in HTML
-- Inline isotopes stay inline in paragraphs
-- Font automatically matches Bootstrap body text (system-ui stack)
+- Clean ASCII/Unicode text in HTML (no SVG fragments needed)
+- Perfect math typography in PDF using physica package
+- Better accessibility - screen readers can read the Unicode text directly
+- Smaller HTML file sizes (no embedded SVGs for isotopes)
+- Better text selection and copy/paste in HTML
 
 ### Implementation Details
 
+- Unicode superscript mapping: 0→⁰, 1→¹, 2→², 3→³, 4→⁴, 5→⁵, 6→⁶, 7→⁷, 8→⁸, 9→⁹, m→ᵐ, n→ⁿ, +→⁺, -→⁻
+- Unicode subscript mapping: 0→₀, 1→₁, 2→₂, 3→₃, 4→₄, 5→₅, 6→₆, 7→₇, 8→₈, 9→₉
+- Beta particles (β⁺ and β⁻) also use Unicode in HTML export for consistency
 - Hyphens in tracer names are escaped to prevent interpretation as subtraction
 - Supports full range of mass numbers (0-9) and special characters (m for metastable states)
 - The build script (`build-html-bootstrap.py`) automatically sets the `html-export=true` flag
-- Show rule detects export mode via `sys.inputs.at("html-export", default: "false")`
 
 ## Design Principles (DRY & SOLID)
 

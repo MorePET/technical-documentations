@@ -78,10 +78,11 @@
     block(above: 1.4em, below: 1em, it)
   }
 
-  // Configure math equations for isotope notation
+  // Configure math equations
   // - PDF: Use proper math font for best typography
   // - HTML: Use system fonts to match Bootstrap's default font stack
   // - Box inline equations to keep them inline in paragraphs
+  // Note: Isotopes now use Unicode superscripts directly (not math equations)
   set math.equation(numbering: none)
   show math.equation: it => context {
     let is-html = sys.inputs.at("html-export", default: "false") == "true"

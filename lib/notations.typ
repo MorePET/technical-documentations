@@ -1,9 +1,44 @@
 // Nuclear and radiopharmaceutical notation package
-// Uses physica package with html.frame for HTML export compatibility
+// Uses physica package for PDF, Unicode superscripts for HTML export
 //
-// Note: HTML export is enabled via show rule in technical-documentation-package.typ
+// HTML export automatically uses clean Unicode text (e.g., ⁴⁴Sc)
+// PDF export uses physica package for proper mathematical typesetting
 
 #import "@preview/physica:0.9.4": isotope
+
+// ========================================
+// Unicode character mappings for HTML export
+// ========================================
+
+// Map regular digits and letters to Unicode superscript characters
+#let to-superscript(text) = {
+  let char-map = (
+    "0": "⁰", "1": "¹", "2": "²", "3": "³", "4": "⁴",
+    "5": "⁵", "6": "⁶", "7": "⁷", "8": "⁸", "9": "⁹",
+    "m": "ᵐ", "n": "ⁿ",
+    "+": "⁺", "-": "⁻",
+  )
+
+  let result = ""
+  for char in text {
+    result += char-map.at(char, default: char)
+  }
+  result
+}
+
+// Map regular digits to Unicode subscript characters
+#let to-subscript(text) = {
+  let char-map = (
+    "0": "₀", "1": "₁", "2": "₂", "3": "₃", "4": "₄",
+    "5": "₅", "6": "₆", "7": "₇", "8": "₈", "9": "₉",
+  )
+
+  let result = ""
+  for char in text {
+    result += char-map.at(char, default: char)
+  }
+  result
+}
 
 // ========================================
 // Core isotope notation function
@@ -11,15 +46,29 @@
 // A = mass number (superscript)
 // Z = atomic number (subscript, optional)
 //
-// Uses physica package for both PDF and HTML
-// HTML export enabled via html.frame show rule above
-#let nuclide(element, A: none, Z: none) = {
-  if Z != none {
-    isotope(element, a: str(A), z: str(Z))
-  } else if A != none {
-    isotope(element, a: str(A))
+// PDF: Uses physica package for proper math typography
+// HTML: Uses Unicode superscripts for clean text output
+#let nuclide(element, A: none, Z: none) = context {
+  let is-html = sys.inputs.at("html-export", default: "false") == "true"
+
+  if is-html {
+    // HTML export: use Unicode superscripts/subscripts
+    if Z != none {
+      [#to-superscript(str(A))#to-subscript(str(Z))#element]
+    } else if A != none {
+      [#to-superscript(str(A))#element]
+    } else {
+      element
+    }
   } else {
-    element
+    // PDF export: use physica package for proper typography
+    if Z != none {
+      isotope(element, a: str(A), z: str(Z))
+    } else if A != none {
+      isotope(element, a: str(A))
+    } else {
+      element
+    }
   }
 }
 
@@ -28,33 +77,33 @@
 // ========================================
 
 // Fluorine isotopes
-#let F18 = isotope("F", a: "18")
-#let F19 = isotope("F", a: "19")
+#let F18 = nuclide("F", A: "18")
+#let F19 = nuclide("F", A: "19")
 
 // Gallium isotopes
-#let Ga68 = isotope("Ga", a: "68")
+#let Ga68 = nuclide("Ga", A: "68")
 
 // Scandium isotopes
-#let Sc44 = isotope("Sc", a: "44")
-#let Sc47 = isotope("Sc", a: "47")
+#let Sc44 = nuclide("Sc", A: "44")
+#let Sc47 = nuclide("Sc", A: "47")
 
 // Carbon isotopes (for research/labeling)
-#let C11 = isotope("C", a: "11")
-#let C13 = isotope("C", a: "13")
-#let C14 = isotope("C", a: "14")
+#let C11 = nuclide("C", A: "11")
+#let C13 = nuclide("C", A: "13")
+#let C14 = nuclide("C", A: "14")
 
 // Iodine isotopes
-#let I123 = isotope("I", a: "123")
-#let I131 = isotope("I", a: "131")
+#let I123 = nuclide("I", A: "123")
+#let I131 = nuclide("I", A: "131")
 
 // Technetium
-#let Tc99m = isotope("Tc", a: "99m")
+#let Tc99m = nuclide("Tc", A: "99m")
 
 // Oxygen
-#let O15 = isotope("O", a: "15")
+#let O15 = nuclide("O", A: "15")
 
 // Nitrogen
-#let N13 = isotope("N", a: "13")
+#let N13 = nuclide("N", A: "13")
 
 // ========================================
 // Radiopharmaceutical Tracer System
@@ -127,6 +176,23 @@
 // Greek symbols and particles
 // ========================================
 
-// Beta particles
-#let betaplus = $beta^+$
-#let betaminus = $beta^-$
+// Beta particles with Unicode support for HTML
+// PDF: Uses math mode for proper typography
+// HTML: Uses Unicode β⁺ and β⁻ for clean text output
+#let betaplus = context {
+  let is-html = sys.inputs.at("html-export", default: "false") == "true"
+  if is-html {
+    [β⁺]
+  } else {
+    $beta^+$
+  }
+}
+
+#let betaminus = context {
+  let is-html = sys.inputs.at("html-export", default: "false") == "true"
+  if is-html {
+    [β⁻]
+  } else {
+    $beta^-$
+  }
+}
