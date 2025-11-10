@@ -91,14 +91,20 @@ def inject_svgs_into_html(html_content: str, diagrams_dir: Path) -> str:
         # Pattern: <figure>...<img src="data:image/svg+xml...>...<figcaption>Figure X: Caption</figcaption></figure>
         # We want to replace the img tag with dual-theme SVG while keeping the figure wrapper
         # The caption may include "Figure X: " prefix with regular or non-breaking space
-        # Use \s* to match any whitespace including non-breaking spaces
-        pattern = rf"(<figure[^>]*>).*?(<figcaption[^>]*>Figure[\s\xa0]+\d+:[\s\xa0]+{re.escape(caption_text)}.*?</figcaption>\s*</figure>)"
+        # Use [^<]* to match content without starting a new tag (prevents crossing element boundaries)
+        # This ensures we only match within the intended figure element
+        pattern = rf'(<figure[^>]*>\s*<img[^>]*src="data:image/svg\+xml;base64,[^"]*"[^>]*>\s*)(<figcaption[^>]*>Figure[\s\xa0]+\d+:[\s\xa0]+{re.escape(caption_text)}.*?</figcaption>\s*</figure>)'
 
         def replace_figure_img(match, base_name=base_name):
             svg_html = inject_dual_theme_svg(diagrams_dir, base_name)
             if svg_html:
                 # Return figure opening tag + SVG + figcaption + figure closing tag
-                return match.group(1) + "\n    " + svg_html + "\n    " + match.group(2)
+                return (
+                    match.group(1)[: match.group(1).find("<img")]
+                    + svg_html
+                    + "\n    "
+                    + match.group(2)
+                )
             return match.group(0)  # Return original if SVG not found
 
         html_content = re.sub(
