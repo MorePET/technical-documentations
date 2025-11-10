@@ -15,14 +15,17 @@ You need **one** of the following:
   - [Download Docker Desktop](https://www.docker.com/products/docker-desktop/)
   - Ensure Docker Desktop is running before opening the devcontainer
 
-- **Podman Desktop** (alternative, works on Linux/macOS/Windows)
-  - [Download Podman Desktop](https://podman-desktop.io/)
-  - Ensure podman machine is initialized and running:
+- **Podman** (alternative, works on Linux/macOS/Windows)
+  - [Podman Desktop](https://podman-desktop.io/) GUI application, or
+  - [Podman CLI](https://podman.io/docs/installation) command-line only
+  - Ensure podman machine is initialized and running (macOS/Windows):
 
     ```bash
     podman machine init
     podman machine start
     ```
+
+  - On Linux, podman runs natively without a machine
 
 ### Development Environment
 
@@ -44,7 +47,7 @@ You need **one** of the following:
 - Launch Docker Desktop application
 - Wait for it to fully start (Docker icon in system tray)
 
-**Podman users:**
+**Podman users (macOS/Windows):**
 
 ```bash
 # Initialize podman machine (first time only)
@@ -56,6 +59,10 @@ podman machine start
 # Verify it's running
 podman machine list
 ```
+
+**Podman on Linux:**
+
+No setup needed - podman runs natively without a machine.
 
 ### 2. Open in Devcontainer
 
