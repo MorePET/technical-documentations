@@ -5,6 +5,53 @@ All notable changes to this template will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.2] - 2025-11-10
+
+### Added
+
+- **Devcontainer Prerequisites Validation**
+  - Comprehensive 5-step validation script (`setup-user-conf.sh`)
+  - Validates GHCR authentication (Docker/Podman)
+  - Checks SSH public key (`id_ed25519_github.pub`)
+  - Validates allowed-signers file
+  - Checks Git configuration (user.name/email)
+  - Validates GitHub CLI authentication
+  - Provides detailed setup instructions for missing prerequisites
+  - Differentiates between required errors and optional warnings
+  - Shows actionable commands to fix issues
+
+### Changed
+
+- **README Documentation**
+  - Added prominent prerequisite validation tip in Requirements section
+  - Created comprehensive "Host Machine Prerequisites" section
+  - Added GHCR authentication setup with token creation steps
+  - Documented Git configuration alternatives for SSH/remote scenarios
+  - Added SSH key setup with specific naming requirements
+  - Documented allowed-signers file setup
+  - Added GitHub CLI authentication instructions
+  - Created "Quick Validation - Test All Logins" section
+  - Updated Quick Start with "Test All Logins and Prerequisites" step
+  - Added note about Docker/Podman interchangeability
+
+- **Setup Scripts**
+  - Enhanced `setup-user-conf.sh` with environment variable fallback support
+  - Added `GIT_USER_NAME` and `GIT_USER_EMAIL` environment variable support for SSH scenarios
+
+### Fixed
+
+- Improved devcontainer setup UX by preventing "login hell"
+- Better error messaging for missing prerequisites
+- Clear guidance for SSH/remote server scenarios (#18)
+
+## [0.3.1] - 2025-11-10
+
+### Changed
+
+- **Documentation Updates**
+  - Updated devcontainer setup documentation
+  - Improved SSH key and authentication instructions
+
 ## [0.3.0]
 
 ### Added

@@ -7,6 +7,8 @@ documentation generation.
 
 ## Requirements
 
+> **💡 Quick Start:** After installing requirements, run `.devcontainer/setup-user-conf.sh` to test all logins and validate your setup before opening the devcontainer!
+
 ### Container Runtime
 
 You need **one** of the following:
@@ -33,10 +35,122 @@ You need **one** of the following:
   - Install VS Code: <https://code.visualstudio.com/>
   - Install extension: [Dev Containers](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers)
 
-### Optional (for SSH signing)
+### Host Machine Prerequisites
 
-- SSH key configured for Git signing
-- SSH agent running with your key loaded (automatically forwarded to container)
+Before opening the devcontainer, your **host machine** (or remote server) must have:
+
+#### 1. GHCR Authentication ⚠️ CRITICAL
+
+The devcontainer image is pulled from GitHub Container Registry and **requires authentication**.
+
+**Create GitHub Personal Access Token:**
+
+1. Go to [GitHub Settings → Developer settings → Tokens (classic)](https://github.com/settings/tokens)
+2. Click **"Generate new token (classic)"**
+3. Name: `GHCR Dev Container Access`
+4. Select scope: **`read:packages`** ✅ (required)
+5. Generate and **copy the token immediately**
+
+**Login to GHCR:**
+
+```bash
+# Docker
+echo "YOUR_TOKEN" | docker login ghcr.io -u YOUR_GITHUB_USERNAME --password-stdin
+
+# Podman
+echo "YOUR_TOKEN" | podman login ghcr.io -u YOUR_GITHUB_USERNAME --password-stdin
+```
+
+**Verify:**
+
+```bash
+# Docker
+docker pull ghcr.io/morepet/containers/dev/typst:1.3-dev
+
+# Podman
+podman pull ghcr.io/morepet/containers/dev/typst:1.3-dev
+```
+
+#### 2. Git Configuration ⚠️ REQUIRED
+
+```bash
+git config --global user.name "Your Name"
+git config --global user.email "your.email@example.com"
+```
+
+**For SSH/remote scenarios** (if git not configured on remote server):
+
+```bash
+export GIT_USER_NAME="Your Name"
+export GIT_USER_EMAIL="your.email@example.com"
+```
+
+#### 3. SSH Key (Specific Name Required)
+
+The setup expects: `~/.ssh/id_ed25519_github.pub`
+
+**If you don't have this key:**
+
+```bash
+# Generate new key
+ssh-keygen -t ed25519 -C "your.email@example.com" -f ~/.ssh/id_ed25519_github
+
+# Add to GitHub as "Signing key"
+cat ~/.ssh/id_ed25519_github.pub
+# Add at: https://github.com/settings/keys
+```
+
+**If you have a different key name:**
+
+```bash
+# Create symlink
+ln -s ~/.ssh/your_key.pub ~/.ssh/id_ed25519_github.pub
+```
+
+#### 4. Allowed-Signers File
+
+For commit signature verification:
+
+```bash
+mkdir -p ~/.config/git
+echo "your.email@example.com $(cat ~/.ssh/id_ed25519_github.pub)" > ~/.config/git/allowed-signers
+git config --global gpg.ssh.allowedSignersFile ~/.config/git/allowed-signers
+```
+
+#### 5. GitHub CLI (Optional but Recommended)
+
+For seamless GitHub integration:
+
+```bash
+# Install (see https://cli.github.com/)
+# Then authenticate
+gh auth login
+
+# Verify
+gh auth status
+```
+
+#### Quick Validation - Test All Logins
+
+**Before attempting to open the devcontainer, run this script to test all logins and prerequisites:**
+
+```bash
+.devcontainer/setup-user-conf.sh
+```
+
+**This script validates:**
+- ✅ GHCR authentication (Docker/Podman login to ghcr.io)
+- ✅ Git configuration (user.name and user.email)
+- ✅ SSH key setup (id_ed25519_github.pub)
+- ✅ Allowed-signers file
+- ✅ GitHub CLI authentication
+
+**The script will:**
+- Show exactly what's configured ✅ and what's missing ❌
+- Provide step-by-step instructions to fix any issues
+- Tell you if you're ready to open the devcontainer
+
+**Note:** Docker and Podman commands are interchangeable in this guide.
 
 ## Quick Start
 
@@ -64,15 +178,45 @@ podman machine list
 
 No setup needed - podman runs natively without a machine.
 
-### 2. Open in Devcontainer
+### 2. Test All Logins and Prerequisites
+
+**⚠️ IMPORTANT: Run this script to test all your logins before opening the devcontainer:**
+
+```bash
+.devcontainer/setup-user-conf.sh
+```
+
+This validates:
+- GHCR authentication (Docker/Podman → ghcr.io)
+- GitHub CLI authentication
+- Git configuration
+- SSH keys and allowed-signers
+
+**You'll get a full report showing:**
+- ✅ What's correctly configured
+- ❌ What's missing (with instructions to fix)
+- ⚠️ Optional items that can be configured later
+
+**Only proceed to step 3 if the script shows all required items are configured!**
+
+### 3. Open in Devcontainer
+
+**Important:** Complete [Host Machine Prerequisites](#host-machine-prerequisites) first!
 
 1. Clone this repository
 2. Open the folder in VS Code
 3. When prompted, click **"Reopen in Container"**
    - Or use Command Palette (F1): "Dev Containers: Reopen in Container"
-4. Wait for container to build (first time takes 2-3 minutes)
+4. Container will pull and initialize (first time: 2-3 minutes)
+5. Watch initialization output for:
+   - ✅ Container image pulled successfully
+   - ✅ Git configuration valid
+   - ✅ SSH key copied
+   - ✅ GitHub CLI authenticated
 
-### 3. Build Documentation
+**If container fails to pull:** You're not authenticated to `ghcr.io` (see prerequisites step 1)
+
+### 4. Build Documentation
 
 Once inside the devcontainer:
 
@@ -84,7 +228,7 @@ make
 make example
 ```
 
-### 4. View Your Documentation
+### 5. View Your Documentation
 
 Open your browser to <http://localhost:8000> to see:
 
