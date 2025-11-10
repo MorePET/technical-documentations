@@ -23,4 +23,7 @@ SCRIPTS_DIR="/workspace/.devcontainer/scripts"
 # Protect linting configuration files (read-only)
 "$SCRIPTS_DIR/setup-protected-configs.sh"
 
+# Set up Node.js and live-server for development
+"$SCRIPTS_DIR/setup-node-liveserver.sh"
+
 echo "Post-create setup complete"
