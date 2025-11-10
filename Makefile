@@ -15,7 +15,7 @@ THEME_TOGGLE ?= yes
 TECH_DOC_SRC = docs/main.typ
 TECH_DOC_OUT = build/technical-documentation
 EXAMPLE_SRC = example/docs/main.typ
-EXAMPLE_OUT = example/build/example-documentation
+EXAMPLE_OUT = example/build/technical-documentation
 
 # Default target - builds the technical-documentation project
 all: technical-documentation
@@ -48,17 +48,15 @@ technical-documentation:
 	@$(MAKE) build-summary OUT=$(TECH_DOC_OUT)
 	@echo "🌓 Toggle dark mode with the button in top-right"
 
-# Build example project (depends on python-project artifacts)
+# Build example project (uses same build process as technical-documentation)
 example:
 	@echo "=================================================="
 	@echo "🎨 Building Example Project"
 	@echo "=================================================="
-	@$(MAKE) python-api
-	@$(MAKE) python-tests
-	@$(MAKE) python-diagrams
 	@$(MAKE) build-project SRC=$(EXAMPLE_SRC) OUT=$(EXAMPLE_OUT) PROJECT=example
 	@$(MAKE) server-start
 	@$(MAKE) build-summary OUT=$(EXAMPLE_OUT)
+	@echo "🌓 Toggle dark mode with the button in top-right"
 
 # Generate color files (CSS and Typst) from colors.json
 colors:
@@ -132,10 +130,10 @@ check:
 
 # Internal: Check that build outputs exist
 check-outputs:
-	@test -f technical-documentation/build/technical-documentation.pdf && echo "✓ Technical doc PDF exists" || echo "❌ Technical doc PDF missing"
-	@test -f technical-documentation/build/technical-documentation.html && echo "✓ Technical doc HTML exists" || echo "❌ Technical doc HTML missing"
-	@test -f example/build/example-documentation.pdf && echo "✓ Example PDF exists" || echo "❌ Example PDF missing"
-	@test -f example/build/example-documentation.html && echo "✓ Example HTML exists" || echo "❌ Example HTML missing"
+	@test -f build/technical-documentation.pdf && echo "✓ Technical doc PDF exists" || echo "❌ Technical doc PDF missing"
+	@test -f build/technical-documentation.html && echo "✓ Technical doc HTML exists" || echo "❌ Technical doc HTML missing"
+	@test -f example/build/technical-documentation.pdf && echo "✓ Example PDF exists" || echo "❌ Example PDF missing"
+	@test -f example/build/technical-documentation.html && echo "✓ Example HTML exists" || echo "❌ Example HTML missing"
 	@test -f lib/generated/colors.css && echo "✓ Colors generated" || echo "❌ Colors missing"
 
 # Quick test - compile everything and check outputs exist
@@ -146,7 +144,7 @@ test: technical-documentation example
 
 # Internal: Remove PDF and HTML outputs
 clean-outputs:
-	@rm -rf technical-documentation/build/
+	@rm -rf build/
 	@rm -rf example/build/
 	@rm -rf example/python-project/build/
 	@rm -f *_temp*.html
