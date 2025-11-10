@@ -15,29 +15,28 @@
 // Align first column to left
 #show table.cell.where(x: 0): set align(left)
 
-
-= Medical Device Development
+Medical Device Development
 <b---company-product>
-== IVDR (EU) 2017/746 EN Version
+= IVDR (EU) 2017/746 EN Version
 <ivdr-eu-2017746-en-version>
-=== TEXTBOOK
+== TEXTBOOK
 <textbook>
 #link("attachments/Regulatory_Pathways_for_IVD-Medical_Devices.docx")[Regulatory\_Pathways\_for\_IVD-Medical\_Devices.docx]
 (2.2 MB)
 
-== MDR (EU) 2017/745 EN Version
+= MDR (EU) 2017/745 EN Version
 <mdr-eu-2017745-en-version>
-=== TEXTBOOK
+== TEXTBOOK
 <textbook-1>
 
 #link("attachments/Regulatory_Pathways_for_Medical_Devices.docx")[Regulatory\_Pathways\_for\_Medical\_Devices.docx]
 (2.1 MB)
 
-== ExoPET
+= ExoPET
 <exopet>
-=== iUse / wPrinciples / Classification
+== iUse / wPrinciples / Classification
 <iuse-wprinciples-classification>
-==== Intended Purpose / Intended Use
+=== Intended Purpose / Intended Use
 <intended-purpose-intended-use>
 #strong[Intended Purpose] \
 The DUPLET / EXOPET system is intended to perform simultaneous
@@ -70,9 +69,9 @@ exposure (compared to sequential scans), better alignment of diagnostic
 imaging with targeted therapies, and potential for new biomarker
 discovery through positron annihilation lifetime analysis.
 
-==== Working Principle, Components, and Accessories
+=== Working Principle, Components, and Accessories
 <working-principle-components-and-accessories>
-===== Working Principle
+==== Working Principle
 <working-principle>
 DUPLET departs from traditional sinogram-based PET by acquiring and
 analyzing #strong[list-mode PET data];, enabling:
@@ -89,13 +88,13 @@ analyzing #strong[list-mode PET data];, enabling:
   #strong[Cartesian-time-histogram space] with increased sensitivity and
   signal-to-noise ratio (SNR).
 
-===== System Components
+==== System Components
 <system-components>
   #table(
     columns: (auto, auto),
     align: (auto,auto,),
     table.hline(),
-    table.header([Subsystem], [Description],),
+    [Subsystem], [Description],
     table.hline(),
     [PET Detector Hardware (EXOPET)], [Custom-built modular scanner
     using LYSO crystals and SiPMs in arc-ring architecture, optimized
@@ -113,7 +112,7 @@ analyzing #strong[list-mode PET data];, enabling:
     integrated with BioMedIT/Leonhard Med.],
     table.hline(),
   )
-===== Accessories
+==== Accessories
 <accessories>
 - Phantom sets for validation and calibration
 - Cyclotron-based isotope production (e.g., \[44Sc\] via Ca(p,n)Sc)
@@ -121,16 +120,16 @@ analyzing #strong[list-mode PET data];, enabling:
 - Clinical interface (graphical front-end for acquisition and
   processing)
 
-==== MDR Classification with Rationale (Annex VIII MDR 2017/745)
+=== MDR Classification with Rationale (Annex VIII MDR 2017/745)
 <mdr-classification-with-rationale-annex-viii-mdr-2017745>
-===== Applicable Rules (Annex VIII, MDR)
+==== Applicable Rules (Annex VIII, MDR)
 <applicable-rules-annex-viii-mdr>
 #figure(
   align(center)[#table(
     columns: (auto, auto),
     align: (auto,auto,),
     table.hline(),
-    table.header([Rule], [Justification],),
+    [Rule], [Justification],
     table.hline(),
     [Rule 10], [Applies to active devices for diagnosis that monitor
     vital physiological processes. Although PET imaging is not direct
@@ -144,7 +143,7 @@ analyzing #strong[list-mode PET data];, enabling:
   , kind: table
   )
 
-===== Proposed Classification: [Class IIb]
+==== Proposed Classification: [Class IIb]
 <proposed-classification-class-iib>
 #strong[Rationale:]
 
@@ -162,40 +161,36 @@ analyzing #strong[list-mode PET data];, enabling:
   #strong[direct therapeutic implications] of the diagnostic
   information.
 
-===== Software Risk Classification (IEC 62304): Class C
+==== Software Risk Classification (IEC 62304): Class C
 <software-risk-classification-iec-62304-class-c>
 - The software is used to inform treatment selection decisions (e.g.,
   inclusion/exclusion from PRRT protocols).
 - Misclassification due to incorrect tracer separation or signal
   discrimination could lead to #strong[incorrect patient management];.
 
-=== Design and Development
+== Design and Development
 <design-and-development>
-==== D&D Planning
+=== D&D Planning
 <dd-planning>
-===== Explanations
-<explanations>#table(
+==== Explanations
+<explanations>
+
+#table(
     columns: (5cm, auto),
     align: (auto,auto,),
     table.hline(),
-    table.header([Element], [Explanation],),
+    [Element], [Explanation],
     table.hline(),
-    [Design & Development Plan (DDP)], [A roadmap describing how the
-    medical device is developed — from idea to product release.],
-    [Task], [A specific action that must be performed during
-    development.],
-    [Standard Reference], [Which international regulation or standard
-    applies (e.g., MDR, ISO 13485, IEC 62304).],
-    [Responsible], [Who owns or leads the task (e.g., project manager,
-    software lead, regulatory affairs).],
-    [Deliverable], [What result, document, or milestone should come from
-    the task.],
-    [Remarks / Reference], [A space to track status (e.g., "done"), link
-    documents, or make internal notes.],
+    [Design & Development Plan (DDP)], [A roadmap describing how the medical device is developed — from idea to product release.],
+    [Task], [A specific action that must be performed during development.],
+    [Standard Reference], [Which international regulation or standard applies (e.g., MDR, ISO 13485, IEC 62304).],
+    [Responsible], [Who owns or leads the task (e.g., project manager, software lead, regulatory affairs).],
+    [Deliverable], [What result, document, or milestone should come from the task.],
+    [Remarks / Reference], [A space to track status (e.g., "done"), link documents, or make internal notes.],
     table.hline(),
   )
 
-===== This plan must ensure compliance with:
+==== This plan must ensure compliance with:
 <this-plan-must-ensure-compliance-with>
 - #strong[ISO 13485:2016] – Quality management system
 - #strong[MDR 2017/745] – EU medical device regulation
@@ -206,21 +201,21 @@ analyzing #strong[list-mode PET data];, enabling:
 - #strong[IEC 60601] – Electrical safety
 - #strong[ISO 20416:2020] – Post-market surveillance
 
-===== Product Realization Plan
+==== Product Realization Plan
 <product-realization-plan>
 #link("attachments/Regulatory_Thinking_Product_Realization_Plan.xlsx")[Regulatory\_Thinking\_Product\_Realization\_Plan.xlsx]
 (33.2 kB)
 
-====== Design & Development Plan – DUPLET / EXOPET
+===== Design & Development Plan – DUPLET / EXOPET
 <design-development-plan-duplet-exopet>
 
   #table(
     columns: (auto, auto, auto, auto, auto, auto),
     align: (auto,auto,auto,auto,auto,auto,),
     table.hline(),
-    table.header([Phase / Milestone], [Task], [Standard
+    [Phase / Milestone], [Task], [Standa
       Reference], [Responsible], [Review / Deliverable], [Remarks /
-      Reference],),
+      Reference],
     table.hline(),
     [Initial Planning], [Define project structure], [ISO 13485 §7.3.2 /
     MDR Annex II], [Project Manager], [DDP v1], [],
@@ -275,15 +270,15 @@ analyzing #strong[list-mode PET data];, enabling:
     Team], [PMS Plan, PMCF, Feedback Register], [],
     table.hline(),
   )
-==== D&D Matrix (DiDo)
+=== D&D Matrix (DiDo)
 <dd-matrix-dido>
-===== Stakeholder Definitions for DUPLET / EXOPET System
+==== Stakeholder Definitions for DUPLET / EXOPET System
 <stakeholder-definitions-for-duplet-exopet-system>
 #table(
     columns: (5cm, auto),
     align: (auto,auto,),
     table.hline(),
-    table.header([Stakeholder], [Definition and Role],),
+    [Stakeholder], [Definition and Role],
     table.hline(),
     [Medical Doctors], [Physicians specializing in nuclear medicine,
     oncology, radiology, or theranostics who are responsible for
@@ -349,14 +344,14 @@ analyzing #strong[list-mode PET data];, enabling:
     table.hline(),
   )
 
-====== DIDO Matrix – DUPLET / EXOPET
+===== DIDO Matrix – DUPLET / EXOPET
 <dido-matrix-duplet-exopet>
 #table(
     columns: (auto, auto, auto, auto),
     align: (auto,auto,auto,auto,),
     table.hline(),
-    table.header([Stakeholder], [Stakeholder Requirement], [Product
-      Requirement], [Preliminary Product Specification],),
+    [Stakeholder], [Stakeholder Requirement], [Product
+      Requirement], [Preliminary Product Specification],
     table.hline(),
     [Medical Doctors], [Clear image separation for two
     tracers], [Dual-tracer separation must be \>90% accurate], [ML-based
@@ -444,13 +439,13 @@ analyzing #strong[list-mode PET data];, enabling:
   table.hline(),
   )
 
-====== Systemkomponentenübersicht – DUPLET / EXOPET
+===== Systemkomponentenübersicht – DUPLET / EXOPET
 <systemkomponentenübersicht-duplet-exopet>
 #table(
     columns: (5cm, auto),
     align: (left,auto,),
     table.hline(),
-    table.header([Systemkomponente], [Definition und Zweck],),
+    [Systemkomponente], [Definition und Zweck],
     table.hline(),
     [PET-Detektorhardware (EXOPET-Ring)], [Modularer Ring aus
     LYSO-Kristallen und SiPMs zur Detektion von β⁺-Annihilations- und
@@ -493,15 +488,15 @@ analyzing #strong[list-mode PET data];, enabling:
     über BioMedIT/Leonhard Med.],
     table.hline(),
   )
-==== Verification and Validation (V&V)
+=== Verification and Validation (V&V)
 <verification-and-validation-vv>
-===== V&V Plan
+==== V&V Plan
 <vv-plan>
-===== V&V Report
+==== V&V Report
 <vv-report>
-===== Testing
+==== Testing
 <testing>
-==== Software Development
+=== Software Development
 <software-development>
 - #strong[Development environment & OS (IEC 62304 §5.1.6; ISO 13485
   §7.5.6)]
@@ -568,49 +563,49 @@ analyzing #strong[list-mode PET data];, enabling:
     Software Verification & Validation Plan/Report, Configuration
     Management and Problem Resolution procedures.
 
-===== ISO 62304 Checklist
+==== ISO 62304 Checklist
 <iso-62304-checklist>
 #link("attachments/ISO_62304_Implementation_Checklist.xlsx")[ISO\_62304\_Implementation\_Checklist.xlsx]
 (37.5 kB)
 
-=== Risk Management (RM)
+== Risk Management (RM)
 <risk-management-rm>
-==== RM Plan
+=== RM Plan
 <rm-plan>
 #link("attachments/BD_Risk_Management_Plan.docx")[BD\_Risk\_Management\_Plan.docx]
 (114.6 kB)
 
-==== RM Report
+=== RM Report
 <rm-report>
 #link("attachments/BD_Risk_Management_Report.docx")[BD\_Risk\_Management\_Report.docx]
 (77.7 kB)
 
-==== FMEA
+=== FMEA
 <fmea>
-=== Usability Engineering (UE)
+== Usability Engineering (UE)
 <usability-engineering-ue>
-==== UE Plan
+=== UE Plan
 <ue-plan>
-==== UE Report
+=== UE Report
 <ue-report>
-=== Clinical Evaluation (ClinEval)
+== Clinical Evaluation (ClinEval)
 <clinical-evaluation-clineval>
-==== Clinical Study Development Plan
+=== Clinical Study Development Plan
 <clinical-study-development-plan>
-===== IB MDR - Investigator´s Brochure
+==== IB MDR - Investigator´s Brochure
 <ib-mdr---investigators-brochure>
 #link("attachments/RT_Basis-Document_IB_MD.docx")[RT\_Basis-Document\_IB\_MD.docx]
 (90.6 kB)
 
-==== ClinEval Plan
+=== ClinEval Plan
 <clineval-plan>
-==== ClinEval Report
+=== ClinEval Report
 <clineval-report>
-=== EU AI ACT
+== EU AI ACT
 <eu-ai-act>
-=== PMS - Post Market Surveillance
+== PMS - Post Market Surveillance
 <pms---post-market-surveillance>
-==== Post Market Surveillance Medical Devices
+=== Post Market Surveillance Medical Devices
 <post-market-surveillance-medical-devices>
-==== Post Market Surveillance IVD Medical Devices
+=== Post Market Surveillance IVD Medical Devices
 <post-market-surveillance-ivd-medical-devices>

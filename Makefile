@@ -12,8 +12,8 @@ PROJECT ?= technical-documentation
 THEME_TOGGLE ?= yes
 
 # Project configurations
-TECH_DOC_SRC = technical-documentation/technical-documentation.typ
-TECH_DOC_OUT = technical-documentation/build/technical-documentation
+TECH_DOC_SRC = docs/main.typ
+TECH_DOC_OUT = build/technical-documentation
 EXAMPLE_SRC = example/docs/main.typ
 EXAMPLE_OUT = example/build/example-documentation
 
