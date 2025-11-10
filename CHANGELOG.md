@@ -5,6 +5,21 @@ All notable changes to this template will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+
+- **Podman Usage Documentation**
+  - Comprehensive guide for using devcontainer with Podman without VS Code (#24)
+  - Three usage options: Direct CLI, Podman Compose, and Dev Container CLI
+  - `podman-compose.yml` configuration file for declarative container management
+  - Detailed comparison table of all three Podman usage options
+  - SELinux context handling documentation for Linux users (`:Z` flag)
+  - Proper initialization script execution order (post-create.sh, post-attach.sh)
+  - Installation instructions for multiple platforms
+  - Pros/cons analysis for each approach
+  - Recommendations for different use cases
+
 ## [0.4.1] - 2025-11-10
 
 ### Fixed
