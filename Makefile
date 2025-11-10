@@ -2,7 +2,7 @@
 # Builds diagrams, colors, PDF, and HTML with dark mode support
 # Supports multiple projects
 
-.PHONY: all clean colors diagrams pdf html help check test example technical-documentation rebuild install-hook build-project build-summary check-outputs clean-outputs clean-generated server-start server-stop server-status
+.PHONY: all clean colors diagrams pdf html help check test example technical-documentation rebuild install-hook build-project build-summary check-outputs clean-outputs clean-generated server-start server-stop server-status version bump-patch bump-minor bump-major
 
 # Default project
 PROJECT ?= technical-documentation
@@ -125,7 +125,7 @@ check:
 	@echo "🔍 Checking configuration..."
 	@python3 -c "import json; json.load(open('lib/colors.json')); print('✓ lib/colors.json is valid')"
 	@python3 -c "from pathlib import Path; assert Path('lib/technical-documentation-package.typ').exists(); print('✓ Package exists')"
-	@python3 -c "from pathlib import Path; assert Path('technical-documentation/technical-documentation.typ').exists(); print('✓ Main document exists')"
+	@python3 -c "from pathlib import Path; assert Path('docs/main.typ').exists(); print('✓ Main document exists')"
 	@echo "✅ All checks passed"
 
 # Internal: Check that build outputs exist
@@ -199,6 +199,12 @@ help:
 	@echo "  make server-start       - Start dev server (live-server or Python fallback) on port 8000"
 	@echo "  make server-stop        - Stop the HTTP server"
 	@echo "  make server-status      - Check server status"
+	@echo ""
+	@echo "Version management:"
+	@echo "  make version            - Show current version from pyproject.toml"
+	@echo "  make bump-patch         - Bump patch version (0.3.2 → 0.3.3)"
+	@echo "  make bump-minor         - Bump minor version (0.3.2 → 0.4.0)"
+	@echo "  make bump-major         - Bump major version (0.3.2 → 1.0.0)"
 	@echo ""
 	@echo "Pre-commit hook:"
 	@echo "  make install-hook       - Install git pre-commit hook"
@@ -275,3 +281,35 @@ server-status:
 		echo "ℹ️  Server not running (no PID file)"; \
 		echo "   Start with: make server-start"; \
 	fi
+
+# ==============================================================================
+# Version Management
+# ==============================================================================
+
+# Show current version from pyproject.toml
+version:
+	@echo "Current version: $$(python3 scripts/get_version.py)"
+
+# Bump patch version (0.3.2 → 0.3.3)
+bump-patch:
+	@echo "🔄 Bumping patch version..."
+	@python3 scripts/bump_version.py patch
+	@echo ""
+	@echo "📝 Next: Review and update CHANGELOG.md with actual changes"
+	@echo "💾 Then: git add pyproject.toml CHANGELOG.md && git commit -m 'chore(release): bump version'"
+
+# Bump minor version (0.3.2 → 0.4.0)
+bump-minor:
+	@echo "🔄 Bumping minor version..."
+	@python3 scripts/bump_version.py minor
+	@echo ""
+	@echo "📝 Next: Review and update CHANGELOG.md with actual changes"
+	@echo "💾 Then: git add pyproject.toml CHANGELOG.md && git commit -m 'chore(release): bump version'"
+
+# Bump major version (0.3.2 → 1.0.0)
+bump-major:
+	@echo "🔄 Bumping major version..."
+	@python3 scripts/bump_version.py major
+	@echo ""
+	@echo "📝 Next: Review and update CHANGELOG.md with actual changes"
+	@echo "💾 Then: git add pyproject.toml CHANGELOG.md && git commit -m 'chore(release): bump version'"
