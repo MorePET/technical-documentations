@@ -51,7 +51,7 @@
 #strong[Intended Purpose] \
 The DUPLET / EXOPET system is intended to perform simultaneous
 dual-tracer Positron Emission Tomography (PET) imaging using
-radiopharmaceuticals that emit β⁺ particles, enabling non-invasive in
+radiopharmaceuticals that emit #betaplus particles, enabling non-invasive in
 vivo detection, spatial localization, and functional characterization of
 cancer lesions with high spatial and temporal resolution. It aims to
 improve diagnosis and therapy planning by resolving intralesional and
@@ -89,8 +89,8 @@ analyzing #strong[list-mode PET data];, enabling:
 - Capture of full photon energy and timestamp data for each detection
   event.
 - Identification of #strong[triplet events];: two 511 keV annihilation
-  photons and an additional prompt nuclear gamma (e.g., from 68Ga or
-  44Sc decay).
+  photons and an additional prompt nuclear gamma (e.g., from #Ga68 or
+  #Sc44 decay).
 - Separation of signals from multiple tracers in one scan by applying
   #strong[energy-time discrimination];, positron lifetime analysis, and
   ML-supported pattern recognition.
@@ -117,7 +117,7 @@ analyzing #strong[list-mode PET data];, enabling:
     algorithms using MVA/BDT, supervised learning, and domain-adapted
     image reconstruction (CASTOR, STIR, Geant4/GATE).],
     [Radiotracers and Isotopes], [Dual-tracer combinations, typically
-    \[18F\]-FDG and \[68Ga\]-PSMA or \[44Sc\]-FAPI.],
+    #FDG and #Ga68PSMA or #Sc44FAPI().],
     [Image Analysis Workstation], [GPU-supported server platform
     integrated with BioMedIT/Leonhard Med.],
     table.hline(),
@@ -125,7 +125,7 @@ analyzing #strong[list-mode PET data];, enabling:
 ==== Accessories
 <accessories>
 - Phantom sets for validation and calibration
-- Cyclotron-based isotope production (e.g., \[44Sc\] via Ca(p,n)Sc)
+- Cyclotron-based isotope production (e.g., #Sc44 via Ca(p,n)Sc)
 - Dose calibrators, gamma spectrometers, and QA tools
 - Clinical interface (graphical front-end for acquisition and
   processing)
@@ -314,7 +314,7 @@ analyzing #strong[list-mode PET data];, enabling:
     oncology to bridge human and veterinary diagnostics.],
     [Radiopharmacists / Radiochemists], [Experts responsible for the
     production, radiolabeling, quality control, and dosing of PET
-    tracers such as \[¹⁸F\]FDG and \[⁴⁴Sc\]-FAPI-04 under GMP or
+    tracers such as #FDG and #Sc44FAPI04 under GMP or
     equivalent standards.],
     [Software Developers / Data Scientists], [Personnel developing and
     maintaining the reconstruction, dual-tracer separation, and ML
@@ -449,53 +449,50 @@ analyzing #strong[list-mode PET data];, enabling:
   table.hline(),
   )
 
-===== Systemkomponentenübersicht – DUPLET / EXOPET
-<systemkomponentenübersicht-duplet-exopet>
+===== System Components Overview – DUPLET / EXOPET
+<system-components-overview-duplet-exopet>
 #table(
     columns: (5cm, auto),
     align: (left,auto,),
     table.hline(),
-    [Systemkomponente], [Definition und Zweck],
+    [System Component], [Definition and Purpose],
     table.hline(),
-    [PET-Detektorhardware (EXOPET-Ring)], [Modularer Ring aus
-    LYSO-Kristallen und SiPMs zur Detektion von β⁺-Annihilations- und
-    nuklearen Gammastrahlen (z. B. von ⁶⁸Ga oder ⁴⁴Sc). Ermöglicht
-    simultane Multi-Tracer-Bildgebung mit hoher räumlicher und
-    zeitlicher Auflösung.],
-    [Akquisitionselektronik & DAQ-System], [FPGA-basierte Zeitstempelung
-    und Digitalisierung aller Detektionsereignisse im List-Mode (inkl.
-    Energie & Zeit). Hohe Datenrate und Echtzeit-Speicherung zur
-    ML-gestützten Ereignisanalyse.],
-    [Bildverarbeitungssoftware & ML-Pipeline], [Software-Framework zur
-    Tracer-Diskriminierung (z. B. ⁶⁸Ga vs.~¹⁸F), basierend auf
-    Zeit-Energie-Korrelationen und ML-Algorithmen. Unterstützt
-    quantitative Bildrekonstruktion (z. B. SUV-Berechnung) und
-    Positronen-Lifetime-Analyse.],
-    [Benutzeroberfläche & Workflow-Software], [Touchscreen-gesteuerte
-    Bedienoberfläche zur Steuerung von Injektionen, Start/Stop des
-    Scans, Logging, Patientensicherheit und Positionierung.
-    Workflowführung zur Sicherstellung von Dual-Tracer-Kompatibilität.],
-    [Radiopharmazeutische Schnittstelle], [Eingabemodule für
-    Tracerinformationen (z. B. Aktivität, Injektionszeitpunkt,
-    Halbwertszeit), automatisierte Zerfallskorrektur und Verknüpfung mit
-    Dosimetriealgorithmen. GMP-konform.],
-    [Gehäuse & Mechanik], [Clamp-On-Ringstruktur zur Nachrüstung
-    bestehender PET/CT-Geräte. Wartungsfreundliches, modulares Design
-    mit Schnellzugriff auf Komponenten für Servicezwecke.],
-    [Datenexport & PACS-Integration], [HL7- und DICOM-kompatibler Export
-    an klinische IT-Systeme (PACS/RIS). Absicherung der Datenübertragung
-    durch AES-Verschlüsselung, Audit-Trail und BioMedIT-Anbindung.],
-    [Kalibrierung & QA-Zubehör], [NEMA-NU2-konforme Phantome (z. B. IEC
-    Body Phantom), automatische Kalibrierungsroutinen,
-    Tageskontrollfunktionen für Energie, Zeitauflösung und
-    Sensitivität.],
-    [Tierbildgebungsschnittstelle], [Spezielle Aufnahmeeinsätze und
-    Immobilisierungshilfen zur PET/CT-Diagnostik bei Hunden (z. B. für
-    komparative Onkologie). Anpassbar für Kleintiere.],
-    [IT-Sicherheit & Datenmanagement], [Sichere Speicherung und
-    Verarbeitung von Rohdaten und Patientendaten. DSGVO/HFG-konforme
-    Pseudonymisierung, rollenbasiertes Benutzer-Login, Datenübertragung
-    über BioMedIT/Leonhard Med.],
+    [PET Detector Hardware (EXOPET Ring)], [Modular ring of LYSO
+    crystals and SiPMs for detection of #betaplus annihilation and nuclear
+    gamma rays (e.g., from #Ga68 or #Sc44). Enables simultaneous
+    multi-tracer imaging with high spatial and temporal resolution.],
+    [Acquisition Electronics & DAQ System], [FPGA-based timestamping and
+    digitization of all detection events in list mode (incl. energy &
+    time). High data rate and real-time storage for ML-supported event
+    analysis.],
+    [Image Processing Software & ML Pipeline], [Software framework for
+    tracer discrimination (e.g., #Ga68 vs.~#F18), based on time-energy
+    correlations and ML algorithms. Supports quantitative image
+    reconstruction (e.g., SUV calculation) and positron lifetime
+    analysis.],
+    [User Interface & Workflow Software], [Touchscreen-controlled
+    interface for managing injections, scan start/stop, logging, patient
+    safety, and positioning. Workflow guidance to ensure dual-tracer
+    compatibility.],
+    [Radiopharmaceutical Interface], [Input modules for tracer
+    information (e.g., activity, injection time, half-life), automated
+    decay correction, and integration with dosimetry algorithms.
+    GMP-compliant.],
+    [Housing & Mechanics], [Clamp-on ring structure for retrofitting
+    existing PET/CT devices. Maintenance-friendly, modular design with
+    quick access to components for service purposes.],
+    [Data Export & PACS Integration], [HL7 and DICOM-compatible export
+    to clinical IT systems (PACS/RIS). Data transmission secured through
+    AES encryption, audit trail, and BioMedIT integration.],
+    [Calibration & QA Accessories], [NEMA NU-2 compliant phantoms (e.g.,
+    IEC Body Phantom), automatic calibration routines, daily quality
+    control functions for energy, time resolution, and sensitivity.],
+    [Animal Imaging Interface], [Special imaging inserts and
+    immobilization aids for PET/CT diagnostics in dogs (e.g., for
+    comparative oncology). Adaptable for small animals.],
+    [IT Security & Data Management], [Secure storage and processing of
+    raw data and patient data. GDPR/HFG-compliant pseudonymization,
+    role-based user login, data transmission via BioMedIT/Leonhard Med.],
     table.hline(),
   )
 === Verification and Validation (V&V)

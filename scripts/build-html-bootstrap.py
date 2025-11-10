@@ -34,6 +34,8 @@ def compile_typst_to_html(typ_file: Path, html_file: Path) -> bool:
                 "html",
                 "--input",
                 "use-svg=true",
+                "--input",
+                "html-export=true",
                 str(typ_file),
                 str(html_file),
             ],

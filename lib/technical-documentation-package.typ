@@ -7,6 +7,9 @@
 // Import Cheq for markdown-like checklists
 #import "@preview/cheq:0.3.0": checklist
 
+// Import and re-export notations for isotopes and radiopharmaceuticals
+#import "notations.typ": *
+
 // Main template function that applies all formatting
 #let tech-doc(
   body,
@@ -47,8 +50,17 @@
   // )
 
   // Set text properties
+  // PDF: Libertinus Serif for beautiful typography
+  // HTML: System fonts to match Bootstrap 5.3.2
+  let is-html = sys.inputs.at("html-export", default: "false") == "true"
+  let body-font = if is-html {
+    ("system-ui", "Arial", "sans-serif")
+  } else {
+    "Libertinus Serif"
+  }
+
   set text(
-    font: "Libertinus Serif",
+    font: body-font,
     size: 10pt,
     lang: "en",
   )
@@ -64,6 +76,28 @@
   show heading: it => {
     set text(weight: "bold")
     block(above: 1.4em, below: 1em, it)
+  }
+
+  // Configure math equations
+  // - PDF: Use proper math font for best typography
+  // - HTML: Use system fonts to match Bootstrap's default font stack
+  // - Box inline equations to keep them inline in paragraphs
+  // Note: Isotopes now use Unicode superscripts directly (not math equations)
+  set math.equation(numbering: none)
+  show math.equation: it => context {
+    let is-html = sys.inputs.at("html-export", default: "false") == "true"
+
+    if is-html {
+      // HTML export: match Bootstrap's system font stack (sans-serif)
+      // Bootstrap 5.3.2 uses: system-ui, -apple-system, "Segoe UI", Roboto, etc.
+      set text(font: ("system-ui", "Arial", "sans-serif"))
+      // Wrap inline equations in box so they don't interrupt paragraphs
+      show: if it.block { it => it } else { box }
+      html.frame(it)
+    } else {
+      // PDF export: use default math font for proper math typography
+      it
+    }
   }
 
   // Note: HTML styling must be added after export using Bootstrap build script:
