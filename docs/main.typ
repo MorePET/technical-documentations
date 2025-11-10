@@ -1,5 +1,8 @@
+#import "../lib/technical-documentation-package.typ": *
+#show: tech-doc
+
 #outline(
-  // title: "Table of Contents",
+  title: "Table of Contents",
   // depth: 3,
   indent: auto
 )
@@ -15,8 +18,15 @@
 // Align first column to left
 #show table.cell.where(x: 0): set align(left)
 
-Medical Device Development
-<b---company-product>
+#align(center)[
+  #v(3em)
+  #text(28pt, weight: "bold")[
+    Medical Device Development
+    <b---company-product>
+  ]
+]
+
+
 = IVDR (EU) 2017/746 EN Version
 <ivdr-eu-2017746-en-version>
 == TEXTBOOK
@@ -91,7 +101,7 @@ analyzing #strong[list-mode PET data];, enabling:
 ==== System Components
 <system-components>
   #table(
-    columns: (auto, auto),
+    columns: (auto, 1fr),
     align: (auto,auto,),
     table.hline(),
     [Subsystem], [Description],
