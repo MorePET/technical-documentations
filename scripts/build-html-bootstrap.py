@@ -20,7 +20,7 @@ from pathlib import Path
 
 
 def compile_typst_to_html(typ_file: Path, html_file: Path) -> bool:
-    """Compile Typst document to HTML with inline SVG support."""
+    """Compile Typst document to HTML with SVG support (legacy approach until Typst adds HTML export)."""
     print(f"Compiling {typ_file} to HTML...")
 
     try:
@@ -30,12 +30,8 @@ def compile_typst_to_html(typ_file: Path, html_file: Path) -> bool:
                 "compile",
                 "--root",
                 ".",
-                "--features",
-                "html",
                 "--input",
                 "use-svg=true",
-                "--input",
-                "html-export=true",
                 str(typ_file),
                 str(html_file),
             ],
@@ -245,38 +241,43 @@ def main():
     print("Bootstrap HTML Build Workflow")
     print("=" * 70)
 
-    # Step 1: Compile to HTML with inline SVGs via html.frame
+    # Step 1: Compile to HTML (legacy approach - Typst 0.12.0 doesn't support HTML export yet)
     temp_html = html_file.parent / f"{html_file.stem}_temp.html"
     if not compile_typst_to_html(typ_file, temp_html):
         sys.exit(1)
 
-    # Step 2: Add Bootstrap classes
+    # Step 2: Post-process HTML (inject SVGs - needed until Typst adds HTML export)
     temp_html2 = html_file.parent / f"{html_file.stem}_temp2.html"
-    if not add_bootstrap_classes(temp_html, temp_html2):
+    if not post_process_html(temp_html, temp_html2):
         sys.exit(1)
 
-    # Step 3: Remove body TOC (keep sidebar TOC only)
+    # Step 3: Add Bootstrap classes
     temp_html3 = html_file.parent / f"{html_file.stem}_temp3.html"
-    if not remove_body_toc(temp_html2, temp_html3):
+    if not add_bootstrap_classes(temp_html2, temp_html3):
         sys.exit(1)
 
-    # Step 4: Copy custom CSS and JS
+    # Step 4: Remove body TOC (keep sidebar TOC only)
+    temp_html4 = html_file.parent / f"{html_file.stem}_temp4.html"
+    if not remove_body_toc(temp_html3, temp_html4):
+        sys.exit(1)
+
+    # Step 5: Copy custom CSS and JS
     copy_css_and_js(html_file)
 
-    # Step 5: Add Bootstrap styling (CSS/JS, theme toggle, TOC)
+    # Step 6: Add Bootstrap styling (CSS/JS, theme toggle, TOC)
     # Copy temp file to final output first
-    shutil.copy(temp_html3, html_file)
+    shutil.copy(temp_html4, html_file)
 
     if not add_bootstrap_styling(
         html_file, theme_toggle=theme_toggle, toc_sidebar=toc_sidebar
     ):
         sys.exit(1)
 
-    # Step 6: Fix trailing whitespace
+    # Step 7: Fix trailing whitespace
     fix_trailing_whitespace(html_file)
 
     # Clean up temp files
-    for temp_file in [temp_html, temp_html2, temp_html3]:
+    for temp_file in [temp_html, temp_html2, temp_html3, temp_html4]:
         if temp_file.exists():
             temp_file.unlink()
 
