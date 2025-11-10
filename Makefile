@@ -198,7 +198,7 @@ help:
 	@echo "  make help               - Show this help message"
 	@echo ""
 	@echo "Server targets:"
-	@echo "  make server-start       - Start HTTP server on port 8000"
+	@echo "  make server-start       - Start dev server (live-server or Python fallback) on port 8000"
 	@echo "  make server-stop        - Stop the HTTP server"
 	@echo "  make server-status      - Check server status"
 	@echo ""
@@ -233,10 +233,17 @@ server-start:
 		echo "✅ Server already running (PID: $$(cat .server.pid))"; \
 	else \
 		rm -f .server.pid; \
-		python3 -m http.server 8000 > /dev/null 2>&1 & echo $$! > .server.pid; \
+		if command -v live-server >/dev/null 2>&1; then \
+			echo "🚀 Starting live-server..."; \
+			live-server --port=8000 --no-browser --quiet --wait=100 > /dev/null 2>&1 & echo $$! > .server.pid; \
+		else \
+			echo "⚠️  live-server not found, falling back to Python server"; \
+			python3 scripts/dev-server.py -p 8000 > /dev/null 2>&1 & echo $$! > .server.pid; \
+		fi; \
 		sleep 1; \
 		if [ -f .server.pid ] && kill -0 $$(cat .server.pid) 2>/dev/null; then \
 			echo "🌐 Server started (PID: $$(cat .server.pid))"; \
+			echo "📖 http://localhost:8000/build/technical-documentation.html"; \
 		else \
 			echo "❌ Failed to start server (port may be in use)"; \
 			rm -f .server.pid; \

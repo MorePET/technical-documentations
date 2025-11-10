@@ -168,6 +168,7 @@ h3::before {
 }
 
 /* Column widths */
+/* Default widths for 4-column tables */
 .table td:nth-child(2) {
   width: 28%;
 }
@@ -178,6 +179,11 @@ h3::before {
 
 .table td:nth-child(4) {
   width: 29%;
+}
+
+/* Override for 2-column tables: let second column expand */
+.table tr:has(td:nth-child(2):last-child) td:nth-child(2) {
+  width: auto !important;
 }
 
 /* Disable Bootstrap's default table-hover effect on header row */

@@ -6,7 +6,28 @@ Usage: python add-styling-bootstrap.py input.html [output.html] [--inline] [--th
 
 import re
 import sys
+import time
 from pathlib import Path
+
+
+def get_cache_buster(file_path=None):
+    """
+    Generate a cache-busting query parameter.
+    Uses file modification time if file exists, otherwise uses current timestamp.
+
+    Args:
+        file_path: Optional path to file to check modification time
+
+    Returns:
+        String like "?v=1699632000" for cache-busting
+    """
+    if file_path and Path(file_path).exists():
+        # Use file modification time
+        mtime = int(Path(file_path).stat().st_mtime)
+        return f"?v={mtime}"
+    else:
+        # Use current timestamp
+        return f"?v={int(time.time())}"
 
 
 def add_bootstrap_to_html(
@@ -102,12 +123,17 @@ def add_bootstrap_to_html(
     print("✅ Added Bootstrap 5.3.2 CSS from CDN")
 
     # Add colors.css first (needed for theme-aware diagram colors)
-    colors_link = '\n    <link rel="stylesheet" href="colors.css">'
+    # Find colors.css file for cache-busting
+    colors_css_path = output_path.parent / "colors.css"
+    colors_cache_buster = get_cache_buster(colors_css_path)
+    colors_link = (
+        f'\n    <link rel="stylesheet" href="colors.css{colors_cache_buster}">'
+    )
     if "</head>" in html_content:
         html_content = html_content.replace("</head>", f"{colors_link}\n  </head>", 1)
     else:
         html_content = html_content.replace("<head>", f"<head>{colors_link}", 1)
-    print("✅ Added link to colors.css")
+    print(f"✅ Added link to colors.css{colors_cache_buster}")
 
     # Add custom CSS
     if inline:
@@ -129,16 +155,19 @@ def add_bootstrap_to_html(
 
         print("✅ Embedded custom CSS inline")
     else:
-        # External link to custom CSS
+        # External link to custom CSS with cache-busting
         css_relative = css_path.name
-        link_tag = f'\n    <link rel="stylesheet" href="{css_relative}">'
+        # Find the CSS file in the output directory for cache-busting
+        output_css_path = output_path.parent / css_relative
+        cache_buster = get_cache_buster(output_css_path)
+        link_tag = f'\n    <link rel="stylesheet" href="{css_relative}{cache_buster}">'
 
         if "</head>" in html_content:
             html_content = html_content.replace("</head>", f"{link_tag}\n  </head>", 1)
         else:
             html_content = html_content.replace("<head>", f"<head>{link_tag}", 1)
 
-        print(f"✅ Added link to {css_relative}")
+        print(f"✅ Added link to {css_relative}{cache_buster}")
 
     # Add Bootstrap JS bundle (includes Popper)
     bootstrap_js = '    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>'

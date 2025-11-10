@@ -279,7 +279,7 @@ def main():
     print(f"\nOutput: {html_file}")
     print("\nFeatures:")
     print("  ✅ Bootstrap 5.3.2 styling")
-    print("  ✅ Responsive design (mobile-first)")
+    print("  ✅ Responsive design")
     print("  ✅ Dark mode support (auto/light/dark)")
     if theme_toggle:
         print("  ✅ Theme toggle button (top-right corner)")
