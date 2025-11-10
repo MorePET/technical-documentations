@@ -2,6 +2,21 @@
 """
 Build script for compiling diagrams to SVG format with dual theme support.
 
+⚠️  DEPRECATION NOTICE ⚠️
+
+This script is being DEPRECATED in favor of the html.frame approach for HTML export.
+
+New approach (recommended for HTML):
+  - Diagrams are included directly via Typst's include statement
+  - html.frame generates inline SVGs automatically during HTML compilation
+  - diagram-theme-switcher.js dynamically recolors SVGs based on theme
+  - No need for pre-compiled dual-theme SVGs for HTML
+
+Legacy functionality (still useful for):
+  - Generating standalone SVG files for other purposes
+  - PDF generation workflows that need pre-compiled SVGs
+  - Projects not yet migrated to html.frame approach
+
 This script:
 1. Compiles all .typ files in the diagrams/ folder to SVG
 2. Generates both light and dark theme versions (-light.svg and -dark.svg)
@@ -12,6 +27,9 @@ Usage:
 
     project: Project folder name (default: technical-documentation)
              The script will look for diagrams in {project}/diagrams/
+
+Migration Guide:
+  See docs/MIGRATION.md for instructions on migrating to html.frame approach.
 """
 
 import argparse
@@ -195,9 +213,28 @@ def compile_diagram_both_themes(typ_file: Path) -> bool:
 
 def main():
     """Compile all diagram files to SVG with dual theme support."""
+    print("=" * 60)
+    print("⚠️  DEPRECATION NOTICE")
+    print("=" * 60)
+    print("This script is deprecated for HTML export workflows.")
+    print("")
+    print("NEW APPROACH (html.frame):")
+    print("  • Diagrams included directly in Typst documents")
+    print("  • html.frame generates inline SVGs automatically")
+    print("  • diagram-theme-switcher.js provides dynamic theming")
+    print("")
+    print("STILL USEFUL FOR:")
+    print("  • Generating standalone SVG files")
+    print("  • PDF workflows needing pre-compiled SVGs")
+    print("  • Projects not yet migrated to html.frame")
+    print("")
+    print("See docs/MIGRATION.md for migration instructions.")
+    print("=" * 60)
+    print()
+
     # Parse command-line arguments
     parser = argparse.ArgumentParser(
-        description="Compile diagrams to SVG (light + dark themes)"
+        description="Compile diagrams to SVG (light + dark themes) - DEPRECATED"
     )
     parser.add_argument(
         "project",

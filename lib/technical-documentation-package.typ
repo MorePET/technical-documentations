@@ -66,6 +66,29 @@
     block(above: 1.4em, below: 1em, it)
   }
 
+  // Show rule for Fletcher diagrams: Use html.frame for HTML export
+  // This renders diagrams as inline SVG in HTML, which can be recolored via JavaScript
+  show figure: it => {
+    // Check if we're exporting to HTML
+    let is-html = sys.inputs.at("html-export", default: "false") == "true"
+    
+    // Check if the figure contains a diagram (looking for Fletcher diagram elements)
+    // We'll wrap any figure body in html.frame for HTML export
+    // For PDF, render normally
+    if is-html {
+      // For HTML: wrap in html.frame to generate inline SVG
+      figure(
+        html.frame(it.body),
+        caption: it.caption,
+        kind: it.kind,
+        supplement: it.supplement,
+      )
+    } else {
+      // For PDF: render normally
+      it
+    }
+  }
+
   // Note: HTML styling must be added after export using Bootstrap build script:
   // python3 scripts/build-html-bootstrap.py your-file.typ your-file.html
   //
@@ -257,62 +280,35 @@
 // ============================================
 
 // Unified figure wrapper for diagrams
-// Supports both direct inclusion (PDF vector quality) and pre-compiled SVGs (HTML dark mode)
+// Includes .typ diagram files directly - the show rule handles HTML vs PDF rendering
 //
 // Parameters:
 //   - diagram-path: SOURCE path to .typ file (e.g., "diagrams/v-model.typ")
 //   - caption: Figure caption
 //   - label-ref: Label for cross-references
 //   - width: Width of the figure (default 90%)
-//   - mode: Rendering mode:
-//       * "auto" (default): Include directly for PDF, use SVG for HTML
-//       * "include": Always include the .typ file directly (best PDF quality)
-//       * "svg": Always use pre-compiled SVG (consistent across formats)
 #let fig(
   diagram-path,
   caption: none,
   label-ref: none,
   width: 90%,
-  mode: "auto",
 ) = {
-  // Extract diagram name from path (e.g., "diagrams/v-model.typ" -> "v-model")
-  let parts = diagram-path.split("/")
-  let filename = parts.at(parts.len() - 1)
-  let diagram-name = filename.replace(".typ", "")
-
-  // Determine which rendering mode to use
-  let use-svg = if mode == "svg" {
-    true
-  } else if mode == "include" {
-    false
+  // Convert relative path to absolute path from workspace root
+  let absolute-path = if diagram-path.starts-with("/") {
+    diagram-path
+  } else if diagram-path.starts-with("../") {
+    // "../diagrams/x.typ" -> "/example/diagrams/x.typ"
+    "/example/" + diagram-path.slice(3)
   } else {
-    // Auto mode: always use SVG for consistent sizing and dark mode support
-    // SVGs are vector format anyway, so no quality loss
-    true
+    // Assume calling document is in example/docs/
+    "/example/docs/" + diagram-path
   }
 
-  // Create the figure content
-  let content = if use-svg {
-    // SVG mode: use pre-compiled SVG
-    // Works for both PDF and HTML, ensures width control works correctly
-    let svg-path = "/example/build/diagrams/" + diagram-name + ".svg"
-    image(svg-path, width: width)
-  } else {
-    // Include mode: directly include .typ file
-    // NOTE: Width control doesn't work in this mode - diagram renders at natural size
-    // Convert relative path to absolute path from workspace root
-    let absolute-path = if diagram-path.starts-with("/") {
-      diagram-path
-    } else if diagram-path.starts-with("../") {
-      // "../diagrams/x.typ" -> "/example/diagrams/x.typ"
-      "/example/" + diagram-path.slice(3)
-    } else {
-      // Assume calling document is in example/docs/
-      "/example/docs/" + diagram-path
-    }
-
-    include absolute-path
-  }
+  // Include the diagram file directly
+  // The show rule will automatically handle:
+  // - HTML export: wrap in html.frame for inline SVG
+  // - PDF export: render normally with light theme
+  let content = include absolute-path
 
   // Return figure with optional label
   if label-ref != none {

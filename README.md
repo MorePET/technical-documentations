@@ -110,3 +110,83 @@ echo "test" >> .pre-commit-config.yaml
 
 - GitHub Issue: [#9 - Protected config file security](https://github.com/MorePET/technical-documentations/issues/9)
 - Setup script: `.devcontainer/scripts/setup-protected-configs.sh`
+
+---
+
+## HTML Frame-Based Diagram Rendering
+
+### New Approach for HTML Export
+
+This project now uses Typst's `html.frame` feature for generating diagrams in HTML output, eliminating the need for pre-compiled dual-theme SVG files.
+
+**Key Features:**
+- ✨ **Inline SVG generation** - Diagrams rendered directly during Typst compilation
+- 🎨 **Dynamic theme switching** - JavaScript recolors diagrams based on theme
+- 🚀 **Simplified workflow** - No pre-compilation or post-processing needed
+- 📦 **Smaller output** - Single light-theme source instead of dual SVGs
+- 🔧 **Better DX** - Diagrams work like any other Typst content
+
+### Quick Start
+
+**1. Create a diagram:**
+```typst
+// example/diagrams/my-diagram.typ
+#import "@preview/fletcher:0.5.8" as fletcher: diagram, node, edge
+#import "/lib/generated/colors.typ": stroke_color, node_bg_blue
+
+#diagram(
+  node-stroke: (paint: stroke_color, thickness: 1pt),
+  node((0, 0), [Start], fill: node_bg_blue),
+  node((1, 0), [End], fill: node_bg_blue),
+  edge((0, 0), (1, 0), "->")
+)
+```
+
+**2. Include in your document:**
+```typst
+#import "lib/technical-documentation-package.typ": *
+#show: tech-doc
+
+= My Document
+
+#fig(
+  "diagrams/my-diagram.typ",
+  caption: [My Diagram]
+)
+```
+
+**3. Build HTML:**
+```bash
+python3 scripts/build-html-bootstrap.py example/docs/main.typ output.html
+```
+
+That's it! The diagram will:
+- Render inline as SVG in HTML
+- Automatically switch colors when theme changes
+- Work perfectly in both light and dark modes
+
+### How It Works
+
+1. **Show Rule** - Automatically wraps figures in `html.frame` for HTML export
+2. **Light Theme** - All diagrams use light theme colors from `lib/generated/colors.typ`
+3. **JavaScript** - `diagram-theme-switcher.js` dynamically recolors SVGs on theme change
+4. **CSS Variables** - Colors defined in `lib/colors.json` → `lib/generated/colors.css`
+
+### Migration from Old Approach
+
+If you're using the old dual-SVG approach, see the migration guide:
+- **📖 [HTML Frame Migration Guide](docs/HTML_FRAME_MIGRATION.md)**
+
+The old approach still works but is deprecated:
+- `build-diagrams.py` - Pre-compile diagrams (deprecated)
+- `post-process-html.py` - Inject dual SVGs (deprecated)
+
+### Resources
+
+- **Color System:** `lib/colors.json` - Define your color palette
+- **Generated Files:** `lib/generated/colors.typ` & `colors.css`
+- **JS Module:** `lib/diagram-theme-switcher.js`
+- **Show Rule:** `lib/technical-documentation-package.typ`
+- **Build Script:** `scripts/build-html-bootstrap.py`
+
+---

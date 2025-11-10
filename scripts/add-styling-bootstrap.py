@@ -172,9 +172,12 @@ def add_bootstrap_to_html(
     # Add Bootstrap JS bundle (includes Popper)
     bootstrap_js = '    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>'
 
+    # Add diagram theme switcher JS
+    diagram_js = '    <script src="diagram-theme-switcher.js"></script>'
+
     if "</body>" in html_content:
         html_content = html_content.replace(
-            "</body>", f"\n{bootstrap_js}\n  </body>", 1
+            "</body>", f"\n{bootstrap_js}\n{diagram_js}\n  </body>", 1
         )
     else:
         html_content = html_content.replace("</html>", f"{bootstrap_js}\n</html>", 1)

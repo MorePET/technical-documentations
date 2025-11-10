@@ -9,6 +9,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **HTML Frame-Based Diagram Rendering** 🎨
+  - New `html.frame` approach for generating inline SVG diagrams in HTML
+  - Diagrams now rendered directly during Typst compilation (no post-processing needed)
+  - Dynamic theme switching via JavaScript without dual-SVG files
+  - New `diagram-theme-switcher.js` module for automatic color rewriting
+  - Simplified `fig()` function - just include `.typ` files directly
+  - Show rule automatically wraps diagrams in `html.frame` for HTML export
+  - Light theme colors used for all diagram generation (PDF and HTML)
+  - More natural developer experience - diagrams work like any other Typst content
+
 - **Development Server**
   - Node.js and live-server integration for better development experience
   - Automatic setup in devcontainer via `setup-node-liveserver.sh`
@@ -39,11 +49,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Checklist support with customizable icons
   - Expanded technical documentation package
   - Theme-aware diagram support with automatic color switching
+  - Show rule for figures to automatically wrap diagrams in `html.frame`
+  - Simplified `fig()` function with automatic HTML vs PDF rendering
 
 - **Bootstrap Styling Support**
   - Bootstrap 5.3.2 integration for HTML output
-  - New `build-html-bootstrap.py` script for complete Bootstrap workflow
-  - `add-styling-bootstrap.py` for adding Bootstrap CDN links and components
+  - New `build-html-bootstrap.py` script for complete Bootstrap workflow (updated for html.frame)
+  - `add-styling-bootstrap.py` for adding Bootstrap CDN links and components (includes diagram-theme-switcher.js)
   - `add-bootstrap-classes.py` for automatic class application to HTML elements
   - Bootstrap-compatible theme toggle (light/dark/auto modes)
   - Bootstrap Offcanvas TOC sidebar for navigation
@@ -59,11 +71,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- **Diagram Rendering Architecture** 🔄
+  - Diagrams now use `html.frame` for inline SVG generation (HTML export)
+  - Removed dual-SVG file generation requirement for HTML
+  - Single light-theme diagram files used for both PDF and HTML
+  - JavaScript handles dynamic theme switching instead of pre-generated SVGs
+  - Simplified build pipeline - no more SVG injection post-processing
+
 - **Build System Restructuring**
   - All build outputs now use `build/` directories instead of `out/`
   - Consolidated diagram outputs to project-specific build directories
   - Simplified gitignore patterns for build artifacts
   - Updated all include paths to reference build directories
+  - Removed `post-process-html.py` step from build-html-bootstrap.py workflow
 
 - **Documentation Migration**
   - Migrated all documentation from Markdown to Typst format
@@ -74,7 +94,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Build scripts now support both custom CSS and Bootstrap workflows
   - Theme toggle adapted to work with Bootstrap's `data-bs-theme` attribute
   - TOC sidebar uses Bootstrap Offcanvas component for better mobile support
-  - Improved regex patterns for SVG injection to prevent content deletion
+  - Added `diagram-theme-switcher.js` to HTML output automatically
+
+### Deprecated
+
+- **build-diagrams.py** - Pre-compiling dual-theme SVGs no longer needed for HTML workflow
+  - Still useful for generating standalone SVG files
+  - Still useful for PDF workflows needing pre-compiled SVGs
+  - See migration guide in `docs/HTML_FRAME_MIGRATION.md`
+
+- **post-process-html.py** - SVG injection no longer needed with html.frame approach
+  - Maintained for backward compatibility only
+  - Shows deprecation warning when run
+  - Will be removed in future version
 
 ### Fixed
 
