@@ -1,428 +1,387 @@
 # Tag and Release Command
 
-This command automates the complete git tag creation and GitHub release workflow.
+**CREATES GIT TAG AND GITHUB RELEASE - FULLY AUTOMATED**
 
-## Usage
+Execute `/tag-and-release` after PR merge to create git tag and GitHub release from CHANGELOG.
 
-```bash
-/tag-and-release
-```
+## PREREQUISITES
 
-**Purpose:** Create a git tag and GitHub release for the current version in pyproject.toml.
+- On `main` branch
+- Clean working directory
+- Version already bumped in `pyproject.toml` (from `/create-pr`)
+- CHANGELOG.md updated with version entry
+- All changes committed and merged
 
-## Prerequisites
+## EXECUTION PROTOCOL
 
-Before running this command, ensure:
-
-- [ ] On **main** branch
-- [ ] **Clean working directory** (no uncommitted changes)
-- [ ] **Version already bumped** in pyproject.toml (done during `/create-pr`)
-- [ ] **CHANGELOG.md already updated** with release notes (done during `/create-pr`)
-- [ ] All changes **committed and merged** to main
-
-**Note:** Version bumping and CHANGELOG updates are handled by `/create-pr`.
-After PR merge, `/tag-and-release` validates everything and creates the git tag and GitHub release.
-
-## Workflow
-
-The command performs these steps automatically:
-
-### 1. Validate Prerequisites
-
-**Branch Check:**
+### STEP 1: VALIDATE PREREQUISITES
 
 ```bash
-# Must be on main
 BRANCH=$(git branch --show-current)
-if [ "$BRANCH" != "main" ]; then
-  echo "❌ Error: Must be on main branch (currently on: $BRANCH)"
-  exit 1
-fi
 ```
 
-**Working Directory Check:**
+**DECISION POINT: On main branch?**
+
+**IF NOT main:**
+```text
+❌ Error: Must be on main branch
+Current: $BRANCH
+
+Run: git checkout main
+```
+→ ABORT
+
+**IF main:**
+→ PROCEED to working directory check
 
 ```bash
-# Must be clean
-if ! git diff-index --quiet HEAD --; then
-  echo "❌ Error: Working directory has uncommitted changes"
-  echo "Commit or stash changes before creating release"
-  exit 1
-fi
+git diff-index --quiet HEAD --
 ```
 
-### 2. Get and Validate Version
+**DECISION POINT: Working directory clean?**
 
-**Extract version from pyproject.toml:**
+**IF NOT clean:**
+```text
+❌ Error: Uncommitted changes detected
+
+Modified files:
+[list files]
+
+Action: Commit or stash changes
+```
+→ ABORT
+
+**IF clean:**
+→ PROCEED to STEP 2
+
+### STEP 2: GET AND VALIDATE VERSION
 
 ```bash
-# Use make version to get current version
 VERSION=$(make version | grep -oP '\d+\.\d+\.\d+')
-echo "Current version: $VERSION"
 ```
 
-**Validate version format:**
-
+**Validate format (X.Y.Z):**
 ```bash
-# Must match X.Y.Z format (Semantic Versioning)
 if ! [[ "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-  echo "❌ Error: Invalid version format: $VERSION"
-  echo "Expected: X.Y.Z (e.g., 0.3.3)"
+  echo "❌ Invalid version format: $VERSION"
   exit 1
 fi
 ```
 
-**Check version is consecutive to existing tags:**
-
+**Get latest tag:**
 ```bash
-# Get latest tag
 LATEST_TAG=$(git tag -l | grep -E '^[0-9]+\.[0-9]+\.[0-9]+$' | sort -V | tail -1)
+```
 
-if [ -z "$LATEST_TAG" ]; then
-  echo "ℹ️  No previous tags found - this will be the first release"
-else
-  echo "Latest tag: $LATEST_TAG"
-  echo "New version: $VERSION"
+**DECISION POINT: Latest tag exists?**
 
-  # Version must be greater than latest tag
-  LATEST_SEMVER=$(echo "$LATEST_TAG" | sed 's/v//')
-  if [ "$VERSION" == "$LATEST_SEMVER" ]; then
-    echo "❌ Error: Version $VERSION already exists as a tag"
-    echo "Bump version using: make bump-patch/minor/major"
-    exit 1
-  fi
+**IF NO tags:**
+→ Display: "ℹ️ No previous tags - first release"
+→ PROCEED to STEP 3
 
-  # Check if version is consecutive (no gaps)
-  # Parse versions
-  IFS='.' read -r -a LATEST_PARTS <<< "$LATEST_SEMVER"
-  IFS='.' read -r -a NEW_PARTS <<< "$VERSION"
+**IF tags exist:**
+→ Validate version is consecutive
 
-  LATEST_MAJOR=${LATEST_PARTS[0]}
-  LATEST_MINOR=${LATEST_PARTS[1]}
-  LATEST_PATCH=${LATEST_PARTS[2]}
+**Parse versions:**
+```bash
+IFS='.' read -r -a LATEST_PARTS <<< "$LATEST_TAG"
+IFS='.' read -r -a NEW_PARTS <<< "$VERSION"
 
-  NEW_MAJOR=${NEW_PARTS[0]}
-  NEW_MINOR=${NEW_PARTS[1]}
-  NEW_PATCH=${NEW_PARTS[2]}
+LATEST_MAJOR=${LATEST_PARTS[0]}
+LATEST_MINOR=${LATEST_PARTS[1]}
+LATEST_PATCH=${LATEST_PARTS[2]}
 
-  # Validate consecutive bump
-  VALID=false
-  # Major bump: X.0.0
-  if [ "$NEW_MAJOR" -eq $((LATEST_MAJOR + 1)) ] && \
-     [ "$NEW_MINOR" -eq 0 ] && [ "$NEW_PATCH" -eq 0 ]; then
-    VALID=true
-  # Minor bump: 0.X.0
-  elif [ "$NEW_MAJOR" -eq "$LATEST_MAJOR" ] && \
-       [ "$NEW_MINOR" -eq $((LATEST_MINOR + 1)) ] && \
-       [ "$NEW_PATCH" -eq 0 ]; then
-    VALID=true
-  # Patch bump: 0.0.X
-  elif [ "$NEW_MAJOR" -eq "$LATEST_MAJOR" ] && \
-       [ "$NEW_MINOR" -eq "$LATEST_MINOR" ] && \
-       [ "$NEW_PATCH" -eq $((LATEST_PATCH + 1)) ]; then
-    VALID=true
-  fi
+NEW_MAJOR=${NEW_PARTS[0]}
+NEW_MINOR=${NEW_PARTS[1]}
+NEW_PATCH=${NEW_PARTS[2]}
+```
 
-  if [ "$VALID" = "false" ]; then
-    echo "❌ Error: Version $VERSION is not consecutive to $LATEST_SEMVER"
-    echo ""
-    echo "Valid next versions:"
-    echo "  - Patch: $LATEST_MAJOR.$LATEST_MINOR.$((LATEST_PATCH + 1))"
-    echo "  - Minor: $LATEST_MAJOR.$((LATEST_MINOR + 1)).0"
-    echo "  - Major: $((LATEST_MAJOR + 1)).0.0"
-    exit 1
-  fi
+**Validate consecutive:**
+```bash
+VALID=false
+
+# Major bump: X.0.0
+if [ "$NEW_MAJOR" -eq $((LATEST_MAJOR + 1)) ] && \
+   [ "$NEW_MINOR" -eq 0 ] && [ "$NEW_PATCH" -eq 0 ]; then
+  VALID=true
+# Minor bump: 0.X.0
+elif [ "$NEW_MAJOR" -eq "$LATEST_MAJOR" ] && \
+     [ "$NEW_MINOR" -eq $((LATEST_MINOR + 1)) ] && \
+     [ "$NEW_PATCH" -eq 0 ]; then
+  VALID=true
+# Patch bump: 0.0.X
+elif [ "$NEW_MAJOR" -eq "$LATEST_MAJOR" ] && \
+     [ "$NEW_MINOR" -eq "$LATEST_MINOR" ] && \
+     [ "$NEW_PATCH" -eq $((LATEST_PATCH + 1)) ]; then
+  VALID=true
 fi
 ```
 
-### 3. Validate CHANGELOG.md Format
+**IF NOT consecutive:**
+```text
+❌ Error: Version $VERSION not consecutive to $LATEST_TAG
 
-**Check version entry exists:**
+Valid next versions:
+- Patch: $LATEST_MAJOR.$LATEST_MINOR.$((LATEST_PATCH + 1))
+- Minor: $LATEST_MAJOR.$((LATEST_MINOR + 1)).0
+- Major: $((LATEST_MAJOR + 1)).0.0
+
+Current: $LATEST_TAG
+Attempted: $VERSION
+```
+→ ABORT
+
+**IF consecutive:**
+→ PROCEED to STEP 3
+
+### STEP 3: VALIDATE CHANGELOG
 
 ```bash
-# CHANGELOG must have entry for current version
-if ! grep -q "^## \[$VERSION\]" CHANGELOG.md; then
-  echo "❌ Error: CHANGELOG.md missing entry for version $VERSION"
-  echo ""
-  echo "Expected format:"
-  echo "## [$VERSION] - YYYY-MM-DD"
-  echo ""
-  echo "Update CHANGELOG.md before creating release"
-  exit 1
-fi
+grep -q "^## \[$VERSION\]" CHANGELOG.md
 ```
 
-**Validate Keep a Changelog format:**
+**DECISION POINT: Version entry exists?**
+
+**IF NOT exists:**
+```text
+❌ Error: CHANGELOG.md missing entry for $VERSION
+
+Expected format:
+## [$VERSION] - YYYY-MM-DD
+
+### Added
+- Features
+
+### Changed
+- Modifications
+
+### Fixed
+- Bug fixes
+```
+→ ABORT
+
+**IF exists:**
+→ Validate format
 
 ```bash
-# Extract the version entry
 ENTRY=$(sed -n "/^## \[$VERSION\]/,/^## \[/p" CHANGELOG.md | head -n -1)
-
-# Check for date
 DATE_PATTERN="^## \[$VERSION\] - [0-9]\{4\}-[0-9]\{2\}-[0-9]\{2\}"
+
 if ! echo "$ENTRY" | grep -q "$DATE_PATTERN"; then
-  echo "❌ Error: Version entry missing or incorrectly formatted date"
-  echo "Expected: ## [$VERSION] - YYYY-MM-DD"
+  echo "❌ Error: Version entry missing date"
   exit 1
 fi
 
-# Check for at least one category (Added, Changed, Fixed, etc.)
 CATEGORIES="Added|Changed|Deprecated|Removed|Fixed|Security"
 if ! echo "$ENTRY" | grep -qE "^### ($CATEGORIES)"; then
-  echo "❌ Error: CHANGELOG entry must have at least one category"
-  echo "Categories: Added, Changed, Deprecated, Removed, Fixed, Security"
+  echo "❌ Error: CHANGELOG must have at least one category"
   exit 1
 fi
-
-echo "✅ CHANGELOG.md format valid"
 ```
 
-### 4. Extract Release Notes
+**IF validation fails:**
+→ Display specific error
+→ ABORT
 
-**Parse CHANGELOG for current version:**
+**IF validation succeeds:**
+→ Display: "✅ CHANGELOG.md format valid"
+→ PROCEED to STEP 4
+
+### STEP 4: EXTRACT RELEASE NOTES
 
 ```bash
-# Extract release notes for this version
 RELEASE_NOTES=$(sed -n "/^## \[$VERSION\]/,/^## \[/p" CHANGELOG.md | head -n -1)
 
-# Extract title from first line after version header
-# Look for main feature/category
-RELEASE_TITLE="Release $VERSION"
-
-# Try to determine feature name from CHANGELOG
-# Look for the first major feature in Added or Changed sections
+# Determine release title from first major feature
 FEATURE_NAME=$(echo "$RELEASE_NOTES" | grep -A1 "^### Added" | \
   tail -1 | sed 's/^- \*\*//' | sed 's/\*\*.*//' | head -c 40)
+
 if [ -n "$FEATURE_NAME" ]; then
   RELEASE_TITLE="Release $VERSION - $FEATURE_NAME"
+else
+  RELEASE_TITLE="Release $VERSION"
 fi
 ```
 
-### 5. Create Git Tag
-
-**Create annotated tag:**
+### STEP 5: CREATE GIT TAG
 
 ```bash
-# Create tag with message from CHANGELOG
 TAG_MESSAGE="Release $VERSION
 
 $RELEASE_NOTES"
 
 git tag -a "$VERSION" -m "$TAG_MESSAGE"
-echo "✅ Created tag: $VERSION"
 ```
 
-### 6. Push Tag
+**Display:** "✅ Created tag: $VERSION"
 
-**Push to remote:**
+### STEP 6: PUSH TAG
 
 ```bash
 git push --tags
-echo "✅ Pushed tag: $VERSION"
 ```
 
-### 7. Create GitHub Release
+**IF push fails (authentication):**
+```bash
+gh auth setup-git
+git push --tags
+```
 
-**Format release notes:**
+**IF push fails (tag exists remotely):**
+```text
+❌ Error: Tag $VERSION already exists on remote
+
+To delete and recreate (DANGEROUS):
+git push origin :refs/tags/$VERSION
+git tag -d $VERSION
+[Then run /tag-and-release again]
+```
+→ ABORT
+
+**IF push succeeds:**
+→ Display: "✅ Pushed tag: $VERSION"
+→ PROCEED to STEP 7
+
+### STEP 7: CREATE GITHUB RELEASE
 
 ```bash
-# Create release with formatted notes
-# Add comparison link
+# Get previous tag for comparison link
 PREV_TAG=$(git tag -l | grep -E '^[0-9]+\.[0-9]+\.[0-9]+$' | \
   sort -V | tail -2 | head -1)
-COMPARISON_LINK=""
+
+# Build comparison link
 if [ -n "$PREV_TAG" ]; then
   REPO=$(gh repo view --json nameWithOwner --jq .nameWithOwner)
   COMPARISON_URL="https://github.com/$REPO/compare/$PREV_TAG...$VERSION"
   COMPARISON_LINK="\n\n---\n\n**Full Changelog**: $COMPARISON_URL"
+else
+  COMPARISON_LINK=""
 fi
 
 # Create release
 gh release create "$VERSION" \
   --title "$RELEASE_TITLE" \
   --notes "$RELEASE_NOTES$COMPARISON_LINK"
-
-echo "✅ Created GitHub release: $VERSION"
 ```
 
-## Complete Example
+**IF release creation fails:**
+→ Check if release already exists: `gh release list | grep $VERSION`
+→ If exists: Delete with `gh release delete $VERSION --yes`
+→ Retry release creation
 
-Here's what the command does step-by-step:
+**IF release succeeds:**
+→ Display: "✅ Created GitHub release: $VERSION"
+→ PROCEED to STEP 8
 
+### STEP 8: COMPLETION REPORT
+
+```text
+✅ Tag and Release Complete
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📦 Release Details
+
+Version: $VERSION
+Previous: $PREV_TAG
+Type: [patch/minor/major]
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✅ Actions Completed
+
+- Git tag created: $VERSION
+- Tag pushed to remote
+- GitHub release created
+- Release notes from CHANGELOG
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🔗 URLs
+
+Tag: https://github.com/$REPO/releases/tag/$VERSION
+Changelog: https://github.com/$REPO/compare/$PREV_TAG...$VERSION
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+```
+
+## ERROR RECOVERY
+
+**Tag already exists locally:**
 ```bash
-# 1. Validate prerequisites
-echo "Validating prerequisites..."
-# - Check on main branch
-# - Check clean working directory
+# Delete local tag
+git tag -d $VERSION
 
-# 2. Get version
-echo "Getting version from pyproject.toml..."
-VERSION=$(make version | grep -oP '\d+\.\d+\.\d+')
-echo "Current version: $VERSION"
-
-# 3. Validate version continuity
-echo "Validating version continuity..."
-LATEST_TAG=$(git tag -l | grep -E '^[0-9]+\.[0-9]+\.[0-9]+$' | sort -V | tail -1)
-echo "Latest tag: $LATEST_TAG"
-# - Check version is consecutive (no gaps)
-
-# 4. Validate CHANGELOG
-echo "Validating CHANGELOG.md..."
-# - Check entry exists for $VERSION
-# - Validate format: ## [X.Y.Z] - YYYY-MM-DD
-# - Check has categories (Added/Changed/Fixed/etc.)
-
-# 5. Extract release notes
-echo "Extracting release notes from CHANGELOG..."
-RELEASE_NOTES=$(sed -n "/^## \[$VERSION\]/,/^## \[/p" CHANGELOG.md | head -n -1)
-
-# 6. Create tag
-echo "Creating git tag..."
-git tag -a "$VERSION" -m "Release $VERSION
-
-$RELEASE_NOTES"
-
-# 7. Push tag
-echo "Pushing tag to remote..."
-git push --tags
-
-# 8. Create GitHub release
-echo "Creating GitHub release..."
-gh release create "$VERSION" \
-  --title "Release $VERSION - Feature Name" \
-  --notes "$RELEASE_NOTES
-
----
-
-**Full Changelog**: https://github.com/ORG/REPO/compare/$PREV_TAG...$VERSION"
-
-echo "✅ Release complete: $VERSION"
+# Re-run /tag-and-release
 ```
 
-## Error Handling
+**Tag exists remotely:**
+```bash
+# Delete remote tag (CAREFUL - check with team first)
+git push origin :refs/tags/$VERSION
 
-### Not on Main Branch
+# Delete local tag
+git tag -d $VERSION
 
-```text
-❌ Error: Must be on main branch (currently on: feature/xyz)
-
-Switch to main:
-  git checkout main
+# Re-run /tag-and-release
 ```
 
-### Uncommitted Changes
+**Release creation fails (422 Validation):**
+```bash
+# List releases
+gh release list | grep $VERSION
 
-```text
-❌ Error: Working directory has uncommitted changes
+# If exists, delete
+gh release delete $VERSION --yes
 
-Uncommitted files:
-  - file1.py
-  - file2.md
-
-Action required:
-  1. Commit changes: git add . && git commit -m "..."
-  2. Or stash: git stash save "wip"
-
-Then run /tag-and-release again
+# Re-run /tag-and-release
 ```
 
-### Version Already Tagged
+**CHANGELOG format invalid:**
+→ Edit CHANGELOG.md to match format:
+```markdown
+## [X.Y.Z] - YYYY-MM-DD
 
-```text
-❌ Error: Version 0.3.3 already exists as a tag
-
-Current version in pyproject.toml: 0.3.3
-Existing tags: 0.3.0, 0.3.1, 0.3.2, 0.3.3
-
-Action required:
-  Bump version using:
-    make bump-patch  # → 0.3.4
-    make bump-minor  # → 0.4.0
-    make bump-major  # → 1.0.0
+### Added/Changed/Fixed
+- Description
 ```
+→ Commit changes
+→ Re-run `/tag-and-release`
 
-### Non-Consecutive Version
+**Version not consecutive:**
+→ Bump version correctly: `make bump-patch/minor/major`
+→ Update CHANGELOG.md
+→ Commit changes
+→ Re-run `/tag-and-release`
 
-```text
-❌ Error: Version 0.3.5 is not consecutive to 0.3.2
+## VALIDATION CHECKLIST
 
-Latest tag: 0.3.2
-New version: 0.3.5 (skips 0.3.3 and 0.3.4)
+**Automatically checked:**
+- [ ] On main branch
+- [ ] Working directory clean
+- [ ] Version format valid (X.Y.Z)
+- [ ] Version consecutive to latest tag
+- [ ] CHANGELOG entry exists
+- [ ] CHANGELOG has date
+- [ ] CHANGELOG has categories
+- [ ] Git tag created
+- [ ] Tag pushed to remote
+- [ ] GitHub release created
 
-Valid next versions:
-  - Patch: 0.3.3
-  - Minor: 0.4.0
-  - Major: 1.0.0
+## KEEP A CHANGELOG FORMAT
 
-Action required:
-  Update pyproject.toml to a consecutive version
-```
-
-### Missing CHANGELOG Entry
-
-```text
-❌ Error: CHANGELOG.md missing entry for version 0.3.3
-
-Expected format:
-## [0.3.3] - 2025-11-10
+**Required structure:**
+```markdown
+## [X.Y.Z] - YYYY-MM-DD
 
 ### Added
 - New features
 
 ### Changed
-- Changes to functionality
-
-### Fixed
-- Bug fixes
-
-Action required:
-  1. Add CHANGELOG entry for version 0.3.3
-  2. Follow Keep a Changelog format
-  3. Run /tag-and-release again
-
-Reference: https://keepachangelog.com/en/1.0.0/
-```
-
-### Invalid CHANGELOG Format
-
-```text
-❌ Error: CHANGELOG entry for 0.3.3 is incorrectly formatted
-
-Found:
-## [0.3.3]
-
-Expected:
-## [0.3.3] - YYYY-MM-DD
-
-### Added
-- Feature 1
-
-### Changed
-- Change 1
-
-Action required:
-  1. Add date to version header
-  2. Add at least one category section
-  3. Add entries under categories
-
-Reference: https://keepachangelog.com/en/1.0.0/
-```
-
-## Keep a Changelog Format Summary
-
-CHANGELOG.md must follow this structure:
-
-```markdown
-## [X.Y.Z] - YYYY-MM-DD
-
-### Added
-- New features for users
-
-### Changed
-- Changes to existing functionality
+- Modifications
 
 ### Deprecated
-- Soon-to-be removed features
+- Soon-to-be removed
 
 ### Removed
 - Removed features
@@ -431,273 +390,37 @@ CHANGELOG.md must follow this structure:
 - Bug fixes
 
 ### Security
-- Security vulnerability fixes
+- Security fixes
 ```
 
-**Requirements:**
-- Version header: `## [X.Y.Z] - YYYY-MM-DD`
-- Most recent version at top
-- At least one category section
-- Entries are bullet points
-- Focus on user-facing changes
+**Must have:**
+- Version header with date
+- At least one category
+- Bullet points under categories
 
-**Reference:** [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
+## SEMANTIC VERSIONING
 
-## Semantic Versioning Summary
+**MAJOR.MINOR.PATCH**
 
-Versions follow **MAJOR.MINOR.PATCH** format (e.g., 1.4.2):
-
-- **MAJOR (X.0.0)**: Incompatible API changes (breaking changes)
-- **MINOR (0.X.0)**: New features (backward compatible)
-- **PATCH (0.0.X)**: Bug fixes (backward compatible)
+**MAJOR (X.0.0):** Breaking changes
+**MINOR (0.X.0):** New features (compatible)
+**PATCH (0.0.X):** Bug fixes (compatible)
 
 **Rules:**
-- Never reuse version numbers
-- Must be consecutive (no skipping versions)
-- Initial development starts at 0.1.0
-- Public API starts at 1.0.0
-
-**Reference:** [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
-
-## Complete Release Workflow
-
-### Typical Release Process
-
-```bash
-# 1. Work on feature branch
-git checkout -b feature/new-feature
-# ... make changes ...
-git commit -m "feat(scope): add new feature"
-
-# 2. Create PR with version bump (see create-pr.md)
-/create-pr  # Will suggest version bump
-
-# 3. PR gets reviewed and merged to main
-# ... review, approve, merge ...
-
-# 4. Switch to main and pull
-git checkout main
-git pull origin main
-
-# 5. Create tag and release
-/tag-and-release
-
-# Done! Tag and release created automatically
-```
-
-### Quick Release (Already on Main)
-
-If you're already on main with version bumped and CHANGELOG updated:
-
-```bash
-# Just run the command
-/tag-and-release
-```
-
-It will:
-- ✅ Validate everything
-- ✅ Create git tag
-- ✅ Push tag to remote
-- ✅ Create GitHub release with CHANGELOG notes
-
-## Integration with Version Management
-
-This command integrates with the version management system:
-
-```bash
-# 1. Bump version
-make bump-patch  # or bump-minor, bump-major
-
-# 2. Update CHANGELOG.md
-vim CHANGELOG.md
-# Add actual changes for the version
-
-# 3. Commit version bump
-git add pyproject.toml CHANGELOG.md
-git commit -m "chore(release): bump version to X.Y.Z"
-
-# 4. Push to main
-git push origin main
-
-# 5. Create tag and release
-/tag-and-release
-```
-
-## Success Output
-
-```text
-🚀 Creating Tag and Release for v0.3.3
-
-✅ Prerequisites validated
-   - On main branch
-   - Working directory clean
-
-✅ Version validated: 0.3.3
-   - Latest tag: 0.3.2
-   - Consecutive bump: ✓ (patch)
-
-✅ CHANGELOG.md validated
-   - Entry exists: ## [0.3.3] - 2025-11-10
-   - Format correct: ✓
-   - Categories present: Added, Changed
-
-✅ Release notes extracted
-
-✅ Git tag created: 0.3.3
-
-✅ Tag pushed to remote
-
-✅ GitHub release created
-   - Title: Release 0.3.3 - Version Management System
-   - URL: https://github.com/ORG/REPO/releases/tag/0.3.3
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-🎉 Release 0.3.3 Complete!
-
-View release: https://github.com/ORG/REPO/releases/tag/0.3.3
-```
-
-## Troubleshooting
-
-### Issue: Tag Creation Fails
-
-**Error:**
-
-```bash
-fatal: tag '0.3.3' already exists
-```
-
-**Solution:**
-
-The tag already exists locally or remotely.
-
-```bash
-# Check existing tags
-git tag -l | grep 0.3.3
-
-# If you need to recreate (CAREFUL):
-git tag -d 0.3.3              # Delete local
-git push origin :refs/tags/0.3.3  # Delete remote (CAREFUL!)
-
-# Then run /tag-and-release again
-```
-
-### Issue: Push Fails
-
-**Error:**
-
-```bash
-error: failed to push some refs
-```
-
-**Solution:**
-
-Network issue or permissions problem.
-
-```bash
-# Verify authentication
-gh auth status
-
-# Verify remote
-git remote -v
-
-# Try pushing again
-git push --tags
-```
-
-### Issue: CHANGELOG Format Invalid
-
-**Error:**
-
-```text
-❌ Error: CHANGELOG entry must have at least one category
-```
-
-**Solution:**
-
-Add at least one category section to your CHANGELOG entry:
-
-```markdown
-## [0.3.3] - 2025-11-10
-
-### Added
-- New feature X
-
-### Fixed
-- Bug in Y
-```
-
-### Issue: GitHub Release Creation Fails
-
-**Error:**
-
-```bash
-HTTP 422: Validation Failed
-```
-
-**Solution:**
-
-Tag might already have a release. Check:
-
-```bash
-# List releases
-gh release list | grep 0.3.3
-
-# If release exists, delete and recreate
-gh release delete 0.3.3 --yes
-
-# Then run /tag-and-release again
-```
-
-## Related Commands
-
-- **[git-commit.md](./git-commit.md)**: Commit changes before release
-- **[create-pr.md](./create-pr.md)**: Create PR with version bumping
-- **[Version Management](./../VERSION_MANAGEMENT.md)**: Version management system docs
-
-## Quick Reference
-
-### Command Execution
-
-```bash
-/tag-and-release
-```
-
-### Prerequisites Checklist
-
-Before running, ensure:
-- [ ] On main branch: `git branch --show-current`
-- [ ] Clean working directory: `git status`
+- Never reuse versions
+- Must be consecutive
+- No gaps allowed
+
+## EXECUTION CHECKLIST
+
+- [ ] PR merged to main
+- [ ] On main branch
+- [ ] Pulled latest: `git pull origin main`
+- [ ] Working directory clean
 - [ ] Version bumped in pyproject.toml
-- [ ] CHANGELOG.md updated with:
-  - [ ] Version header: `## [X.Y.Z] - YYYY-MM-DD`
-  - [ ] At least one category
-  - [ ] Actual release notes
-- [ ] Changes committed and pushed to main
-
-### What It Does
-
-1. ✅ Validates prerequisites (branch, working directory, version)
-2. ✅ Checks version is consecutive to latest tag
-3. ✅ Validates CHANGELOG.md format
-4. ✅ Extracts release notes
-5. ✅ Creates annotated git tag
-6. ✅ Pushes tag to remote
-7. ✅ Creates GitHub release with CHANGELOG notes
-
-### Version Management Tools
-
-```bash
-# Check current version
-make version
-
-# Bump versions
-make bump-patch  # 0.3.3 → 0.3.4
-make bump-minor  # 0.3.3 → 0.4.0
-make bump-major  # 0.3.3 → 1.0.0
-```
+- [ ] CHANGELOG.md has version entry with date
+- [ ] Ready to create tag and release
 
 ---
 
-**For version management details, see [VERSION_MANAGEMENT.md](./../VERSION_MANAGEMENT.md)**
+**WORKFLOW:** `/create-pr` (bumps version) → merge PR → `/tag-and-release` (creates tag and release)
