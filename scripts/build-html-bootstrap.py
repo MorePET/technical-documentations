@@ -20,7 +20,7 @@ from pathlib import Path
 
 
 def compile_typst_to_html(typ_file: Path, html_file: Path) -> bool:
-    """Compile Typst document to HTML with SVG support (legacy approach until Typst adds HTML export)."""
+    """Compile Typst document to HTML (legacy approach - html.frame not yet available in Typst 0.14.0)."""
     print(f"Compiling {typ_file} to HTML...")
 
     try:
@@ -30,6 +30,8 @@ def compile_typst_to_html(typ_file: Path, html_file: Path) -> bool:
                 "compile",
                 "--root",
                 ".",
+                "-f",
+                "html",
                 "--input",
                 "use-svg=true",
                 str(typ_file),
@@ -241,12 +243,12 @@ def main():
     print("Bootstrap HTML Build Workflow")
     print("=" * 70)
 
-    # Step 1: Compile to HTML (legacy approach - Typst 0.12.0 doesn't support HTML export yet)
+    # Step 1: Compile to HTML (legacy approach - html.frame not available yet)
     temp_html = html_file.parent / f"{html_file.stem}_temp.html"
     if not compile_typst_to_html(typ_file, temp_html):
         sys.exit(1)
 
-    # Step 2: Post-process HTML (inject SVGs - needed until Typst adds HTML export)
+    # Step 2: Post-process HTML (inject dual-theme SVGs)
     temp_html2 = html_file.parent / f"{html_file.stem}_temp2.html"
     if not post_process_html(temp_html, temp_html2):
         sys.exit(1)

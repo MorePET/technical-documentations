@@ -67,27 +67,23 @@
   }
 
   // Show rule for Fletcher diagrams: Use html.frame for HTML export
-  // This renders diagrams as inline SVG in HTML, which can be recolored via JavaScript
-  show figure: it => {
-    // Check if we're exporting to HTML
-    let is-html = sys.inputs.at("html-export", default: "false") == "true"
-    
-    // Check if the figure contains a diagram (looking for Fletcher diagram elements)
-    // We'll wrap any figure body in html.frame for HTML export
-    // For PDF, render normally
-    if is-html {
-      // For HTML: wrap in html.frame to generate inline SVG
-      figure(
-        html.frame(it.body),
-        caption: it.caption,
-        kind: it.kind,
-        supplement: it.supplement,
-      )
-    } else {
-      // For PDF: render normally
-      it
-    }
-  }
+  // NOTE: html.frame is not yet available in Typst 0.14.0
+  // This show rule is ready for when the feature becomes available
+  // For now, we use the legacy dual-SVG approach
+  // Uncomment this when Typst supports html.frame:
+  // show figure: it => {
+  //   let is-html = sys.inputs.at("html-export", default: "false") == "true"
+  //   if is-html {
+  //     figure(
+  //       html.frame(it.body),
+  //       caption: it.caption,
+  //       kind: it.kind,
+  //       supplement: it.supplement,
+  //     )
+  //   } else {
+  //     it
+  //   }
+  // }
 
   // Note: HTML styling must be added after export using Bootstrap build script:
   // python3 scripts/build-html-bootstrap.py your-file.typ your-file.html
