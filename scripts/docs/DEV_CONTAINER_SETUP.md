@@ -266,6 +266,61 @@ git config --global user.name "Your Name"
 git config --global user.email "your.email@example.com"
 ```
 
+**For SSH/Remote Server Scenarios:**
+
+If you're SSH'ing into a remote server and then opening the devcontainer there, you have three options:
+
+**Option 1: Environment Variables (Recommended)**
+
+Set environment variables on the remote server before opening the devcontainer:
+
+```bash
+# On the remote server, add to ~/.bashrc or ~/.profile:
+export GIT_USER_NAME="Your Name"
+export GIT_USER_EMAIL="your.email@example.com"
+```
+
+Then reload your shell configuration:
+
+```bash
+source ~/.bashrc
+```
+
+**Option 2: SSH Environment Forwarding**
+
+Configure your local SSH client to forward git config:
+
+Add to `~/.ssh/config` on your **local machine**:
+
+```ssh
+Host your-remote-server
+    HostName your-server.com
+    User your-username
+    SendEnv GIT_USER_NAME GIT_USER_EMAIL
+```
+
+Set variables on your **local machine**:
+
+```bash
+export GIT_USER_NAME="Your Name"
+export GIT_USER_EMAIL="your.email@example.com"
+```
+
+**Note:** The remote server must accept these variables. Check that `/etc/ssh/sshd_config` includes:
+
+```text
+AcceptEnv GIT_USER_NAME GIT_USER_EMAIL
+```
+
+**Option 3: Configure Git on Remote Server**
+
+Simply configure git directly on the remote server (traditional method):
+
+```bash
+git config --global user.name "Your Name"
+git config --global user.email "your.email@example.com"
+```
+
 #### SSH Key for Git Signing (Optional but Recommended)
 
 The setup script looks for an SSH key specifically named **`id_ed25519_github.pub`** in `~/.ssh/`.
