@@ -1,0 +1,10 @@
+version: '3'
+services:
+  dev:
+    image: ghcr.io/morepet/containers/dev/typst:1.3-dev
+    volumes:
+      - .:/workspace:cached
+    working_dir: /workspace
+    command: /bin/bash
+    stdin_open: true
+    tty: true
