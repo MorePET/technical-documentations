@@ -50,8 +50,17 @@
   // )
 
   // Set text properties
+  // PDF: Libertinus Serif for beautiful typography
+  // HTML: System fonts to match Bootstrap 5.3.2
+  let is-html = sys.inputs.at("html-export", default: "false") == "true"
+  let body-font = if is-html {
+    ("system-ui", "Arial", "sans-serif")
+  } else {
+    "Libertinus Serif"
+  }
+
   set text(
-    font: "Libertinus Serif",
+    font: body-font,
     size: 10pt,
     lang: "en",
   )
