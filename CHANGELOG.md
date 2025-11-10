@@ -5,6 +5,15 @@ All notable changes to this template will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.4.1] - 2025-11-10
+
+### Fixed
+
+- **Build System**: Aligned PROJECT variable with actual source directory (#22)
+  - Changed Makefile PROJECT from `technical-documentation` to `docs`
+  - Resolves build failure where build-diagrams.py couldn't find project directory
+  - Build now correctly looks for diagrams in `/workspace/docs/diagrams`
+
 ## [0.4.0] - 2025-11-10
 
 ### Added
@@ -52,7 +61,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     - `make bump-patch`: Bump patch version (0.3.2 → 0.3.3)
     - `make bump-minor`: Bump minor version (0.3.2 → 0.4.0)
     - `make bump-major`: Bump major version (0.3.2 → 1.0.0)
-  - `docs/VERSION_MANAGEMENT.md`: Comprehensive documentation
+  - `VERSION_MANAGEMENT.md`: Comprehensive documentation
     - Single source of truth approach with pyproject.toml
     - Release workflow guidelines
     - Best practices for version management

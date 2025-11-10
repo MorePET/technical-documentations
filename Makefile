@@ -4,8 +4,8 @@
 
 .PHONY: all clean colors diagrams pdf html help check test example technical-documentation rebuild install-hook build-project build-summary check-outputs clean-outputs clean-generated server-start server-stop server-status version bump-patch bump-minor bump-major
 
-# Default project
-PROJECT ?= technical-documentation
+# Default project (matches the actual source directory)
+PROJECT ?= docs
 
 # Theme toggle configuration
 # Set to "yes" to include theme toggle button, "no" to use auto (system settings only)
@@ -43,7 +43,7 @@ technical-documentation:
 	@echo "=================================================="
 	@echo "🚀 Building Technical Documentation Project"
 	@echo "=================================================="
-	@$(MAKE) build-project SRC=$(TECH_DOC_SRC) OUT=$(TECH_DOC_OUT) PROJECT=technical-documentation
+	@$(MAKE) build-project SRC=$(TECH_DOC_SRC) OUT=$(TECH_DOC_OUT) PROJECT=docs
 	@$(MAKE) server-start
 	@$(MAKE) build-summary OUT=$(TECH_DOC_OUT)
 	@echo "🌓 Toggle dark mode with the button in top-right"
@@ -53,7 +53,13 @@ example:
 	@echo "=================================================="
 	@echo "🎨 Building Example Project"
 	@echo "=================================================="
-	@$(MAKE) build-project SRC=$(EXAMPLE_SRC) OUT=$(EXAMPLE_OUT) PROJECT=example
+	@$(MAKE) colors
+	@$(MAKE) diagrams PROJECT=example
+	@$(MAKE) python-diagrams
+	@$(MAKE) python-api
+	@$(MAKE) python-tests
+	@$(MAKE) pdf-only SRC=$(EXAMPLE_SRC) OUT=$(EXAMPLE_OUT)
+	@$(MAKE) html-only SRC=$(EXAMPLE_SRC) OUT=$(EXAMPLE_OUT)
 	@$(MAKE) server-start
 	@$(MAKE) build-summary OUT=$(EXAMPLE_OUT)
 	@echo "🌓 Toggle dark mode with the button in top-right"

@@ -8,7 +8,7 @@ For complete documentation on pull request guidelines, templates, and review pro
 
 - **[Pull Request Guidelines](./../pr-template.md)**
 - **[Git Workflow](./../git-workflow.md)**
-- **[Version Management](./../../docs/VERSION_MANAGEMENT.md)**
+- **[Version Management](./../VERSION_MANAGEMENT.md)**
 
 ## Workflow
 
@@ -23,6 +23,7 @@ When creating a pull request, follow these steps:
 
 **IMPORTANT:** Version bump and CHANGELOG update happen **during PR creation**, not after merge.
 After PR is merged to main, run `/tag-and-release` directly to create the git tag and GitHub release.
+We start with version bump only then edit the changelog
 
 **AI analyzes your changes, suggests version bump, and generates CHANGELOG:**
 
