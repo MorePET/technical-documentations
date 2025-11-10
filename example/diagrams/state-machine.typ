@@ -3,7 +3,7 @@
 
 // State Machine Diagram
 #set page(width: auto, height: auto, margin: 5mm)
-#set text(font: "Libertinus Serif", size: 10pt)
+#set text(font: "Libertinus Serif", size: 10pt, fill: text-c)
 
 #align(center)[
   #diagram(

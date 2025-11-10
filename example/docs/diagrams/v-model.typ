@@ -2,8 +2,8 @@
 #import "/lib/generated/colors.typ": text-c, stroke-c, node-bg-blue, node-bg-blue-light, node-bg-green, node-bg-orange, gradient-end-blue
 
 // V-Model Diagram
-#set page(width: auto, height: auto, margin: 5mm)
-#set text(font: "Libertinus Serif", size: 9pt)
+#set page(width: auto, height: auto, margin: 5mm, fill: none)
+#set text(font: "Libertinus Serif", size: 9pt, fill: text-c)
 
 #align(center)[
   #diagram(
