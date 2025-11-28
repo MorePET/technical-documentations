@@ -206,7 +206,7 @@ This validates:
 1. Clone this repository
 2. Open the folder in VS Code
 3. When prompted, click **"Reopen in Container"**
-   - Or use Command Palette (F1): "Dev Containers: Reopen in Container"
+   - Or use Command Palette: "Dev Containers: Reopen in Container"
 4. Container will pull and initialize (first time: 2-3 minutes)
 5. Watch initialization output for:
    - ✅ Container image pulled successfully
@@ -298,31 +298,31 @@ make
 - Need to remember the correct command and flags
 - No automatic devcontainer.json integration
 
-### Option 2: Podman Compose
+### Option 2: Podman Compose (not tested)
 
-Use `podman-compose` for a more declarative approach with persistent configuration.
+Use `podman compose` for a more declarative approach with persistent configuration.
 
-**Install podman-compose:**
+**Install docker compose:**
 
 ```bash
 # Using pip
-pip install podman-compose
+pip install docker-compose
 
 # Or using system package manager (Fedora/RHEL)
-sudo dnf install podman-compose
+sudo dnf install docker-compose
 
 # Or using system package manager (Debian/Ubuntu)
-sudo apt install podman-compose
+sudo apt install docker-compose
 ```
 
 **Start the container:**
 
 ```bash
 # Start in detached mode
-podman-compose up -d
+podman compose up -d
 
 # Attach to the running container
-podman-compose exec dev /bin/bash
+podman compose exec dev /bin/bash
 ```
 
 **Inside the container, run initialization scripts:**
@@ -339,7 +339,7 @@ make
 **Stop the container:**
 
 ```bash
-podman-compose down
+podman compose down
 ```
 
 **Configuration file:** The repository includes `podman-compose.yml` with proper settings:
@@ -391,39 +391,6 @@ The Dev Container CLI automatically:
 - ✅ Mounts volumes correctly
 - ✅ Installs VS Code extensions (when used with VS Code)
 
-**Pros:**
-- **Best option for full compatibility** with devcontainer.json
-- Automatic script execution in correct order
-- Supports all devcontainer features (extensions, settings, lifecycle scripts)
-- Works with Podman via `--docker-path` flag
-- Can be used in CI/CD pipelines
-
-**Cons:**
-- Requires Node.js and npm
-- More complex installation
-- Slight learning curve for CLI commands
-
-### Comparison Table
-
-| Feature | Direct CLI | Podman Compose | Dev Container CLI |
-|---------|------------|----------------|-------------------|
-| **Setup Complexity** | Low | Medium | Medium |
-| **Dependencies** | Podman only | Podman + podman-compose | Podman + Node.js + npm |
-| **Script Automation** | Manual | Manual | Automatic ✅ |
-| **devcontainer.json Support** | None | None | Full ✅ |
-| **Flexibility** | Highest | High | Medium |
-| **Best For** | Quick tests, scripting | Persistent dev environments | Full devcontainer compatibility |
-
-### Recommendation
-
-- **Use Option 1 (Direct CLI)** for quick testing or one-off builds
-- **Use Option 2 (Podman Compose)** if you prefer docker-compose workflow
-- **Use Option 3 (Dev Container CLI)** for the most complete devcontainer experience
-
-**Still prefer VS Code integration?** See [Quick Start](#quick-start) for using VS Code's built-in Dev Containers extension, which provides the best IDE integration.
-
-## Features
-
 ### Documentation Generation
 
 - **Dual Output Format**: Generate both PDF and HTML from the same Typst source
@@ -473,36 +440,6 @@ make clean              # Remove all build artifacts
 make rebuild            # Clean and rebuild everything
 ```
 
-### Component Targets
-
-```bash
-make colors             # Generate color files from colors.json
-make diagrams           # Compile all diagrams for current project
-make pdf                # Compile PDF only
-make html               # Compile HTML with Bootstrap styling
-```
-
-### Server Control
-
-```bash
-make server-start       # Start development server on port 8000
-make server-stop        # Stop the development server
-make server-status      # Check if server is running
-```
-
-### Configuration Options
-
-```bash
-# Disable theme toggle (use system preference only)
-make THEME_TOGGLE=no
-
-# Build specific project
-make PROJECT=example
-
-# Compile diagrams for specific project
-make diagrams PROJECT=example
-```
-
 ## Project Structure
 
 ```text
@@ -538,257 +475,3 @@ workspace/
 └── Makefile                      # Build system
 ```
 
-## Creating Documentation
-
-### 1. Create Your Document
-
-Edit `docs/main.typ`:
-
-```typst
-#import "../lib/technical-documentation-package.typ": *
-
-#show: tech-doc.with(
-  title: "My Technical Documentation",
-  authors: ("Your Name",),
-  date: datetime.today(),
-)
-
-= Introduction
-
-Your content here...
-```
-
-### 2. Add Diagrams
-
-Create diagrams in `docs/diagrams/`:
-
-```typst
-// diagrams/architecture.typ
-#import "../../lib/generated/colors.typ": *
-#import "@preview/fletcher:0.5.8" as fletcher: diagram, edge, node
-
-#set page(width: auto, height: auto, margin: 1em, fill: none)
-
-#align(center)[
-  #diagram(
-    node-stroke: 1pt,
-    node-fill: node-bg-blue,
-    spacing: 5em,
-
-    node((0, 0), [Frontend]),
-    node((1, 0), [Backend]),
-    edge((0, 0), (1, 0), [API], "->"),
-  )
-]
-```
-
-### 3. Include Diagrams
-
-In your main document:
-
-```typst
-#figure(
-  image("build/diagrams/architecture.svg"),
-  caption: [System Architecture]
-)
-```
-
-### 4. Build
-
-```bash
-make
-```
-
-## Available Functions
-
-Import from the package:
-
-```typst
-#import "../lib/technical-documentation-package.typ": *
-```
-
-### Document Template
-
-- `tech-doc()` - Main document template with proper styling
-
-### Diagram Helpers
-
-- `architecture-diagram()` - System architecture diagrams
-- `data-flow-diagram()` - Data flow diagrams
-- `state-diagram()` - State machine diagrams
-
-### Typography
-
-- `nuclide()` - Isotope notation (⁴⁴Sc, ⁶⁸Ga, ¹⁸F)
-- `beta-plus()` - β⁺ particle
-- `beta-minus()` - β⁻ particle
-
-See `lib/NOTATIONS-README.md` for complete notation reference.
-
-## Python API Documentation
-
-Generate API documentation from Python source code:
-
-```bash
-# Generate API docs for your Python project
-make python-api
-
-# Run tests and generate coverage
-make python-tests
-
-# Compile Python-specific diagrams
-make python-diagrams
-```
-
-The system uses `griffe` to extract API information and generates Typst documentation automatically.
-
-## Customization
-
-### Colors
-
-Edit `lib/colors.json` to customize the color palette:
-
-```json
-{
-  "light": {
-    "primary": "#0066cc",
-    "background": "#ffffff",
-    ...
-  },
-  "dark": {
-    "primary": "#4dabf7",
-    "background": "#1a1a1a",
-    ...
-  }
-}
-```
-
-Run `make colors` to regenerate color files.
-
-### HTML Styling
-
-Edit `lib/styles-bootstrap.css` for custom HTML styling. The template uses Bootstrap 5.3 as a base.
-
-### Build Process
-
-The `Makefile` orchestrates the complete build process:
-
-1. **Color Generation**: `lib/colors.json` → `lib/generated/colors.typ`
-2. **Diagram Compilation**: `diagrams/*.typ` → `build/diagrams/*.svg`
-3. **PDF Build**: Typst compilation with all resources
-4. **HTML Build**: Typst HTML export + Bootstrap styling + cache-busting
-5. **Server Start**: Live-server or Python HTTP server
-
-## Development Server
-
-The template includes a smart development server:
-
-- **Primary**: `live-server` (Node.js) with auto-reload on file changes
-- **Fallback**: Python `ThreadingHTTPServer` if live-server unavailable
-- **Port**: 8000 by default
-- **Features**: Proper CORS headers, cache control, concurrent requests
-
-Control the server:
-
-```bash
-make server-start   # Start server
-make server-stop    # Stop server
-make server-status  # Check status
-```
-
-## Dark Mode
-
-HTML output automatically supports dark mode:
-
-- **System Detection**: Respects `prefers-color-scheme`
-- **Manual Toggle**: Button in top-right corner (optional)
-- **Persistence**: Choice saved in localStorage
-- **Diagrams**: All diagrams switch colors automatically
-
-Disable the toggle button:
-
-```bash
-make THEME_TOGGLE=no
-```
-
-## Example Project
-
-The `example/` directory contains a complete reference implementation:
-
-- Technical documentation following V-Model structure
-- Multiple diagram types (architecture, data flow, state machine)
-- Stakeholder analysis with data from multiple sources (CSV, JSON, YAML)
-- Python API documentation integration
-- Test coverage integration
-
-Build it:
-
-```bash
-make example
-```
-
-## Tips
-
-1. **Multiple Projects**: Create new folders at workspace root, each with `docs/main.typ` and `docs/diagrams/` subdirectories
-2. **Live Reload**: Use `live-server` for best development experience with auto-reload
-3. **Diagram Organization**: Group related diagrams in subdirectories under `diagrams/`
-4. **Color Consistency**: Use generated color variables from `lib/generated/colors.typ` in diagrams
-5. **Version Control**: Build outputs (`build/` directories) are gitignored by default
-
-## Documentation
-
-- **Build System**: See `Makefile` for all targets and options
-- **Git Workflow**: See `docs/git-workflow.md` for commit conventions
-- **Devcontainer**: See `docs/devcontainer-setup.md` for environment details
-- **Linting**: See `docs/linter-precommit-guide.md` for code quality tools
-
-## Protected Configuration Files
-
-This repository protects critical linting configuration files from accidental modifications:
-
-### Protected Files
-
-- `.pre-commit-config.yaml` - Pre-commit hooks
-- `pyproject.toml` - Python dependencies and tools
-- `.hadolint.yaml` - Container linting
-- `.checkmake.ini` - Makefile linting
-- `.yamllint` - YAML linting
-
-These files are set to **read-only (444 permissions)** in the devcontainer.
-
-### Editing Protected Files
-
-```bash
-# Use the helper script
-edit-protected .pre-commit-config.yaml
-
-# Or manually
-chmod 644 .pre-commit-config.yaml
-vim .pre-commit-config.yaml
-chmod 444 .pre-commit-config.yaml
-```
-
-The protection is local-only and doesn't affect CI/CD workflows.
-
-## Manual Setup (Without Devcontainer)
-
-If you prefer not to use the devcontainer:
-
-- Typst 0.12+
-- Python 3.12+
-- Node.js (optional, for live-server)
-- Make
-
-## License
-
-See LICENSE file for details.
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch (`feature/my-feature`)
-3. Follow conventional commit format (enforced by gitlint)
-4. Ensure all pre-commit hooks pass
-5. Submit a pull request
-
-See `docs/git-workflow.md` for detailed guidelines.
