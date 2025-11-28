@@ -13,11 +13,7 @@ documentation generation.
 
 You need **one** of the following:
 
-- **Docker Desktop** (recommended for macOS/Windows)
-  - [Download Docker Desktop](https://www.docker.com/products/docker-desktop/)
-  - Ensure Docker Desktop is running before opening the devcontainer
-
-- **Podman** (alternative, works on Linux/macOS/Windows)
+- **Podman**
   - [Podman Desktop](https://podman-desktop.io/) GUI application, or
   - [Podman CLI](https://podman.io/docs/installation) command-line only
   - Ensure podman machine is initialized and running (macOS/Windows):
@@ -29,6 +25,10 @@ You need **one** of the following:
 
   - On Linux, podman runs natively without a machine
 
+- **Docker Desktop** (alternative)
+  - [Download Docker Desktop](https://www.docker.com/products/docker-desktop/)
+  - Ensure Docker Desktop is running before opening the devcontainer
+  - 
 ### Development Environment
 
 - **VS Code** with **Dev Containers extension**
